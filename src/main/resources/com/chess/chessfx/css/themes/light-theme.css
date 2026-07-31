@@ -1,0 +1,12 @@
+.root {
+    -bg-colour1: #cee5fd;
+    -bg-colour2: #8a9fac;
+
+    -fg-colour1: #22c3bd;
+    -fg-colour2: #742bcd;
+    -accent1: #21e4ce;
+
+
+    -light-tile: linear-gradient(to bottom, #eef3fb, #dfe7f6);
+    -dark-tile: linear-gradient(to bottom, #8da3c7, #6e87b2);
+}
