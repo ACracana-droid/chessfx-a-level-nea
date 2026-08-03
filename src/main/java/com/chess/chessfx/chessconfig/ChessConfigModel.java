@@ -3,10 +3,8 @@ package com.chess.chessfx.chessconfig;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Properties;
 
 public class ChessConfigModel {
@@ -14,6 +12,7 @@ public class ChessConfigModel {
 
     private int height;
     private int width;
+    private ChangedFenManager fen;
 
     /// There are 3 main game types to consider:
     /// 1. player vs player
@@ -22,7 +21,7 @@ public class ChessConfigModel {
     /// There is more if we consider doing any server based stuff:
     /// 4. peer vs peer (?)
     ///
-    StringProperty gamePlayers = new SimpleStringProperty();
+    private final StringProperty gamePlayers = new SimpleStringProperty();
 
     public ChessConfigModel(String propertiesName) {
         Properties properties = new Properties();
@@ -30,18 +29,17 @@ public class ChessConfigModel {
             InputStream stream = getClass().getResourceAsStream(propertiesName);
             properties.load(stream);
         } catch (IOException e) {
-            // Should be updated if we allow saving of configs for user.
-            // Otherwise, the jar cannot change.
-            System.out.println("This should not happen.");
+            System.out.println("This should not happen.\npropertiesName: " + propertiesName);
             e.printStackTrace();
         }
+
         gamePlayers.set(properties.getProperty("gameType"));
+        fen = new ChangedFenManager(properties.getProperty("changedFEN"));
         height = Integer.parseInt(properties.getProperty("height"));
-        height = Integer.parseInt(properties.getProperty("width"));
+        width = Integer.parseInt(properties.getProperty("width"));
     }
 
     public ChessConfigModel() {
-        // Default Constructor
     }
 
     public int getHeight() {
@@ -50,5 +48,17 @@ public class ChessConfigModel {
 
     public int getWidth() {
         return width;
+    }
+
+    public final String getGamePlayers() {
+        return gamePlayers.get();
+    }
+
+    public final StringProperty gamePlayersProperty() {
+        return gamePlayers;
+    }
+
+    public ChangedFenManager getFen() {
+        return fen;
     }
 }

@@ -1,6 +1,7 @@
 package com.chess.chessfx;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
+import com.chess.chessfx.gameui.GameLayoutBuilder;
 import com.chess.chessfx.menu.MenuLayoutBuilder;
 import javafx.animation.FadeTransition;
 import javafx.scene.layout.BorderPane;

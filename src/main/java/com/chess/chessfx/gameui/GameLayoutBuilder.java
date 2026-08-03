@@ -1,6 +1,7 @@
-package com.chess.chessfx;
+package com.chess.chessfx.gameui;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
+import com.chess.chessfx.engine.BoardRepresentation;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -21,7 +22,7 @@ public class GameLayoutBuilder implements Builder<Region> {
 
     private void makeChessboardGUI(BoardRepresentation representation) {
         rootPane.setCenter(null);
-        rootPane.setTop(turnCounterHBox(representation.getTurnCountProperty()));
+        rootPane.setTop(turnCounterHBox(representation.getFullMoveCounter()));
     }
 
     private HBox turnCounterHBox(IntegerProperty turnCountProperty) {
@@ -53,6 +54,7 @@ public class GameLayoutBuilder implements Builder<Region> {
     // This is where a user is directed after pressing play.
     // Due to threading, this likely happens during the `manageLayoutAnimation()`
     // in RootWrapperBuilder.
+
     public void startup() {
         // chess config is updated as soon as a play button is pressed
         // (which is also when this method occurs).
