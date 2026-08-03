@@ -1,44 +1,41 @@
 package com.chess.chessfx.engine;
 
-import com.chess.chessfx.chessconfig.ChangedFenManager;
 import com.chess.chessfx.chessconfig.ChessConfigModel;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BoardRepresentation {
 
-    IntegerProperty fullMoveCounter;
-    IntegerProperty halfMoveCounter;
+    IntegerProperty fullmoveCounter;
+    IntegerProperty halfmoveClock; // used for 50 move draw rule (since last capture or pawn advance)
+    int halfmoveClockRuleNumber; // used for changing '50' halfmove draw rule
 
-    ChessConfigModel chessConfig;
+    private final ChessConfigModel chessConfig;
 
     final int BOARD_HEIGHT;
     final int BOARD_WIDTH;
+
+    Tile[][] board;
 
     public BoardRepresentation(ChessConfigModel chessConfig) {
         this.chessConfig = chessConfig;
 
         BOARD_HEIGHT = chessConfig.getHeight();
         BOARD_WIDTH = chessConfig.getWidth();
-        ChangedFenManager fen = chessConfig.getFen();
-        fullMoveCounter = new SimpleIntegerProperty(fen.getFullMoveNumber());
-        halfMoveCounter = new SimpleIntegerProperty(fen.getHalfMoveNumber());
+        board = chessConfig.getGameBoard();
+        fullmoveCounter = new SimpleIntegerProperty(chessConfig.getFullmoveNumber());
+        halfmoveClock = new SimpleIntegerProperty(chessConfig.getHalfmoveClock());
+        halfmoveClockRuleNumber = chessConfig.getHalfmoveClockRuleNumber();
     }
 
-    public List<List<Tile>> getBoardData() {
-        List<List<Tile>> boardTiles = new ArrayList<>();
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-
-            }
-        }
-        return boardTiles;
+    public IntegerProperty fullmoveCounterProperty() {
+        return fullmoveCounter;
     }
 
-    public IntegerProperty getFullMoveCounter() {
-        return fullMoveCounter;
+    public Tile[][] getBoardAsTileArray2D() {
+        return board;
+    }
+    public ChessConfigModel getChessConfig() {
+        return chessConfig;
     }
 }

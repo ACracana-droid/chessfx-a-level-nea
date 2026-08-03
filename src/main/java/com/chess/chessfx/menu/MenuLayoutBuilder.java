@@ -28,14 +28,14 @@ public class MenuLayoutBuilder implements Builder<Region> {
 
     private Node makeQuickPlayerVsPlayerButton() {
         PlayButton button = new PlayButton(changeLayoutToGame,
-                () -> chessConfig = new ChessConfigModel("defaultPlayerVsPlayer.properties"));
+                () -> chessConfig.setChessConfigFromPropertiesResource("defaultPlayerVsPlayer.properties"));
         button.setText("Quick Player Vs Player");
         return button;
     }
 
     private Node makeQuickPlayVsBotButton() {
         PlayButton button = new PlayButton(changeLayoutToGame,
-                () -> chessConfig = new ChessConfigModel("defaultPlayerVsBot.properties"));
+                () -> chessConfig.setChessConfigFromPropertiesResource("defaultPlayerVsBot.properties"));
         button.setText("Quick Player Vs Bot");
         return button;
     }

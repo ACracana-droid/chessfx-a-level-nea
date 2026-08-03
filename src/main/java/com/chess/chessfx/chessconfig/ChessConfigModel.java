@@ -1,7 +1,6 @@
 package com.chess.chessfx.chessconfig;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import com.chess.chessfx.engine.Tile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +11,9 @@ public class ChessConfigModel {
 
     private int height;
     private int width;
-    private ChangedFenManager fen;
+    private FenManager fen;
+    private int halfmoveClockRuleNumber;
+    private EnPassantRule enPassantRule;
 
     /// There are 3 main game types to consider:
     /// 1. player vs player
@@ -21,9 +22,14 @@ public class ChessConfigModel {
     /// There is more if we consider doing any server based stuff:
     /// 4. peer vs peer (?)
     ///
-    private final StringProperty gamePlayers = new SimpleStringProperty();
+    private String gamePlayers;
 
-    public ChessConfigModel(String propertiesName) {
+    // create object without specifying any config.
+    public ChessConfigModel() {
+    }
+
+    // used to be a constructor, works better as method.
+    public void setChessConfigFromPropertiesResource(String propertiesName) {
         Properties properties = new Properties();
         try {
             InputStream stream = getClass().getResourceAsStream(propertiesName);
@@ -33,13 +39,16 @@ public class ChessConfigModel {
             e.printStackTrace();
         }
 
-        gamePlayers.set(properties.getProperty("gameType"));
-        fen = new ChangedFenManager(properties.getProperty("changedFEN"));
+        gamePlayers = (properties.getProperty("gameType"));
+        fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"), properties.getProperty("fen"));
         height = Integer.parseInt(properties.getProperty("height"));
         width = Integer.parseInt(properties.getProperty("width"));
-    }
+        halfmoveClockRuleNumber = Integer.parseInt(properties.getProperty("halfmoveClockRuleNumber"));
+        // if halfmoveClockRuleNumber == 0, this is equivalent to disabling the halfmove clock
+        enPassantRule = EnPassantRule.parseRule(properties.getProperty("enPassantRule"));
+        // can change how en passant works
 
-    public ChessConfigModel() {
+
     }
 
     public int getHeight() {
@@ -50,15 +59,23 @@ public class ChessConfigModel {
         return width;
     }
 
-    public final String getGamePlayers() {
-        return gamePlayers.get();
+    public Tile[][] getGameBoard() {
+        return fen.getGameBoard(height, width);
     }
 
-    public final StringProperty gamePlayersProperty() {
-        return gamePlayers;
+    public EnPassantRule getEnPassantRule() {
+        return enPassantRule;
     }
 
-    public ChangedFenManager getFen() {
-        return fen;
+    public int getFullmoveNumber() {
+        return fen.getFullmoveNumber();
+    }
+
+    public int getHalfmoveClock() {
+        return fen.getHalfmoveClock();
+    }
+
+    public int getHalfmoveClockRuleNumber() {
+        return halfmoveClockRuleNumber;
     }
 }

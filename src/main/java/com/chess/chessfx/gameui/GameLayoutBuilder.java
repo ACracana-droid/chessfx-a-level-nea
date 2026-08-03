@@ -20,11 +20,6 @@ public class GameLayoutBuilder implements Builder<Region> {
         this.chessConfig = chessConfig;
     }
 
-    private void makeChessboardGUI(BoardRepresentation representation) {
-        rootPane.setCenter(null);
-        rootPane.setTop(turnCounterHBox(representation.getFullMoveCounter()));
-    }
-
     private HBox turnCounterHBox(IntegerProperty turnCountProperty) {
         HBox hBox = new HBox(makeTimer(), makeTurnCounter(turnCountProperty));
         hBox.getStyleClass().add("game-top-hbox");
@@ -60,5 +55,10 @@ public class GameLayoutBuilder implements Builder<Region> {
         // (which is also when this method occurs).
         boardRepresentation = new BoardRepresentation(chessConfig);
         makeChessboardGUI(boardRepresentation);
+    }
+
+    private void makeChessboardGUI(BoardRepresentation representation) {
+        rootPane.setCenter(new ChessBoard(representation));
+        rootPane.setTop(turnCounterHBox(representation.fullmoveCounterProperty()));
     }
 }

@@ -14,4 +14,6 @@ module com.chess.chessfx {
     opens com.chess.chessfx.engine to javafx.fxml;
     exports com.chess.chessfx.gameui;
     opens com.chess.chessfx.gameui to javafx.fxml;
+    exports com.chess.chessfx.engine.pieces;
+    opens com.chess.chessfx.engine.pieces to javafx.fxml;
 }

@@ -27,15 +27,14 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
         ChessConfigModel chessConfig = new ChessConfigModel();
 
         // Layouts contain their layout changes and the accompanying animation.
-        GameLayoutBuilder gameLayoutBuilder = new GameLayoutBuilder(
-                () -> fadingLayoutChange(gameLayout, menuLayout),
-                chessConfig);
+        GameLayoutBuilder gameLayoutBuilder = new GameLayoutBuilder(() ->
+                fadingLayoutChange(gameLayout, menuLayout), chessConfig);
 
         gameLayout = gameLayoutBuilder.build();
 
         menuLayout = new MenuLayoutBuilder(() -> {
             fadingLayoutChange(menuLayout, gameLayout);
-            gameLayoutBuilder.startup(); //necessary to configure
+            gameLayoutBuilder.startup(); // necessary to configure
             // and build board when switching to game
         }, chessConfig).build();
 

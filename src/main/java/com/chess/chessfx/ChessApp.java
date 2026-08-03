@@ -17,7 +17,8 @@ public class ChessApp extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
                 "css/themes/" + propertiesManager.getThemeFileName()
         )).toExternalForm());
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/style.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
+                "css/style.css")).toExternalForm());
         stage.setTitle("Chess App");
         stage.setScene(scene);
         stage.show();
