@@ -1,6 +1,7 @@
 package com.chess.chessfx.engine;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
+import com.chess.chessfx.engine.tiles.TileParent;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
@@ -12,17 +13,14 @@ public class BoardRepresentation {
 
     private final ChessConfigModel chessConfig;
 
-    final int BOARD_HEIGHT;
-    final int BOARD_WIDTH;
 
-    Tile[][] board;
+    TileParent[][] board;
 
     public BoardRepresentation(ChessConfigModel chessConfig) {
         this.chessConfig = chessConfig;
 
-        BOARD_HEIGHT = chessConfig.getHeight();
-        BOARD_WIDTH = chessConfig.getWidth();
         board = chessConfig.getGameBoard();
+
         fullmoveCounter = new SimpleIntegerProperty(chessConfig.getFullmoveNumber());
         halfmoveClock = new SimpleIntegerProperty(chessConfig.getHalfmoveClock());
         halfmoveClockRuleNumber = chessConfig.getHalfmoveClockRuleNumber();
@@ -32,10 +30,15 @@ public class BoardRepresentation {
         return fullmoveCounter;
     }
 
-    public Tile[][] getBoardAsTileArray2D() {
+    public TileParent[][] getBoardAsTileArray2D() {
+        if (board == null) {
+            System.out.println("Board was null. bad");
+        }
         return board;
     }
+
     public ChessConfigModel getChessConfig() {
         return chessConfig;
     }
+
 }

@@ -20,6 +20,8 @@ public class ChessApp extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
                 "css/style.css")).toExternalForm());
         stage.setTitle("Chess App");
+        stage.setMinHeight(400);
+        stage.setMinWidth(400);
         stage.setScene(scene);
         stage.show();
     }

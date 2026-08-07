@@ -1,12 +1,15 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
+    <inspection_tool class="AutoCloseableResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="METHOD_MATCHER_CONFIG" value="java.util.Formatter,format,java.io.Writer,append,com.google.common.base.Preconditions,checkNotNull,org.hibernate.Session,close,java.io.PrintWriter,printf,java.io.PrintStream,printf,java.lang.foreign.Arena,ofAuto,java.lang.foreign.Arena,global,java.lang.Class,getResourceAsStream" />
+    </inspection_tool>
     <inspection_tool class="CssUnknownProperty" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myCustomPropertiesEnabled" value="true" />
       <option name="myIgnoreVendorSpecificProperties" value="false" />
       <option name="myCustomPropertiesList">
         <value>
-          <list size="8">
+          <list size="11">
             <item index="0" class="java.lang.String" itemvalue="-fx-border-color" />
             <item index="1" class="java.lang.String" itemvalue="-fx-alignment" />
             <item index="2" class="java.lang.String" itemvalue="-fx-spacing" />
@@ -15,6 +18,9 @@
             <item index="5" class="java.lang.String" itemvalue="-fx-background-color" />
             <item index="6" class="java.lang.String" itemvalue="-fx-border-radius" />
             <item index="7" class="java.lang.String" itemvalue="-fx-border-width" />
+            <item index="8" class="java.lang.String" itemvalue="-fx-opacity" />
+            <item index="9" class="java.lang.String" itemvalue="-fx-visible" />
+            <item index="10" class="java.lang.String" itemvalue="-fx-font-family" />
           </list>
         </value>
       </option>

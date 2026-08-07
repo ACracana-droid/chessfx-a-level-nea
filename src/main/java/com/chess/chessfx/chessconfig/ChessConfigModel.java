@@ -1,10 +1,11 @@
 package com.chess.chessfx.chessconfig;
 
-import com.chess.chessfx.engine.Tile;
+import com.chess.chessfx.engine.tiles.TileParent;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Set;
 
 public class ChessConfigModel {
     // This is a model that can transfer information between both layout builder classes.
@@ -14,7 +15,10 @@ public class ChessConfigModel {
     private FenManager fen;
     private int halfmoveClockRuleNumber;
     private EnPassantRule enPassantRule;
+    private int tileCheckerboardOffset;
+    private TileParent[][] board;
 
+    private String allPiecesInGame;
     /// There are 3 main game types to consider:
     /// 1. player vs player
     /// 2. player vs bot
@@ -40,7 +44,9 @@ public class ChessConfigModel {
         }
 
         gamePlayers = (properties.getProperty("gameType"));
-        fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"), properties.getProperty("fen"));
+//        System.out.println(properties.getProperty("fen"));
+        fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"),
+                properties.getProperty("fen"));
         height = Integer.parseInt(properties.getProperty("height"));
         width = Integer.parseInt(properties.getProperty("width"));
         halfmoveClockRuleNumber = Integer.parseInt(properties.getProperty("halfmoveClockRuleNumber"));
@@ -48,7 +54,11 @@ public class ChessConfigModel {
         enPassantRule = EnPassantRule.parseRule(properties.getProperty("enPassantRule"));
         // can change how en passant works
 
+        // 1 or 0
+        tileCheckerboardOffset = Integer.parseInt(properties.getProperty("tileCheckerboardOffset"));
 
+        // these must be in this order.
+        board = fen.getGameBoard(height, width);
     }
 
     public int getHeight() {
@@ -59,8 +69,8 @@ public class ChessConfigModel {
         return width;
     }
 
-    public Tile[][] getGameBoard() {
-        return fen.getGameBoard(height, width);
+    public TileParent[][] getGameBoard() {
+        return board;
     }
 
     public EnPassantRule getEnPassantRule() {
@@ -77,5 +87,13 @@ public class ChessConfigModel {
 
     public int getHalfmoveClockRuleNumber() {
         return halfmoveClockRuleNumber;
+    }
+
+    public int getTileCheckerboardOffset() {
+        return tileCheckerboardOffset;
+    }
+
+    public Set<String> getInstantiatedPiecesIdSet() {
+        return fen.getInstantiatedPieceIdSet();
     }
 }

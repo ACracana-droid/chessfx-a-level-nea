@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 
+
 public class GameLayoutBuilder implements Builder<Region> {
 
     Runnable changeLayoutToMenu;
@@ -45,11 +46,13 @@ public class GameLayoutBuilder implements Builder<Region> {
         return rootPane;
     }
 
-    // TIP: here is the entry point for the game.
-    // This is where a user is directed after pressing play.
-    // Due to threading, this likely happens during the `manageLayoutAnimation()`
-    // in RootWrapperBuilder.
-
+    /**
+     * <b>The entry point for the chess game.</b>
+     * This is where a user is directed after pressing a play button.
+     * <p>
+     * Due to threading, this likely happens during the `manageLayoutAnimation()`
+     * in RootWrapperBuilder.
+     */
     public void startup() {
         // chess config is updated as soon as a play button is pressed
         // (which is also when this method occurs).
@@ -58,7 +61,7 @@ public class GameLayoutBuilder implements Builder<Region> {
     }
 
     private void makeChessboardGUI(BoardRepresentation representation) {
-        rootPane.setCenter(new ChessBoard(representation));
+        rootPane.setCenter(new ChessBoardBuilder(representation).build());
         rootPane.setTop(turnCounterHBox(representation.fullmoveCounterProperty()));
     }
 }

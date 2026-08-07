@@ -15,7 +15,28 @@
         <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.github.hervegirod</groupId>
+            <artifactId>fxsvgimage</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hervegirod</groupId>
+            <artifactId>fxsvgimage</artifactId>
+            <version>1.7.3</version>
+            <classifier>cssparser</classifier>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -52,10 +73,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                        <release>21</release>
-<!--                    <source>9</source>-->
-<!--                    I changed this from 8 to 9-->
-<!--                    <target>9</target>-->
+                    <release>21</release>
+                    <!--                    <source>9</source>-->
+                    <!--                    I changed this from 8 to 9-->
+                    <!--                    <target>9</target>-->
                 </configuration>
             </plugin>
             <plugin>

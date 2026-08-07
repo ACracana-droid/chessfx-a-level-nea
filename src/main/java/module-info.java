@@ -3,6 +3,8 @@ module com.chess.chessfx {
     requires javafx.fxml;
 
     requires org.kordamp.ikonli.javafx;
+    requires java.desktop;
+    requires org.girod.javafx.svgimage;
 
     opens com.chess.chessfx to javafx.fxml;
     exports com.chess.chessfx;
@@ -16,4 +18,10 @@ module com.chess.chessfx {
     opens com.chess.chessfx.gameui to javafx.fxml;
     exports com.chess.chessfx.engine.pieces;
     opens com.chess.chessfx.engine.pieces to javafx.fxml;
+    exports com.chess.chessfx.engine.tiles;
+    opens com.chess.chessfx.engine.tiles to javafx.fxml;
+    exports com.chess.chessfx.gameui.pieces;
+    opens com.chess.chessfx.gameui.pieces to javafx.fxml;
+    exports com.chess.chessfx.gameui.tiles;
+    opens com.chess.chessfx.gameui.tiles to javafx.fxml;
 }

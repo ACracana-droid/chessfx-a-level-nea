@@ -2,6 +2,7 @@ package com.chess.chessfx.menu;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 
@@ -21,9 +22,23 @@ public class MenuLayoutBuilder implements Builder<Region> {
 
     private Node createOptionsHBox() {
         VBox vBox = new VBox(makeQuickPlayVsBotButton(),
-                makeQuickPlayerVsPlayerButton());
+                makeQuickPlayerVsPlayerButton(),
+                makeWildCardButton(),
+                makeMoreOptionsButton()
+                );
         vBox.getStyleClass().add("options-vbox");
         return vBox;
+    }
+
+    private Node makeMoreOptionsButton() {
+        return new Button("See more (doesn't work yet)");
+    }
+
+    private Node makeWildCardButton() {
+        PlayButton button = new PlayButton(changeLayoutToGame,
+                () -> chessConfig.setChessConfigFromPropertiesResource("reallyBigBasicChess.properties"));
+        button.setText("Wildcard 2 player");
+        return button;
     }
 
     private Node makeQuickPlayerVsPlayerButton() {
