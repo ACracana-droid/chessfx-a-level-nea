@@ -1,87 +1,27 @@
 /*
+
+
+  ░██████      ░██               ░██
+ ░██   ░██     ░██               ░██
+░██         ░████████ ░██    ░██ ░██  ░███████
+ ░████████     ░██    ░██    ░██ ░██ ░██    ░██
+        ░██    ░██    ░██    ░██ ░██ ░█████████
+ ░██   ░██     ░██    ░██   ░███ ░██ ░██
+  ░██████       ░████  ░█████░██ ░██  ░███████
+                             ░██
+                       ░███████
+
+
     This is the main css file for the project.
     Here, I use css variables which are defined in a theme file.
     This means that colour palettes can be changed easily if the theme file is changed.
 */
 
-/* This wrapper defines some defaults that are inherited by the elements it contains (everything)*/
+
 @import "fonts.css";
+@import "menu.css";
+@import "pieces.css";
+@import "tiles.css";
 
-.root-wrapper-pane {
-    /*-fx-border-color: -accent1;*/
-    -fx-background-color: -bg-colour1;
-    -fx-border-radius: 14px;
-    -fx-border-width: 5px;
-}
 
-.options-vbox {
-    -fx-spacing: 20px;
-    -fx-font-size: 20px;
-    -fx-alignment: center;
-}
-
-.menu-play-button {
-    /*-fx-alignment: center-left;*/
-}
-
-.game-top-hbox {
-    -fx-border-color: -accent1;
-    -fx-alignment: center;
-    -fx-spacing: 30px;
-    -fx-padding: 30px, 30px, 30px, 30px;
-    -fx-font-size: 30;
-}
-
-.turn-counter {
-    -fx-background-color: -bg-colour2;
-    -fx-color: -fg-colour1;
-    -fx-alignment: center;
-}
-
-/*
-For the chessboard:
-
-    Inheritance doesn't work like in java, I have to apply the style classes manually.
-    I can still choose to take an inheritance approach if I end up putting some useful utility
-    in `.tile-parent`.
-*/
-/* WRAPPER (GridPane) */
-.chessboard {
-    -fx-alignment: center;
-}
-
-/* TYPES */
-.tile-parent {
-
-}
-
-/* of the standard `Tile` class */
-.chess-tile {
-
-}
-
-.barrier-tile {
-    /*    Dimmed from usual colour   */
-}
-
-.void-tile {
-    -fx-opacity: 0.0;
-    -fx-visible: false;
-}
-
-/* For Dev use, to see when a tile is null.*/
-.null-tile {
-    -fx-opacity: 0.6;
-    -fx-border-color: red;
-}
-
-/* COLOURS */
-
-.light-tile {
-    -fx-background-color: -light-tile;
-}
-
-.dark-tile {
-    -fx-background-color: -dark-tile;
-}
 

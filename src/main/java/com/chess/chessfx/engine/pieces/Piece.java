@@ -15,7 +15,8 @@ abstract public class Piece {
 
     PieceSpriteFactory imageController;
 
-    public Piece(Team team, int rank, int file) {
+    public Piece(String identifier, Team team, int rank, int file) {
+        this.identifier = identifier;
         this.team = team;
         coOrds = new int[]{rank, file};
         team.getPieceList().add(this);

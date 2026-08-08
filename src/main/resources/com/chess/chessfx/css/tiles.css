@@ -1,0 +1,48 @@
+/*
+For the chessboard:
+
+    Inheritance doesn't work like in java, I have to apply the style classes manually.
+    I can still choose to take an inheritance approach if I end up putting some useful utility
+    in `.tile-parent`.
+*/
+
+
+/* WRAPPER (GridPane) */
+.chessboard {
+    -fx-alignment: center;
+}
+
+/* COLOURS */
+
+.light-tile {
+    -fx-background-color: -light-tile;
+}
+
+.dark-tile {
+    -fx-background-color: -dark-tile;
+}
+
+/* TYPES */
+.tile-parent {
+
+}
+
+/* of the standard `Tile` class */
+.chess-tile {
+
+}
+
+.barrier-tile {
+    /*    Dimmed from usual colour   */
+}
+
+.void-tile {
+    -fx-opacity: 0.0;
+    -fx-visible: false;
+}
+
+/* For Dev use, to see when a tile is null.*/
+.null-tile {
+    -fx-opacity: 0.6;
+    -fx-border-color: red;
+}

@@ -1,0 +1,30 @@
+.root-wrapper-pane {
+    /*-fx-border-color: -accent1;*/
+    -fx-background-color: -bg-colour1;
+    -fx-border-radius: 14px;
+    -fx-border-width: 5px;
+}
+
+.options-vbox {
+    -fx-spacing: 20px;
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+}
+
+.menu-play-button {
+    /*-fx-alignment: center-left;*/
+}
+
+.game-top-hbox {
+    -fx-border-color: -accent1;
+    -fx-alignment: center;
+    -fx-spacing: 30px;
+    -fx-padding: 30px, 30px, 30px, 30px;
+    -fx-font-size: 30;
+}
+
+.turn-counter {
+    -fx-background-color: -bg-colour2;
+    -fx-color: -fg-colour1;
+    -fx-alignment: center;
+}

@@ -39,7 +39,7 @@ public class TileUI extends StackPane {
     }
 
     private void showPiece(PieceSpriteFactory pieceSpriteFactory) {
-        this.getChildren().add(pieceSpriteFactory.makePieceSprite(tile.getPiece()));
+        this.getChildren().add(pieceSpriteFactory.makePieceSprite(tile));
 
     }
 }

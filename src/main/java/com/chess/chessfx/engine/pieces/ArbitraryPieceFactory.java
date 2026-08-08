@@ -11,15 +11,15 @@ public class ArbitraryPieceFactory {
     Map<String, PieceData> cache;
 
     public ArbitraryPieceFactory() {
+        cache = new HashMap<>();
     }
 
     public Piece create(String id, Team team, int rank, int file) {
         PieceData pieceData = getPieceEngineData(id);
         // now to deal with pieceData.
-        return new ArbitraryPiece(id, team, rank, file);
+        return new ArbitraryPiece(id, team, rank, file, pieceData.getAllMoveVectors());
     }
 
-    //TODO: GET THIS UP AND RUNNING!
     private PieceData getPieceEngineData(String identifier) {
         // first check cache, then resources, then the app data folder.
 
@@ -30,12 +30,20 @@ public class ArbitraryPieceFactory {
         try {
             Properties properties;
             InputStream inputStream = getClass().getResourceAsStream(identifier + ".properties");
+            if (inputStream == null) {
+                throw new IOException();
+            }
             properties = new Properties();
             properties.load(inputStream);
 
             String importMoveString = properties.getProperty("import");
 
             String moveVectorsString = properties.getProperty("moveVectors");
+
+            if (moveVectorsString == null) {
+                System.out.println("ArbitraryPieceFactory: moveVectorsString was null.");
+                moveVectorsString = "1,0";
+            }
             PieceData data = new PieceData(moveVectorsString);
 
             if (importMoveString != null) {
@@ -66,16 +74,18 @@ public class ArbitraryPieceFactory {
     private class PieceData {
 
         // each move contains data on whether it is 'flying' or other properties
-        MoveVector[][] moveVectors;
+        // using a 'set' because each move is unique.
+        Set<MoveVector> moveSet;
 
         public PieceData(String moveVectorString) {
-            List<int[]> ls = new ArrayList<>();
+            moveSet = new HashSet<>();
             int[] vector = new int[2];
             int pointer = 0;
             int startOfNum = 0;
             for (int i = 0; i < moveVectorString.length(); i++) {
                 if (moveVectorString.charAt(i) == ' ') {
-                    ls.add(vector);
+                    moveSet.add(new MoveVector(vector));
+                    pointer = 0;
                 } else if (moveVectorString.charAt(i) == ',') {
                     vector[pointer++] = Integer.parseInt(moveVectorString.substring(startOfNum, i));
                 } else {
@@ -83,11 +93,18 @@ public class ArbitraryPieceFactory {
                 }
                 startOfNum = i + 1;
             }
-            ls.add(vector);
+            moveSet.add(new MoveVector(vector));
+
         }
 
         public void merge(PieceData[] importPieceData) {
-            // TODO: THIS!
+            for (PieceData data : importPieceData) {
+                moveSet.addAll(data.moveSet);
+            }
+        }
+
+        public MoveVector[] getAllMoveVectors() {
+            return moveSet.toArray(new MoveVector[0]);
         }
     }
 

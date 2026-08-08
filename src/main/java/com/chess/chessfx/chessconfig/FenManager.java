@@ -31,6 +31,7 @@ public class FenManager {
         this.fen = fenString.toCharArray();
         this.fenStyle = fenStyle;
         this.pieceIdSet = new HashSet<>();
+        pieceFactory = new ArbitraryPieceFactory();
     }
 
     public int getFullmoveNumber() {
