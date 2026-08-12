@@ -1,15 +1,16 @@
 package com.chess.chessfx.engine.pieces;
 
+import com.chess.chessfx.engine.ChessGameModel;
 import com.chess.chessfx.engine.Move;
 import com.chess.chessfx.engine.MoveVector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ArbitraryPiece extends Piece {
-    MoveVector[] moveVectors;
 
-    public ArbitraryPiece(String identifier, Team team, int rank, int file, MoveVector[] moveVectors) {
-        super(identifier, team, rank, file);
-        this.moveVectors = moveVectors;
+    public ArbitraryPiece(String name, Team team, int rank, int file, PieceData pieceData, MoveVector[] moveSet, boolean hasMoved) {
+        super(name, pieceData.fenId, team, pieceData.value, rank, file, moveSet, hasMoved);
     }
-
 
 }

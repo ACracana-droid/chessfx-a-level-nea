@@ -1,15 +1,10 @@
-package com.chess.chessfx.gameui.pieces;
+package com.chess.chessfx.ui.game.pieces;
 
 import com.chess.chessfx.engine.pieces.Piece;
-import com.chess.chessfx.engine.pieces.Team;
 import com.chess.chessfx.engine.tiles.TileParent;
-import com.chess.chessfx.gameui.tiles.TileUI;
 import javafx.scene.Node;
-import javafx.scene.transform.Scale;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,26 +21,26 @@ public class PieceSpriteFactory {
      * SVG nodes, particularly duplicates can be created without constantly
      * reading from external files.
      *
-     * @param pieceIdSet set of all the unique piece identifiers which are in a chess game
+     * @param pieceNameSet set of all the unique piece identifiers which are in a chess game
      */
-    public PieceSpriteFactory(Set<String> pieceIdSet) {
+    public PieceSpriteFactory(Set<String> pieceNameSet) {
         svgStringMap = new HashMap<>();
-        for (String id : pieceIdSet) {
-            svgStringMap.put(id, getSVGFileAsStream(id));
+        for (String name : pieceNameSet) {
+            svgStringMap.put(name, getSVGFileAsString(name));
         }
     }
 
 
-    private String getSVGFileAsStream(String identifier) {
+    private String getSVGFileAsString(String name) {
         String svgContent = null;
         // first check resources
         try {
             svgContent = new String(Objects.requireNonNull(getClass().getResourceAsStream(
-                    identifier + ".svg")).readAllBytes(), StandardCharsets.UTF_8);
+                    name + ".svg")).readAllBytes(), StandardCharsets.UTF_8);
         } catch (NullPointerException e) {
             System.out.println("PieceImageController: path at piece identifier was null");
             System.out.println("Running as placeholder.");
-            return getSVGFileAsStream("placeholder");
+            return getSVGFileAsString("placeholder");
         } catch (IOException e) {
             System.out.println("PieceImageController: IO Exception");
             e.printStackTrace();
@@ -59,8 +54,8 @@ public class PieceSpriteFactory {
     public Node makePieceSprite(TileParent tile) {
         Piece piece = tile.getPiece();
 
-        String svgFileString = svgStringMap.get(piece.getIdentifier());
-        PieceSprite sprite = new PieceSprite(svgFileString, piece.getTeam());
-        return sprite.getAsNode();
+        String svgFileString = svgStringMap.get(piece.getName());
+        PieceSpriteBuilder sprite = new PieceSpriteBuilder(svgFileString, piece.getTeam());
+        return sprite.build();
     }
 }

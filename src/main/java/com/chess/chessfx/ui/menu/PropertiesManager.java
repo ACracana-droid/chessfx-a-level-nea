@@ -1,4 +1,4 @@
-package com.chess.chessfx.menu;
+package com.chess.chessfx.ui.menu;
 
 import java.io.*;
 import java.util.Properties;

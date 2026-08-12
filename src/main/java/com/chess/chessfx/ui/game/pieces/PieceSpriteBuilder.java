@@ -1,18 +1,14 @@
-package com.chess.chessfx.gameui.pieces;
+package com.chess.chessfx.ui.game.pieces;
 
 import com.chess.chessfx.engine.pieces.Team;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.shape.Shape;
-import javafx.scene.transform.Scale;
+import javafx.util.Builder;
 import org.girod.javafx.svgimage.*;
 
-public class PieceSprite {
+public class PieceSpriteBuilder implements Builder<SVGImageRegion> {
     Team team;
     SVGImageRegion svgImageRegion;
 
-    public PieceSprite(String svgString, Team team) {
-        this.team = team;
+    public PieceSpriteBuilder(String svgString, Team team) {
 
         // Working with new fxsvgimage library;
         svgImageRegion = SVGLoader.load(svgString).createRegion();
@@ -20,7 +16,10 @@ public class PieceSprite {
         svgImageRegion.getStyleClass().add("whole-piece");
     }
 
-    public Node getAsNode() {
+
+
+    @Override
+    public SVGImageRegion build() {
         return svgImageRegion;
     }
 }

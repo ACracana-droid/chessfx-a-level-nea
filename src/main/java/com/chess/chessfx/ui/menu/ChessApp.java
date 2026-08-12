@@ -1,6 +1,5 @@
-package com.chess.chessfx;
+package com.chess.chessfx.ui.menu;
 
-import com.chess.chessfx.menu.PropertiesManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,10 +14,10 @@ public class ChessApp extends Application {
         Scene scene = new Scene(new RootWrapperBuilder().build());
         PropertiesManager propertiesManager = new PropertiesManager();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
-                "css/themes/" + propertiesManager.getThemeFileName()
+                "/com/chess/chessfx/css/themes/" + propertiesManager.getThemeFileName()
         )).toExternalForm());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
-                "css/style.css")).toExternalForm());
+                "/com/chess/chessfx/css/style.css")).toExternalForm());
         stage.setTitle("Chess App");
         stage.setMinHeight(400);
         stage.setMinWidth(400);

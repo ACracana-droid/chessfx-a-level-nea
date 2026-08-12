@@ -1,9 +1,10 @@
-package com.chess.chessfx.gameui;
+package com.chess.chessfx.ui.game;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
-import com.chess.chessfx.engine.BoardRepresentation;
+import com.chess.chessfx.engine.ChessGameModel;
 import javafx.beans.property.IntegerProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
@@ -13,7 +14,7 @@ public class GameLayoutBuilder implements Builder<Region> {
 
     Runnable changeLayoutToMenu;
     BorderPane rootPane;
-    BoardRepresentation boardRepresentation;
+    ChessGameModel boardRepresentation;
     ChessConfigModel chessConfig;
 
     public GameLayoutBuilder(Runnable changeLayoutToMenu, ChessConfigModel chessConfig) {
@@ -22,9 +23,15 @@ public class GameLayoutBuilder implements Builder<Region> {
     }
 
     private HBox turnCounterHBox(IntegerProperty turnCountProperty) {
-        HBox hBox = new HBox(makeTimer(), makeTurnCounter(turnCountProperty));
+        HBox hBox = new HBox(makeTimer(), makeTurnCounter(turnCountProperty), makeReturnToMenuButton());
         hBox.getStyleClass().add("game-top-hbox");
         return hBox;
+    }
+
+    private Node makeReturnToMenuButton() {
+        Button button = new Button("Exit");
+        button.setOnAction(event -> changeLayoutToMenu.run());
+        return button;
     }
 
     private Node makeTurnCounter(IntegerProperty integerProperty) {
@@ -43,8 +50,11 @@ public class GameLayoutBuilder implements Builder<Region> {
     @Override
     public Region build() {
         rootPane = new BorderPane();
+//        rootPane.setOnMouseClicked(event -> handleGlobalInGameMouseClick());
         return rootPane;
     }
+
+
 
     /**
      * <b>The entry point for the chess game.</b>
@@ -56,12 +66,13 @@ public class GameLayoutBuilder implements Builder<Region> {
     public void startup() {
         // chess config is updated as soon as a play button is pressed
         // (which is also when this method occurs).
-        boardRepresentation = new BoardRepresentation(chessConfig);
+        boardRepresentation = new ChessGameModel(chessConfig);
         makeChessboardGUI(boardRepresentation);
     }
 
-    private void makeChessboardGUI(BoardRepresentation representation) {
-        rootPane.setCenter(new ChessBoardBuilder(representation).build());
-        rootPane.setTop(turnCounterHBox(representation.fullmoveCounterProperty()));
+    private void makeChessboardGUI(ChessGameModel boardModel) {
+        rootPane.setCenter(new ChessBoardBuilder(boardModel).build());
+        rootPane.setTop(turnCounterHBox(boardModel.fullmoveCounterProperty()));
     }
+
 }

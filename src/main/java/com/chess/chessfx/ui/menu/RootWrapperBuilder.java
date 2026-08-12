@@ -1,8 +1,7 @@
-package com.chess.chessfx;
+package com.chess.chessfx.ui.menu;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
-import com.chess.chessfx.gameui.GameLayoutBuilder;
-import com.chess.chessfx.menu.MenuLayoutBuilder;
+import com.chess.chessfx.ui.game.GameLayoutBuilder;
 import javafx.animation.FadeTransition;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -41,6 +40,8 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
         rootBorderPane.setCenter(menuLayout);
         return rootBorderPane;
     }
+
+
 
     private void fadingLayoutChange(Region layout1, Region layout2) {
         FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.7), layout1);

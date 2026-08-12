@@ -1,4 +1,4 @@
-package com.chess.chessfx.menu;
+package com.chess.chessfx.ui.menu;
 
 import com.chess.chessfx.chessconfig.ChessConfigModel;
 import javafx.scene.Node;

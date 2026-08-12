@@ -1,6 +1,6 @@
 package com.chess.chessfx.engine.tiles;
 
-import com.chess.chessfx.gameui.tiles.TileUI;
+import com.chess.chessfx.ui.game.tiles.TileUI;
 
 public class VoidTile extends BarrierTile {
 
@@ -9,5 +9,7 @@ public class VoidTile extends BarrierTile {
         tileUI.getStyleClass().add("void-tile");
     }
 
-
+    public VoidTile() {
+        super();
+    }
 }

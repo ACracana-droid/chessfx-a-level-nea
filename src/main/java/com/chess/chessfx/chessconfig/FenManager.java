@@ -7,6 +7,7 @@ import com.chess.chessfx.engine.tiles.Tile;
 import com.chess.chessfx.engine.tiles.TileParent;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class FenManager {
@@ -14,11 +15,17 @@ public class FenManager {
     char[] fen;
     String fenStyle;
     int fullmoveNumber;
-    int halfmoveNumber;
+    int halfmoveClock;
+    Team startingTeam;
+    int height, width; // simple utility
 
     ArbitraryPieceFactory pieceFactory;
-    Set<String> pieceIdSet;
-    Tile[][] board;
+    Set<String> pieceNameSet;
+
+    Map<String, String> fenIdToNameMap;
+    /// TODO: NOT GOOD ENOUGH> I NEED TO MAP fenID to name!!! Can make that. Maybe.
+
+    TileParent[][] board;
 
     String piecePlacement;
 
@@ -27,11 +34,27 @@ public class FenManager {
     // like 'X-Fen' or 'Shredder-FEN'.
     // I will try to use my own standard. I don't intend for this to be used outside my program.
 
-    public FenManager(String fenStyle, String fenString) {
-        this.fen = fenString.toCharArray();
+    public FenManager(String fenStyle, String fenString, Map<String, String> fenIdToNameMap,
+                      ArbitraryPieceFactory pieceFactory, int height, int width) {
+
+        this.fen = fenString.trim().toCharArray();
         this.fenStyle = fenStyle;
-        this.pieceIdSet = new HashSet<>();
-        pieceFactory = new ArbitraryPieceFactory();
+        this.pieceNameSet = new HashSet<>();
+        this.fenIdToNameMap = fenIdToNameMap;
+        this.pieceFactory = pieceFactory;
+        this.height = height;
+        this.width = width;
+        makeBoard();
+    }
+
+    private void makeBoard() {
+        if (fenStyle.equals("case")) {
+            System.out.println("Fen Manager: Using cased fen.");
+            makeBoardFromCasedTeamsFen();
+        } else {
+            System.out.println("Fen Manager: Using complex FEN: UNFINISHED!!!!");
+            makeBoardFromComplexFen();
+        }
     }
 
     public int getFullmoveNumber() {
@@ -39,18 +62,13 @@ public class FenManager {
     }
 
     public int getHalfmoveClock() {
-        return halfmoveNumber;
+        return halfmoveClock;
     }
 
-    public TileParent[][] getGameBoard(int height, int width) {
-        if (fenStyle.equals("case")) {
-            System.out.println("Fen Manager: Using cased fen.");
-            return getBoardFromCasedTeamsFen(height, width);
-        } else {
-            System.out.println("Fen Manager: Using complex FEN: UNFINISHED!!!!");
-            return getBoardFromComplexFen(height, width);
-        }
-
+    public TileParent[][] getGameBoard() {
+        if (board == null)
+            System.out.println("Fen Manager: Board is null!");
+        return board;
     }
 
 
@@ -59,39 +77,35 @@ public class FenManager {
      * this into a 2D array. Supports variable board size, more players and special tiles,
      * but is not compatible with real world FEN.
      *
-     * @param height chess board height
-     * @param width  chess board width
      * @return 2D array which represents a full board state.
      */
-    private TileParent[][] getBoardFromComplexFen(int height, int width) {
+    private void makeBoardFromComplexFen() {
         //TODO: Make new FEN-inspired notation supporting different tile types.
-        return null;
     }
+
+
+    int i = 0;
 
     /**
      * Parses the board state from FEN and converts this into a 2D array.
      * Supports 2 player matches with variable board size; backwards compatible with real world FEN.
      *
-     * @param height chess board height
-     * @param width  chess board width
-     * @return 2D array which represents a full board state.
      */
-    private TileParent[][] getBoardFromCasedTeamsFen(int height, int width) {
-        TileParent[][] board = new TileParent[height][width];
+    private void makeBoardFromCasedTeamsFen() {
+        board = new TileParent[height][width];
         int rank = 0;
         int file = 0;
         // 0 indexed internally. (rank == row and file == column)
         char cur;
-        for (int i = 0; (cur = fen[i]) != ' '; i++) {
+        i = 0;
+        while ((cur = fen[i]) != ' ') {
             if (Character.isAlphabetic(cur)) {
 
                 board[rank][file] = new Tile(makePieceFromAscii(cur, rank, file));
-
                 file++;
             } else if (Character.isDigit(cur)) {
                 // must look ahead for 2-digit numbers
                 int num = Character.getNumericValue(cur);
-                // To reproduce error, comment out this if-statement
                 if (Character.isDigit(fen[i + 1])) {
                     i++;
                     num = (num * 10) + Character.getNumericValue(fen[i]);
@@ -104,38 +118,73 @@ public class FenManager {
                 rank++;
                 file = 0;
             }
+            i++;
         }
 
+        temporaryBoardChecks();
+        i++;
+        startingTeam = fen[i] == 'w' ? Team.WHITE : Team.BLACK;
+        System.out.println("Team: " + startingTeam);
+        i += 2;
+        // castle rules:
+        while (fen[i] != ' ') {
+            // parse castling rules.
+            i++;
+        }
+        i++;
+        int idx = i;
+        while (fen[i] != ' ') {
+            // parse enPassant square
+            i++;
+        }
+        i++;
+        halfmoveClock = 0;
+        while (fen[i] != ' ') {
+            // parse halfmove number (increments every time a piece is moved)
+            halfmoveClock = halfmoveClock * 10 + Character.getNumericValue(fen[i]);
+            i++;
+        }
+        System.out.println("halfmove clock: " + halfmoveClock);
+        i++;
+        fullmoveNumber = 0;
+        while (i < fen.length) {
+            // parse fullmove number (increments after black moves)
+            fullmoveNumber = fullmoveNumber * 10 + Character.getNumericValue(fen[i]);
+            i++;
+        }
+        System.out.println("fullmove number: " + fullmoveNumber);
+        System.out.println("Fen Manager: Parsed whole FEN String.");
+    }
+
+    private void temporaryBoardChecks() {
         System.out.println("Fen Manager: doing temporary board checks ");
         int count = 0;
-        for (int i = 0; i < height; i++) {
+        for (int idx = 0; idx < height; idx++) {
             for (int j = 0; j < width; j++) {
-                if (board[i][j] == null) {
+                if (board[idx][j] == null) {
                     count++;
-                    System.out.println("" + i + " " + j);
+                    System.out.println("" + idx + " " + j);
                 }
             }
         }
         System.out.println("Fen Manager: Null count: " + count);
-        return board;
     }
 
     public Piece makePieceFromAscii(char c, int rank, int file) {
         Team team = Character.isUpperCase(c) ? Team.WHITE : Team.BLACK;
-        String id = null;
-        switch (Character.toLowerCase(c)) {
-            case 'p' -> id = "pawn";
-            case 'r' -> id = "rook";
-            case 'n' -> id = "knight";
-            case 'b' -> id = "bishop";
-            case 'q' -> id = "queen";
-            case 'k' -> id = "king";
-        }
-        pieceIdSet.add(id);
-        return pieceFactory.create(id, team, rank, file);
+        String name = null;
+        // need external file instead of hardcoding.
+        // use pieces.csv
+        name = fenIdToNameMap.get(String.valueOf(Character.toLowerCase(c)));
+        pieceNameSet.add(name);
+        return pieceFactory.create(name, team, rank, file, false);
     }
 
-    public Set<String> getInstantiatedPieceIdSet() {
-        return pieceIdSet;
+    public Set<String> getInstantiatedPieceNameSet() {
+        return pieceNameSet;
+    }
+
+    public Team getStartingTeam() {
+        return startingTeam;
     }
 }

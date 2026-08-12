@@ -2,7 +2,7 @@ package com.chess.chessfx.engine.tiles;
 
 import com.chess.chessfx.engine.pieces.Piece;
 import com.chess.chessfx.engine.pieces.Team;
-import com.chess.chessfx.gameui.tiles.TileUI;
+import com.chess.chessfx.ui.game.tiles.TileUI;
 
 /**
  * This is the ancestor of tiles which other pieces cannot go on.
@@ -10,6 +10,9 @@ import com.chess.chessfx.gameui.tiles.TileUI;
  */
 public class BarrierTile extends TileParent {
 
+    public BarrierTile() {
+
+    }
     @Override
     public boolean hasPiece() {
         return false;
@@ -27,6 +30,11 @@ public class BarrierTile extends TileParent {
 
     @Override
     public boolean isPossibleMove(Team team) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPieceMatchingTeam(Team currentTeam) {
         return false;
     }
 

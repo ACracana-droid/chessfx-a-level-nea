@@ -1,38 +1,47 @@
 package com.chess.chessfx.chessconfig;
 
+import com.chess.chessfx.engine.pieces.ArbitraryPieceFactory;
+import com.chess.chessfx.engine.pieces.PieceData;
+import com.chess.chessfx.engine.pieces.PieceDataManager;
+import com.chess.chessfx.engine.pieces.Team;
 import com.chess.chessfx.engine.tiles.TileParent;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class ChessConfigModel {
     // This is a model that can transfer information between both layout builder classes.
 
     private int height;
     private int width;
+
     private FenManager fen;
+    private ArbitraryPieceFactory pieceFactory;
+
+    private Map<String, PieceData> pieceMap;
+    private Map<String, String> fenIdToNameMap;
+
+
     private int halfmoveClockRuleNumber;
     private EnPassantRule enPassantRule;
     private int tileCheckerboardOffset;
     private TileParent[][] board;
 
-    private String allPiecesInGame;
-    /// There are 3 main game types to consider:
-    /// 1. player vs player
-    /// 2. player vs bot
-    /// 3. bot vs bot
-    /// There is more if we consider doing any server based stuff:
-    /// 4. peer vs peer (?)
-    ///
-    private String gamePlayers;
 
     // create object without specifying any config.
     public ChessConfigModel() {
+        setUpPieceData();
     }
 
-    // used to be a constructor, works better as method.
+    private void setUpPieceData() {
+        PieceDataManager pieceDataManager = new PieceDataManager();
+        pieceMap = pieceDataManager.getPieceDataMap();
+        fenIdToNameMap = pieceDataManager.getFenIdToNameMap();
+        pieceFactory = new ArbitraryPieceFactory(pieceMap);
+    }
+
+
     public void setChessConfigFromPropertiesResource(String propertiesName) {
         Properties properties = new Properties();
         try {
@@ -43,12 +52,13 @@ public class ChessConfigModel {
             e.printStackTrace();
         }
 
-        gamePlayers = (properties.getProperty("gameType"));
 //        System.out.println(properties.getProperty("fen"));
-        fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"),
-                properties.getProperty("fen"));
+
+
         height = Integer.parseInt(properties.getProperty("height"));
         width = Integer.parseInt(properties.getProperty("width"));
+        fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"),
+                properties.getProperty("fen"), fenIdToNameMap, pieceFactory, height, width);
         halfmoveClockRuleNumber = Integer.parseInt(properties.getProperty("halfmoveClockRuleNumber"));
         // if halfmoveClockRuleNumber == 0, this is equivalent to disabling the halfmove clock
         enPassantRule = EnPassantRule.parseRule(properties.getProperty("enPassantRule"));
@@ -58,7 +68,7 @@ public class ChessConfigModel {
         tileCheckerboardOffset = Integer.parseInt(properties.getProperty("tileCheckerboardOffset"));
 
         // these must be in this order.
-        board = fen.getGameBoard(height, width);
+        board = fen.getGameBoard();
     }
 
     public int getHeight() {
@@ -93,7 +103,11 @@ public class ChessConfigModel {
         return tileCheckerboardOffset;
     }
 
-    public Set<String> getInstantiatedPiecesIdSet() {
-        return fen.getInstantiatedPieceIdSet();
+    public Set<String> getInstantiatedPiecesNameSet() {
+        return fen.getInstantiatedPieceNameSet();
+    }
+
+    public Team getStartingTeam() {
+        return fen.getStartingTeam();
     }
 }

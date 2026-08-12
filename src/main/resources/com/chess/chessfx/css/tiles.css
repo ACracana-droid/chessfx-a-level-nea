@@ -27,9 +27,39 @@ For the chessboard:
 
 }
 
+.tile-parent:active {
+    /*-fx-background-color: derive(-fx-background-color, -30%);*/
+    -fx-background-color: green;
+}
+
+.tile-parent:valid-move {
+    /*-fx-background-color: derive(-fx-background-color, -30%);*/
+    -fx-background-color: yellow;
+}
+
+.tile-parent:capture {
+    /*-fx-background-color: derive(-fx-background-color, -30%);*/
+    -fx-background-color: red;
+}
+
+
 /* of the standard `Tile` class */
 .chess-tile {
 
+}
+
+.chess-tile:active {
+    -fx-background-color: green;
+}
+
+.chess-tile:valid-move {
+    /*-fx-background-color: derive(-fx-background-color, -30%);*/
+    -fx-background-color: yellow;
+}
+
+.chess-tile:capture {
+    /*-fx-background-color: derive(-fx-background-color, -30%);*/
+    -fx-background-color: red;
 }
 
 .barrier-tile {

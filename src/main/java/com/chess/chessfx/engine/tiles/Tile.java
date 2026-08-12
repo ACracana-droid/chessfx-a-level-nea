@@ -2,7 +2,7 @@ package com.chess.chessfx.engine.tiles;
 
 import com.chess.chessfx.engine.pieces.Piece;
 import com.chess.chessfx.engine.pieces.Team;
-import com.chess.chessfx.gameui.tiles.TileUI;
+import com.chess.chessfx.ui.game.tiles.TileUI;
 
 public class Tile extends TileParent {
     Piece piece;
@@ -37,5 +37,9 @@ public class Tile extends TileParent {
         return !hasPiece() || (piece.getTeam().equals(team));
     }
 
+    @Override
+    public boolean hasPieceMatchingTeam(Team currentTeam) {
+        return hasPiece() && piece.getTeam().equals(currentTeam);
+    }
 
 }

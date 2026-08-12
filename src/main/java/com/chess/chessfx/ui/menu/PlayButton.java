@@ -1,4 +1,4 @@
-package com.chess.chessfx.menu;
+package com.chess.chessfx.ui.menu;
 
 import javafx.scene.control.Button;
 

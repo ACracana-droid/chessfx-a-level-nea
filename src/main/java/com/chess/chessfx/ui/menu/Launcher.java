@@ -1,4 +1,4 @@
-package com.chess.chessfx;
+package com.chess.chessfx.ui.menu;
 
 import javafx.application.Application;
 

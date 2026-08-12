@@ -1,6 +1,7 @@
 .root-wrapper-pane {
     /*-fx-border-color: -accent1;*/
     -fx-background-color: -bg-colour1;
+    -fx-color: -fg-colour1;
     -fx-border-radius: 14px;
     -fx-border-width: 5px;
 }
@@ -24,7 +25,6 @@
 }
 
 .turn-counter {
-    -fx-background-color: -bg-colour2;
     -fx-color: -fg-colour1;
     -fx-alignment: center;
 }
