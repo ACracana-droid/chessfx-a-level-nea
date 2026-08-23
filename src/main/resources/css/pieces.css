@@ -1,0 +1,101 @@
+/*
+    ____  _
+   / __ \(_)__  ________  _____
+  / /_/ / / _ \/ ___/ _ \/ ___/
+ / ____/ /  __/ /__/  __(__  )
+/_/   /_/\___/\___/\___/____/
+
+*/
+
+
+.light * {
+    -fx-fill: -light-piece-fill;
+    -fx-stroke: -light-piece-stroke;
+}
+
+
+.dark * {
+    -fx-fill: -dark-piece-fill;
+    -fx-stroke: -dark-piece-stroke;
+}
+
+
+.whole-piece {
+    /* From Rook*/
+    /*-fx-opacity: 1;*/
+    /*-fx-fill-rule: nonzero;*/
+    /*-fx-stroke-width: 1.5;*/
+    /*-fx-stroke-linecap: round;*/
+    /*!*-fx-stroke-linejoin: round;*!*/
+    /*-fx-stroke-miterlimit: 4;*/
+    /*-fx-stroke-dasharray: none;*/
+
+    /*-fx-fill: -piece-fill;*/
+    /*-fx-stroke: -piece-stroke;*/
+}
+
+/*
+    ___       __  _            __                       __
+   /   | ____/ / (_)_  _______/ /_____ ___  ___  ____  / /______
+  / /| |/ __  / / / / / / ___/ __/ __ `__ \/ _ \/ __ \/ __/ ___/
+ / ___ / /_/ / / / /_/ (__  ) /_/ / / / / /  __/ / / / /_(__  )
+/_/  |_\__,_/_/ /\__,_/____/\__/_/ /_/ /_/\___/_/ /_/\__/____/
+           /___/
+*/
+
+
+.dark .all-black {
+    -fx-fill: -dark-piece-fill;
+    -fx-stroke: -dark-piece-fill;
+}
+
+.dark .dark-pattern {
+    -fx-opacity: 1;
+    -fx-fill: -light-piece-fill;
+    -fx-stroke: -light-piece-fill;
+}
+
+.no-fill {
+    -fx-fill: none;
+}
+
+.dark .light-pattern {
+    -fx-opacity: 0;
+}
+
+
+.light .light-pattern {
+    -fx-opacity: 1;
+}
+
+.light .dark-pattern {
+    -fx-opacity: 0;
+}
+
+/* This is the cross at the top of a king's sprite. */
+/*.king-cross {*/
+/*    -fx-stroke: red;*/
+/*}*/
+
+
+/*
+   __  ______   _____ __        __
+  / / / /  _/  / ___// /_____ _/ /____
+ / / / // /    \__ \/ __/ __ `/ __/ _ \
+/ /_/ // /    ___/ / /_/ /_/ / /_/  __/
+\____/___/   /____/\__/\__,_/\__/\___/
+
+*/
+
+.chess-tile:active * {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 3, 0, 0, 0.5);
+
+}
+
+.chess-tile:capture * {
+    -fx-effect: innershadow(three-pass-box, -capture-shadow, 10, 0, 0, 0);
+}
+
+.chess-tile:valid-move * {
+/*    Could have a placeholder circle in GUI when piece isn't present. */
+}

@@ -1,0 +1,100 @@
+
+.root {
+    -text-var: red;
+}
+
+.root-wrapper-pane {
+    /*-fx-border-color: -accent1;*/
+    -fx-background-color: -bg1;
+    /*-fx-color: -fg1;*/
+    -fx-border-radius: 14px;
+    -fx-border-width: 5px;
+    /*-fx-font-size: 30px;*/
+}
+
+.options-vbox {
+    -fx-spacing: 20px;
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+}
+
+
+.title-label {
+    -fx-font-size: 60px;
+    -fx-alignment: center;
+    -fx-font-family: Fira Sans Bold;
+    -fx-stroke: -fg1;
+    -fx-fill: -fg1;
+    -fx-stroke-width: 6;
+}
+
+.title-ornament {
+    -fx-spacing: 20;
+    -fx-indent: 20;
+}
+
+
+/* GAME  */
+.game-top-wrapper {
+    -fx-spacing: 40px;
+    -fx-alignment: center;
+}
+
+
+.game-top-hbox {
+    -fx-alignment: center;
+    -fx-spacing: 30px;
+    -fx-padding: 30px, 30px, 30px, 30px;
+    -fx-font-size: 30;
+}
+
+.turn-counter {
+    -fx-alignment: center;
+}
+
+.current-turn-label {
+    -fx-alignment: center;
+}
+
+.move-index {
+    /*    idk */
+
+}
+
+
+/*  MENU    */
+.return-button {
+    -fx-font-size: 2em;
+}
+
+.return-vbox {
+    -fx-spacing: 10px;
+    -fx-padding: 20px;
+}
+
+
+.menu-button:hover {
+    /* Copied from modena, 'menu-button:focused' */
+    -fx-color: -fx-base;
+    -fx-background-color: -fx-focus-color, -fx-inner-border, -fx-body-color, -fx-faint-focus-color, -fx-body-color;
+    -fx-background-insets: -0.2, 1, 2, -1.4, 2.6;
+    -fx-background-radius: 3, 2, 1, 4, 1;
+}
+
+.menu-button .context-menu {
+    /* This targets the context menu of 'drop downs' (MenuButton) alone */
+
+    /* Assigns -fx-base (which is colour of all buttons) to context menu.*/
+    -fx-background-color: -fx-base;
+    /* gets same text fill as MenuButton */
+    -fx-text-fill: inherit;
+}
+
+.dropdown-option {
+    -fx-background-radius: 8px;
+}
+
+.config-hbox {
+    -fx-alignment: center;
+    -fx-spacing: 15px;
+}

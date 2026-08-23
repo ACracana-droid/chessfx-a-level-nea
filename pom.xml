@@ -13,6 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.1</junit.version>
         <maven.compiler.release>21</maven.compiler.release>
+        <!--        For gluon! -->
+        <gluonfx.target>android</gluonfx.target>
     </properties>
 
     <repositories>
@@ -88,7 +90,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.chess.chessfx/com.chess.chessfx.ui.menu.ChessApp</mainClass>
+                            <mainClass>com.chess.chessfx/com.chessfx.ui.menu.ChessApp</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
@@ -99,6 +101,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>1.0.23</version> <!-- Check for the latest version -->
+                <configuration>
+                    <target>${gluonfx.target}</target>
+                    <mainClass>com.chessfx.ui.menu.Launcher</mainClass>
+                    <graalvmHome>/home/luca/.mysdks/graalvm-jdk-21.0.12+7.1/</graalvmHome>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>
