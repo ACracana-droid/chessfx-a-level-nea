@@ -1,0 +1,90 @@
+.root {
+    -fg1: #7aa2f7;
+    -bg1: #1a1b26;
+    -fg2: #f7768e;
+    -fg2-opacity: #f7768e3E;
+    -bg2: #1a1b26;
+    -fg3: #7dcfff;
+    -bg3: #1a1b26;
+    -outline1: #f7768e;
+
+
+    -bg-var: #24283b;
+    -bg-var2: #414868;
+
+    -surface: #c0caf5;
+
+    /*mOnSurfaceVariant: #a9b1d6;*/
+    /*mOutline: #414868;*/
+    /*mShadow: #101014;*/
+    /*mHover: #292e42;*/
+    /*mOnHover: #c0caf5;*/
+
+    -menu-active: -fg3;
+
+    /* Tiles */
+    -light-tile: #c0caf5;
+    -dark-tile: -bg1;
+
+    /* Tile States */
+    -active: #7dcfff;
+    -capture: #f7768e;
+    -capture-shadow: #f7768e33;
+    -valid-move: #7aa2f7;
+
+    -shadow: -bg-var2;
+
+
+    /*PIECES*/
+
+    /*Dark Pieces*/
+    -dark-piece-fill: -bg-var2;
+    -dark-piece-stroke: #a9b1d6;
+
+    /*Light Pieces*/
+    -light-piece-fill: #a9b1d6;
+    -light-piece-stroke: -bg-var2;
+
+
+    /*
+      ____                  _     __    ___
+      / __ \_   _____  _____(_)___/ /___/ (_)___  ____ _
+     / / / / | / / _ \/ ___/ / __  / __  / / __ \/ __ `/
+    / /_/ /| |/ /  __/ /  / / /_/ / /_/ / / / / / /_/ /
+    \____/ |___/\___/_/  /_/\__,_/\__,_/_/_/ /_/\__, /
+                                               /____/
+        __  ___          __
+       /  |/  /___  ____/ /__  ____  ____ _
+      / /|_/ / __ \/ __  / _ \/ __ \/ __ `/
+     / /  / / /_/ / /_/ /  __/ / / / /_/ /
+    /_/  /_/\____/\__,_/\___/_/ /_/\__,_/
+
+                                          */
+
+    -fx-accent: -fg3;
+    /*Base is the main colour for the buttons!*/
+    -fx-base: #24283B;
+    -fx-default-button: -fg1;
+    /* used to be 3 */
+    -fx-focus-color: -fg2;
+    -fx-faint-focus-color: -fg3;
+
+    -fx-hover-base: -menu-active;
+
+}
+
+
+.original-dark {
+
+    -bg1: #002c2c;
+    -bg2: #F3F4F4;
+
+    -fg1: #853953;
+    -fg2: #612D53;
+
+    -outline1: #162b35;
+
+
+    -light-tile: #56626e;
+    -dark-tile: #0d1522;
+}

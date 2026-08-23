@@ -1,0 +1,73 @@
+/*
+For the chessboard:
+
+    Inheritance doesn't work like in java, I have to apply the style classes manually.
+    I can still choose to take an inheritance approach if I end up putting some useful utility
+    in `.tile-parent`.
+*/
+
+.root {
+    -this: red;
+    -frame: red;
+}
+
+/* WRAPPER (GridPane) */
+.chessboard {
+    -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, -shadow, 10, 10, 0, 0);
+}
+
+/* COLOURS */
+
+.light-tile {
+    -this: -light-tile;
+    /*-fx-background-color: -light-tile;*/
+}
+
+.dark-tile {
+    -this: -dark-tile;
+    /*-fx-background-color: -dark-tile;*/
+}
+
+/* TYPES */
+.tile-parent {
+}
+
+
+/* of the standard `Tile` class */
+.chess-tile {
+    /*-fx-background-insets: 0, 0;*/
+    /*-fx-background-color: -frame, -this;*/
+    -fx-background-color: -this;
+}
+
+.chess-tile:active {
+    /*-fx-background-color: green;*/
+
+    -fx-background-color: -frame, -active;
+}
+
+.chess-tile:valid-move {
+    -fx-background-insets: 0px, 5px;
+    -fx-background-color: -this, -valid-move;
+}
+
+.chess-tile:capture {
+    -fx-background-insets: 0px, 5px;
+    -fx-background-color: -this, -capture;
+}
+
+.barrier-tile {
+    /*    Dimmed from usual colour   */
+}
+
+.void-tile {
+    -fx-opacity: 0.0;
+    -fx-visible: false;
+}
+
+/* For Dev use, to see when a tile is null.*/
+.null-tile {
+    -fx-opacity: 0.6;
+    -fx-border-color: red;
+}

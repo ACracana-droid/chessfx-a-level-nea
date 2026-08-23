@@ -1,0 +1,62 @@
+.root {
+
+    -bg1: #f0f7f8;
+    -bg2: #8a9fac;
+
+    -fg1: #bef8f7;
+    -fg2: #d0ecde;
+    -fg3: #5789a6;
+    -outline1: #3abbf3;
+
+
+    /* Tiles */
+    -light-tile: linear-gradient(to bottom, #f6e3c3, #e6cfa8);
+    -dark-tile: linear-gradient(to bottom, #c19a6b, #9b6f3e);
+
+    /* Tile States */
+    -active: #7dcfff;
+    -capture: #f7768e;
+    -capture-shadow: #f7768e33;
+    -valid-move: #7aa2f7;
+
+    -shadow: #101010;
+
+
+    /*PIECES*/
+
+    /*Dark Pieces*/
+    -dark-piece-fill: #1e1c1c;
+    -dark-piece-stroke: #e4dcdc;
+
+    /*Light Pieces*/
+    -light-piece-fill: -dark-piece-stroke;
+    -light-piece-stroke: -dark-piece-fill;
+
+    /*
+  ____                  _     __    ___
+  / __ \_   _____  _____(_)___/ /___/ (_)___  ____ _
+ / / / / | / / _ \/ ___/ / __  / __  / / __ \/ __ `/
+/ /_/ /| |/ /  __/ /  / / /_/ / /_/ / / / / / /_/ /
+\____/ |___/\___/_/  /_/\__,_/\__,_/_/_/ /_/\__, /
+                                           /____/
+    __  ___          __
+   /  |/  /___  ____/ /__  ____  ____ _
+  / /|_/ / __ \/ __  / _ \/ __ \/ __ `/
+ / /  / / /_/ / /_/ /  __/ / / / /_/ /
+/_/  /_/\____/\__,_/\___/_/ /_/\__,_/
+
+                                      */
+
+    /*-fx-base: -bg1;*/
+    -fx-accent: -fg3;
+    /*-fx-focus-color: -fg3;*/
+    /*Base is the main colour for the buttons!*/
+    -fx-base: #eaefff;
+    -fx-default-button: -fg1;
+    -fx-focus-color: -fg3;
+    -fx-faint-focus-color: -fg3;
+
+    -fx-hover-base: -active;
+
+
+}

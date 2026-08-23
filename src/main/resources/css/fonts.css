@@ -1,0 +1,19 @@
+/*
+Cool fonts:
+ "Fira Sans",
+Crazy:
+"ArcadeClassic", "Orbitron", "Electroharmonix", "Thunderman"
+*/
+/*@font-face {*/
+
+/*}*/
+
+.root {
+    -fx-font-family: "Fira Sans"
+}
+
+/*font-family: "Noto Sans";*/
+/*font-family: Hack;*/
+/*font-style: normal;*/
+/*font-weight: normal;*/
+/*src: url("com/chessfx/css/fonts/Hack-Regular.ttf");*/

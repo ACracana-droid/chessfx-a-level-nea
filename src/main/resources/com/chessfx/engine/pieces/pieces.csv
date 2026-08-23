@@ -1,0 +1,8 @@
+pawn,P,1,o1>;c1X>;oi2>
+knight,N,3,"~1/2"
+bishop,B,3,nX
+rook,R,5,"n+"
+queen,Q,9,n*
+king,K,-1,1*
+chancellor,C,10,n+;~1/2
+archbishop,A,10,nX;~1/2
