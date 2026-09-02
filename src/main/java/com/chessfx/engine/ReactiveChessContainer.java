@@ -31,7 +31,7 @@ public class ReactiveChessContainer extends BoardContainer {
         super.doMove(move);
         previousMoveProperty.set(longAlgebraicNotation(piece, move));
         board[move.y2][move.x2].setPiece(piece);
-        updateGame(move);
+        // updateGame is called from super.
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ReactiveChessContainer extends BoardContainer {
         System.out.println("UPDATING GAME: ");
         moveStack.push(move);
         switchTeams(gameModel);
-        setBoardState(gameModel, board);
+//        setBoardState(gameModel, board);
 
     }
 

@@ -44,8 +44,13 @@ public class ChessEngine {
     }
 
 
-    // TODO: DOCUMENT
+    // TODO: DOCUMENT Fix turns
     public static BoardState getBoardState(GameStateModel gameModel, TileParent[][] board) {
+
+        if (true)
+            return BoardState.DEFAULT;
+
+
         King king = gameModel.getCurrentTeam().getKing();
         List<Piece> enemies = gameModel.getNextTeam().getPieceList();
         if (underThreat(king, gameModel.getCurrentTeam().getMoveSets(), gameModel.getInstantiatedPieceNames(), board)) {

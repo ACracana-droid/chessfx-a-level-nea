@@ -5,6 +5,7 @@ module com.chess.chessfx {
     requires org.kordamp.ikonli.javafx;
     requires java.desktop;
     requires org.girod.javafx.svgimage;
+    requires jdk.incubator.vector;
 
     opens com.chessfx.ui.menu to javafx.fxml;
     exports com.chessfx.chessconfig;

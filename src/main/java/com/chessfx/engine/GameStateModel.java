@@ -69,6 +69,7 @@ public class GameStateModel {
         teamIdx++;
         cycleTeamEndFlag = false;
 
+        System.out.println("GameModel: " + teamIdx);
         if (teamIdx >= teams.size()) {
             teamIdx = (0);
             fullmoveCounter++;
