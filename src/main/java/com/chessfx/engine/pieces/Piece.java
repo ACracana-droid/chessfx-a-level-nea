@@ -15,6 +15,7 @@ abstract public class Piece {
     protected int[] coOrds;
     protected boolean hasMoved;
 
+
     public Piece(String name, String fenId, Team team, int value,
                  int rank, int file, MoveVector[] moveSet, boolean hasMoved) {
         this.name = name;
@@ -40,6 +41,9 @@ abstract public class Piece {
         return name;
     }
 
+    public boolean getHasMoved() {
+        return hasMoved;
+    }
     public MoveVector[] getMoveSet() {
         return moveSet;
     }
@@ -95,11 +99,11 @@ abstract public class Piece {
         while (steps != 0 && boardModel.inBoardBounds(y, x)) {
             if (boardModel.tileHasPiece(y, x)) {
                 if (!boardModel.tileHasPieceMatchingTeam(y, x)) {
-                    ls.add(new Move(coOrds[0], coOrds[1], y, x, boardModel.getTile(y, x).getPiece()));
+                    ls.add(new Move(coOrds[0], coOrds[1], y, x, boardModel.getTile(y, x).getPiece(),hasMoved));
                 }
                 return; // is stopped by allied piece and will stop after capturing enemy.
             } else {
-                ls.add(new Move(coOrds[0], coOrds[1], y, x, false));
+                ls.add(new Move(coOrds[0], coOrds[1], y, x, false, hasMoved));
             }
             y += mv.getDy();
             x += mv.getDx();
@@ -115,7 +119,7 @@ abstract public class Piece {
             if (boardModel.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(new Move(coOrds[0], coOrds[1], y, x, false));
+            ls.add(new Move(coOrds[0], coOrds[1], y, x, false, hasMoved));
             y += dy;
             x += dx;
             steps--;
@@ -135,7 +139,7 @@ abstract public class Piece {
                     || !boardModel.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(new Move(coOrds[0], coOrds[1], y, x, true));
+            ls.add(new Move(coOrds[0], coOrds[1], y, x, true, hasMoved));
             y += mv.getDy();
             x += mv.getDx();
             steps--;

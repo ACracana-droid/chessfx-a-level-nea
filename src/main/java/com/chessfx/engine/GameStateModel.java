@@ -82,6 +82,25 @@ public class GameStateModel {
         return cycleTeamEndFlag;
     }
 
+
+    public boolean cycleTeamBackwards() {
+        teamIdx--;
+        cycleTeamEndFlag = false;
+        System.out.println("Undoing move, cycling team backwards.");
+
+        System.out.println("GameModel: " + teamIdx);
+        if (teamIdx <= -1) {
+            teamIdx = teams.size() - 1;
+            fullmoveCounter--;
+            System.out.println("Decrementing fullmoveCounter. New value: " + fullmoveCounter);
+            cycleTeamEndFlag = true;
+        }
+
+        halfmoveClock++; // must be reset after a pawn move or capture.
+
+        return cycleTeamEndFlag;
+    }
+
     public boolean isTeamEndOfCycle() {
         return cycleTeamEndFlag;
     }
@@ -117,4 +136,6 @@ public class GameStateModel {
     public Set<String> getInstantiatedPieceNames() {
         return chessConfig.getInstantiatedPiecesNameSet();
     }
+
+
 }

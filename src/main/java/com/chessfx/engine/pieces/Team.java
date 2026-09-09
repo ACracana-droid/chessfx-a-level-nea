@@ -79,4 +79,8 @@ public class Team {
     public void addMoveSetToList(String fenId, Set<MoveVector> set) {
         moveSets.put(fenId, set);
     }
+
+    public void removeCapture(Piece capture) {
+        capturedPieceList.remove(capture);
+    }
 }

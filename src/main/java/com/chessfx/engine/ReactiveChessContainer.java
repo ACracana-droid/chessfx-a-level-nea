@@ -10,6 +10,7 @@ public class ReactiveChessContainer extends BoardContainer {
     public final IntegerProperty fullmoveCounterProperty = new SimpleIntegerProperty();
     private final StringProperty previousMoveProperty = new SimpleStringProperty();
 
+
     Runnable removeListeners = null;
 
     public ReactiveChessContainer(GameStateModel gameModel, TileParent[][] board) {
@@ -25,13 +26,23 @@ public class ReactiveChessContainer extends BoardContainer {
         return super.tileHasPieceMatchingTeam(y, x);
     }
 
+    /**
+     * Updates the properties for the UI and calls the superclass method
+     * to internally complete the move and trigger the game update.
+     *
+     * @param move the move being done
+     */
     @Override
     public void doMove(Move move) {
+        // Order matters
+
         Piece piece = board[move.y1][move.x1].getPiece();
-        super.doMove(move);
+
+        // Must set move before 'doing move'
         previousMoveProperty.set(longAlgebraicNotation(piece, move));
-        board[move.y2][move.x2].setPiece(piece);
-        // updateGame is called from super.
+        // doMove calls update game, which causes team to switch.
+        // This is the logical order.
+        super.doMove(move);
     }
 
     @Override

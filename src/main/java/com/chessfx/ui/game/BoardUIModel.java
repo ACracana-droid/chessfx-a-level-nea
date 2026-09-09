@@ -1,8 +1,6 @@
 package com.chessfx.ui.game;
 
 import com.chessfx.engine.BoardContainer;
-import com.chessfx.engine.BoardState;
-import com.chessfx.engine.ReactiveChessContainer;
 import com.chessfx.engine.Move;
 import com.chessfx.engine.tiles.TileParent;
 import com.chessfx.engine.tiles.VoidTile;
@@ -36,7 +34,12 @@ public class BoardUIModel {
         tileUI.setActive();
         selectedTile = tileUI;
         System.out.println("BoardUIModel: Selected Piece");
-        showMoves(tileUI.getTile().getPiece().moves(boardModel));
+        showMoves(getMovesToShow(tileUI));
+    }
+
+    private List<Move> getMovesToShow(TileUI tileUI) {
+        List<Move> unvalidatedMoves = tileUI.getTile().getPiece().moves(boardModel);
+        return boardModel.getValidatedMoves(unvalidatedMoves);
     }
 
     private void showMoves(List<Move> moves) {
@@ -59,6 +62,15 @@ public class BoardUIModel {
         selectedTile = DEV_TILE;
     }
 
+    /**
+     * The central game interaction layer through which the user interacts with the board.
+     * Performs various actions depending on the status of the tile clicked and the surrounding context.
+     *
+     * @param tileUI          the graphic clicked
+     * @param tile            the backend tile
+     * @param prospectiveMove the move proposed by click if there is one
+     */
+    // TODO: Document new version
     public void handleTileClick(TileUI tileUI, TileParent tile, Move prospectiveMove) {
         System.out.println("Clicked tile: " + tileUI);
         System.out.println("Selected tile: " + selectedTile);
@@ -91,6 +103,13 @@ public class BoardUIModel {
         }
     }
 
+    /**
+     * Upon correct user input, the game triggers UI updates and calls for the internal
+     * data to be updated.
+     *
+     * @param from the TileUI which the move starts from.
+     * @param to   the TileUI which was clicked.
+     */
     private void doMove(TileUI from, TileUI to) {
         Node sprite = from.removeExistingPieceSprite();
         Move move = to.getProspectiveMove();

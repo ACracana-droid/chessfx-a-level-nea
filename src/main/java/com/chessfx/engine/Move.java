@@ -6,18 +6,20 @@ public class Move {
 
     int y1, x1, y2, x2;
     boolean isCapture;
+    private boolean hasMoved;
     boolean isCheck;
     Piece capture;
 
-    public Move(int y1, int x1, int y2, int x2, boolean isCapture) {
+    public Move(int y1, int x1, int y2, int x2, boolean isCapture, boolean hasMoved) {
         this.y1 = y1;
         this.x1 = x1;
         this.y2 = y2;
         this.x2 = x2;
         this.isCapture = isCapture;
+        this.hasMoved = hasMoved;
     }
 
-    public Move(int y1, int x1, int y2, int x2, Piece capture) {
+    public Move(int y1, int x1, int y2, int x2, Piece capture, boolean isFirstMove) {
         this.y1 = y1;
         this.x1 = x1;
         this.y2 = y2;
@@ -59,5 +61,10 @@ public class Move {
 
     public boolean hasCapturePiece() {
         return capture != null;
+    }
+
+
+    public boolean pieceHasMoved() {
+        return hasMoved;
     }
 }

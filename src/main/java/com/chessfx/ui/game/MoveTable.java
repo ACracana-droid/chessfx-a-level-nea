@@ -22,17 +22,24 @@ public class MoveTable extends StackPane {
     public MoveTable(MoveTableData ref) {
         super();
         this.ref = ref;
-        ref.setRemoveListenersRunnable(setUpListeners());
+        this.ref.setRemoveListenersRunnable(initialiseListeners());
 
         ScrollPane tableScroller = new ScrollPane();
         tableScroller.setContent(makeTableGridPane());
 
-        grid.add(rowLabel(ref.fullmoveCounterProperty().get()), 0, rowIdx);
+        grid.add(rowLabel(this.ref.fullmoveCounterProperty().get()), 0, rowIdx);
 
         this.getChildren().add(makeHBox(tableScroller));
     }
 
-    private Runnable setUpListeners() {
+    /**
+     * Creates the listeners on the properties from the ReactiveChessContainer class
+     * (brokered by the MoveTableData class) which allow this class (MoveTable) to instantly
+     * adapt to any game updates.
+     *
+     * @return removeListenersRunnable runnable to remove the listeners in this class.
+     */
+    private Runnable initialiseListeners() {
         ChangeListener<Number> fullmoveNumListener = (observable, oldValue, newValue) -> handleFullmoveNumChange(newValue);
         ref.fullmoveCounterProperty().addListener(fullmoveNumListener);
 
@@ -57,7 +64,6 @@ public class MoveTable extends StackPane {
 
     private void handleMoveMade(IntegerProperty fullmoveNumProperty, StringProperty currentMoveProperty) {
         System.out.println("MoveTable: moveProperty changed");
-
         if (ref.isTeamEndOfCycle()) {
             rowIdx++;
         }
