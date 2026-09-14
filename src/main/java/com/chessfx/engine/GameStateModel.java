@@ -82,7 +82,7 @@ public class GameStateModel {
         return cycleTeamEndFlag;
     }
 
-
+    // TODO: FIX!!!!
     public boolean cycleTeamBackwards() {
         teamIdx--;
         cycleTeamEndFlag = false;

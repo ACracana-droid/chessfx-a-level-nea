@@ -17,12 +17,12 @@ public class TeamConf {
         System.out.println("Constructing TeamConf");
         int i = 0;
         while (i < data.length()) {
-            //  Team Colour | Direction Facing | Player Type
+            //  Team Colour | Direction Facing
             Team t = new Team(getTeamStyleClass(data.charAt(i)),
-                    getVector(data.charAt(i + 1)), data.charAt(i + 2));
+                    getVector(data.charAt(i + 1)));
             assignFieldIfNecessary(t, data.charAt(i), i);
             teams.add(t);
-            i += 4;
+            i += 3;
         }
 
     }

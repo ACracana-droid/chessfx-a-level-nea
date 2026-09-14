@@ -11,12 +11,12 @@ import javafx.util.Builder;
 
 
 
-public class GameOptionsLayoutBuilder implements Builder<Region> {
+public class AllGameOptionsLayoutBuilder implements Builder<Region> {
     private final Runnable changeLayoutToGame;
     private final ChessConfigModel chessConfig;
     BorderPane rootPane;
 
-    public GameOptionsLayoutBuilder(Runnable changeLayoutToMenu, Runnable changeLayoutToGame, ChessConfigModel chessConfig) {
+    public AllGameOptionsLayoutBuilder(Runnable changeLayoutToMenu, Runnable changeLayoutToGame, ChessConfigModel chessConfig) {
         this.changeLayoutToGame = changeLayoutToGame;
         this.chessConfig = chessConfig;
         rootPane = new BorderPane();
@@ -32,7 +32,7 @@ public class GameOptionsLayoutBuilder implements Builder<Region> {
 
     private Button makeCapablancaPlayButton() {
         Button button = new PlayButton(changeLayoutToGame,
-                chessConfig, () -> chessConfig.setChessConfigFromPropertiesResource("capablancaPvP.properties"));
+                () -> chessConfig.setChessConfigFromPropertiesResource("capablancaPvP.properties"));
         button.setText("Capablanca PvP");
         return button;
     }

@@ -78,6 +78,8 @@
 }
 
 .table-move {
+    /*Probably use Deja Vu Sans*/
+    -fx-font-family: "monospace";
     -fx-alignment: center-left;
 }
 
@@ -121,4 +123,10 @@
 
 .separator {
     -fx-padding: 0 4em 0 4em;
+}
+
+.game-popup {
+    -fx-background-color: -bg2;
+    -fx-border-color: -active;
+    -fx-alignment: center;
 }

@@ -2,6 +2,7 @@ package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.ui.game.ChessBoardOrnamentBuilder;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
@@ -12,25 +13,27 @@ public class MenuLayoutBuilder implements Builder<Region> {
 
     private Runnable changeLayoutToGame;
     private final Runnable changeLayoutToSettings;
+    private final PopupManager popupManager;
     private final Runnable changeLayoutToMoreOptions;
 
     BorderPane rootPane;
 
     ChessConfigModel chessConfig;
 
-    public MenuLayoutBuilder(Runnable changeLayoutToGame, Runnable changeLayoutToSettings, Runnable changeLayoutToMoreOptions, ChessConfigModel chessConfig) {
+    public MenuLayoutBuilder(Runnable changeLayoutToGame, Runnable changeLayoutToSettings,
+                             Runnable changeLayoutToMoreOptions, ChessConfigModel chessConfig, PopupManager popupManager) {
         this.changeLayoutToMoreOptions = changeLayoutToMoreOptions;
         this.chessConfig = chessConfig;
         this.changeLayoutToGame = changeLayoutToGame;
         this.changeLayoutToSettings = changeLayoutToSettings;
+        this.popupManager = popupManager;
         rootPane = new BorderPane(createOptionsVBox());
         rootPane.setTop(makeBoardOrnament());
     }
 
     private Node createOptionsVBox() {
         VBox vBox = new VBox(
-                makeQuickPlayVsBotButton(),
-                makeQuickPlayerVsPlayerButton(),
+                makeQuickGameButton(),
                 makeWildCardButton(),
                 makeSettingsButton(),
                 makeMoreOptionsButton());
@@ -58,23 +61,19 @@ public class MenuLayoutBuilder implements Builder<Region> {
     }
 
     private Node makeWildCardButton() {
-        PlayButton button = new PlayButton(changeLayoutToGame, chessConfig,
+        PlayButton button = new PlayButton(changeLayoutToGame,
                 () -> chessConfig.setChessConfigFromPropertiesResource("reallyBigBasicChess.properties"));
         button.setText("Wildcard 2 player");
         return button;
     }
 
-    private Node makeQuickPlayerVsPlayerButton() {
-        PlayButton button = new PlayButton(changeLayoutToGame,
-                chessConfig, () -> chessConfig.setChessConfigFromPropertiesResource("defaultPvP.properties"));
-        button.setText("Quick Player Vs Player");
-        return button;
-    }
+    private Node makeQuickGameButton() {
+        Button button = new PlayButtonWithPlayerTypeSelector(changeLayoutToGame,
+                chessConfig, () -> {
+            chessConfig.setChessConfigFromPropertiesResource("defaultPvB.properties");
+        }, popupManager);
 
-    private Node makeQuickPlayVsBotButton() {
-        PlayButton button = new PlayButton(changeLayoutToGame,
-                chessConfig, () -> chessConfig.setChessConfigFromPropertiesResource("defaultPvB.properties"));
-        button.setText("Quick Player Vs Bot");
+        button.setText("Quick Game");
         return button;
     }
 

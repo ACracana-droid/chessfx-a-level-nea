@@ -29,6 +29,7 @@ public class ChessConfigModel {
     private int tileCheckerboardOffset;
 
     private TileParent[][] board;
+    String gameType;
 
     public ChessConfigModel(String propertiesName) {
         setChessConfigFromPropertiesResource(propertiesName);
@@ -63,7 +64,7 @@ public class ChessConfigModel {
 
         height = Integer.parseInt(properties.getProperty("height"));
         width = Integer.parseInt(properties.getProperty("width"));
-        teamConf = new TeamConf(properties.getProperty("teamInfo", "wdp bup"));
+        teamConf = new TeamConf(properties.getProperty("teamInfo", "wd bu"));
         fen = new FenManager(properties.getProperty("fenPieceTeamIndicator"),
                 properties.getProperty("fen"), fenIdToNameMap, pieceFactory, height, width, teamConf);
         halfmoveClockRuleNumber = Integer.parseInt(properties.getProperty("halfmoveClockRuleNumber"));
@@ -123,5 +124,9 @@ public class ChessConfigModel {
 
     public Map<String, PieceData> getPieceDataMap() {
         return pieceMap;
+    }
+
+    public void setGameType(String s) {
+        gameType = s;
     }
 }

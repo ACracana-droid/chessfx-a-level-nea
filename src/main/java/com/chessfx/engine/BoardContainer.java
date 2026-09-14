@@ -110,6 +110,6 @@ public class BoardContainer {
         // need hypothetical board.
 
 
-        return null;
+        return unvalidatedMoves;
     }
 }

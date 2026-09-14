@@ -5,13 +5,16 @@ import com.chessfx.ui.game.GameLayoutBuilder;
 import javafx.animation.FadeTransition;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.util.Builder;
 import javafx.util.Duration;
 
-public class RootWrapperBuilder implements Builder<BorderPane> {
+public class RootWrapperBuilder implements Builder<Pane> {
 
-    private BorderPane rootBorderPane;
+
+    private BorderPane appLevelBorderPane;
 
     // Although these are fields, I should never need to access them from outside.
     // All of their customisation should be handled by the respective classes.
@@ -27,16 +30,21 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
 
 
     @Override
-    public BorderPane build() {
-        rootBorderPane = new BorderPane();
-        rootBorderPane.getStyleClass().add("root-wrapper-pane");
+    public Pane build() {
+        Pane root = new StackPane();
+        root.getChildren().add(makeAppLevelBorderPane(new PopupManager(root.getChildren(), root.heightProperty(), root.widthProperty())));
+        return root;
+    }
+
+    private BorderPane makeAppLevelBorderPane(PopupManager popupManager) {
+        appLevelBorderPane = new BorderPane();
+        appLevelBorderPane.getStyleClass().add("root-wrapper-pane");
 
         ChessConfigModel chessConfig = new ChessConfigModel();
 
         // Layouts contain their layout changes and the accompanying animation.
         GameLayoutBuilder gameLayoutBuilder = new GameLayoutBuilder(
                 () -> {
-                    
                     fadingLayoutChange(gameLayout, menuLayout);
                 }, chessConfig);
 
@@ -49,26 +57,30 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
 
         menuLayout = new MenuLayoutBuilder(
                 changeLayoutToGame,
+                makeSettingsLayoutSwitchRunnable(),
                 () -> {
-                    Region settingsLayout = new SettingsLayoutBuilder(appSettings, () -> fadingLayoutChange(menuLayout)).build();
-                    fadingLayoutChange(menuLayout, settingsLayout);
-                },
-                () -> {
-                    Region seeMoreLayout = new GameOptionsLayoutBuilder(
+                    Region seeAllGamesLayout = new AllGameOptionsLayoutBuilder(
                             () -> fadingLayoutChange(menuLayout),
                             changeLayoutToGame,
                             chessConfig).build();
-                    fadingLayoutChange(menuLayout, seeMoreLayout);
+                    fadingLayoutChange(menuLayout, seeAllGamesLayout);
                 },
-                chessConfig).build();
+                chessConfig, popupManager).build();
 
-        rootBorderPane.setCenter(menuLayout);
-        return rootBorderPane;
+        appLevelBorderPane.setCenter(menuLayout);
+        return appLevelBorderPane;
+    }
+
+    private Runnable makeSettingsLayoutSwitchRunnable() {
+        return () -> {
+            Region settingsLayout = new SettingsLayoutBuilder(appSettings, () -> fadingLayoutChange(menuLayout)).build();
+            fadingLayoutChange(menuLayout, settingsLayout);
+        };
     }
 
 
     private void fadeOutLayout() {
-        Node layoutFrom = rootBorderPane.getCenter();
+        Node layoutFrom = appLevelBorderPane.getCenter();
         FadeTransition fadeOut = new FadeTransition(FADE_DURATION, layoutFrom);
         fadeOut.setFromValue(1.0);
         fadeOut.setToValue(0.0);
@@ -79,7 +91,7 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
 
     private void fadeInLayout(Region layoutTo) {
         layoutTo.setOpacity(0.0);
-        rootBorderPane.setCenter(layoutTo);
+        appLevelBorderPane.setCenter(layoutTo);
         FadeTransition fadeIn = new FadeTransition(FADE_DURATION, layoutTo);
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
@@ -87,7 +99,7 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
     }
 
     private void fadingLayoutChange(Region layoutTo) {
-        Node layoutFrom = rootBorderPane.getCenter();
+        Node layoutFrom = appLevelBorderPane.getCenter();
         FadeTransition fadeOut = new FadeTransition(FADE_DURATION, layoutFrom);
         fadeOut.setFromValue(1.0);
         fadeOut.setToValue(0.0);
@@ -101,7 +113,7 @@ public class RootWrapperBuilder implements Builder<BorderPane> {
         fadeOut.setToValue(0.0);
         fadeOut.setOnFinished(e -> {
             layout2.setOpacity(0.0);
-            rootBorderPane.setCenter(layout2);
+            appLevelBorderPane.setCenter(layout2);
             FadeTransition fadeIn = new FadeTransition(FADE_DURATION, layout2);
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);

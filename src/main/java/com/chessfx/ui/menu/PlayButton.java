@@ -1,19 +1,21 @@
 package com.chessfx.ui.menu;
 
-import com.chessfx.chessconfig.ChessConfigModel;
-
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 
 public class PlayButton extends Button {
 
-    public PlayButton(Runnable changeLayoutToGame, ChessConfigModel chessConfig, Runnable setChessConfig) {
+    public PlayButton(Runnable changeLayoutToGame, Runnable setChessConfig) {
         super();
-        this.setOnAction(event -> changeLayoutToGame(changeLayoutToGame, chessConfig, setChessConfig));
+        this.setOnAction(event -> changeLayoutToGame(changeLayoutToGame, setChessConfig));
         this.getStyleClass().add("menu-play-button");
     }
 
-    private void changeLayoutToGame(Runnable changeLayoutToGame, ChessConfigModel chessConfig, Runnable setChessConfig) {
+    public PlayButton() {
+        super();
+    }
+
+    private void changeLayoutToGame(Runnable changeLayoutToGame, Runnable setChessConfig) {
 
         Task<Void> task = new Task<>() {
             @Override

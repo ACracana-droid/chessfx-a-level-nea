@@ -20,7 +20,7 @@ public class Team {
 
     final private String styleClass;
 
-    public Team(String styleClass, int[] moveTransform, char playerType) {
+    public Team(String styleClass, int[] moveTransform) {
         this.styleClass = styleClass;
         this.moveTransform = moveTransform;
         this.playerType = playerType;
