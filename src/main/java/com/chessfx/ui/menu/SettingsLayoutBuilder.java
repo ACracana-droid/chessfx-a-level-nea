@@ -1,29 +1,32 @@
 package com.chessfx.ui.menu;
 
+import com.chessfx.chessconfig.AppSettings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
-import javafx.util.Builder;
+
+import static com.chessfx.ui.menu.LayoutManager.Layout.MENU;
 
 
-public class SettingsLayoutBuilder implements Builder<Region> {
+public class SettingsLayoutBuilder extends LayoutBuilder {
 
     BorderPane rootPane;
     AppSettings appSettings;
     StringProperty themeNameProperty = new SimpleStringProperty();
 
-    public SettingsLayoutBuilder(AppSettings appSettings, Runnable changeLayoutToMenu) {
+    public SettingsLayoutBuilder(LayoutManager layoutManager,
+                                 AppSettings appSettings) {
+        super(null, layoutManager, LayoutManager.Layout.SETTINGS);
         this.appSettings = appSettings;
         themeNameProperty.set(appSettings.getThemeName());
         rootPane = new BorderPane();
-        rootPane.setTop(new ReturnButton(changeLayoutToMenu, "Return to main menu").getAsVBox());
+        rootPane.setTop(returnButtonVbox("Return to main menu", () -> layoutManager.startup(MENU)));
         rootPane.setCenter(makeSettingsVbox());
+
     }
 
 
@@ -46,7 +49,7 @@ public class SettingsLayoutBuilder implements Builder<Region> {
     }
 
     private HBox makeThemeSelectHBox() {
-        HBox hBox = new HBox(makeTextInfo(), makeThemeDropDownSelector());
+        HBox hBox = new HBox(makeTextInfo(), new ThemeDropDown(appSettings, themeNameProperty).build());
         hBox.getStyleClass().add("config-hbox");
         return hBox;
     }
@@ -56,36 +59,15 @@ public class SettingsLayoutBuilder implements Builder<Region> {
         return label;
     }
 
-    private Node makeThemeDropDownSelector() {
-        MenuButton dropDown = new MenuButton();
-        // StyleClass: menu-button
-        dropDown.textProperty().bind(themeNameProperty);
-        for (String theme : appSettings.getThemes()) {
-            dropDown.getItems().add(makeThemeItem(theme));
-        }
-
-        return dropDown;
-    }
-
-
-    private MenuItem makeThemeItem(String theme) {
-        MenuItem menuItem = new MenuItem(theme);
-        menuItem.getStyleClass().add("dropdown-option");
-        menuItem.setOnAction(event -> handleThemeChange(theme));
-        return menuItem;
-    }
-
-    private void handleThemeChange(String theme) {
-        if (theme.equals(appSettings.getThemeName())) // do nothing
-            return;
-
-        appSettings.setTheme(theme);
-        themeNameProperty.set(theme);
-    }
-
 
     @Override
     public Region build() {
         return rootPane;
     }
+
+    @Override
+    public void startup() {
+        super.startup();
+    }
 }
+

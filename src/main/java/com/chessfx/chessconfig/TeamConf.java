@@ -1,6 +1,7 @@
 package com.chessfx.chessconfig;
 
-import com.chessfx.engine.pieces.Team;
+import com.chessfx.engine.board.Team;
+import com.chessfx.log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class TeamConf {
     int blackIdx;
 
     public TeamConf(String data) {
-        System.out.println("Constructing TeamConf");
+        Log.info("Constructing TeamConf class");
         int i = 0;
         while (i < data.length()) {
             //  Team Colour | Direction Facing

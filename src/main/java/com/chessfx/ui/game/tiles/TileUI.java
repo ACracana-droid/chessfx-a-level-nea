@@ -1,35 +1,33 @@
 package com.chessfx.ui.game.tiles;
 
-import com.chessfx.engine.Move;
+import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.tiles.BarrierTile;
-import com.chessfx.engine.tiles.TileParent;
+import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.engine.tiles.VoidTile;
-import com.chessfx.ui.game.BoardUIModel;
+import com.chessfx.ui.game.board.BoardUIModel;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
 
 public class TileUI extends StackPane {
 
-    TileParent tile;
+    TileBase tile;
     StringProperty uiState = new SimpleStringProperty("");
     BoardUIModel uiModel;
     Move prospectiveMove;
+    boolean isShowingSprite;
 
-    public TileUI(TileParent tile, TileColour tileColour, NumberBinding tileSizeBinding,
+    public TileUI(TileBase tile, TileColour tileColour, NumberBinding tileSizeBinding,
                   PieceSpriteFactory pieceSpriteFactory, BoardUIModel uiModel, int i, int j) {
         super();
         this.tile = tile;
         this.uiModel = uiModel;
-        this.setMinSize(30, 30);
-        this.prefHeightProperty().bind(tileSizeBinding);
-        this.prefWidthProperty().bind(tileSizeBinding);
 
         // Styling for UI
         getStyleClass().add(getColourStyleClass(tileColour));
@@ -53,8 +51,15 @@ public class TileUI extends StackPane {
         if (!(tile instanceof BarrierTile)) {
             setUpPseudoClasses();
             this.setOnMouseClicked(event -> handleTileClick());
+            this.setOnMouseDragged(event -> handleTileDrag(event));
         }
 
+    }
+
+    private void handleTileDrag(MouseEvent event) {
+        if (isShowingSprite && tile.hasPiece()){
+
+        }
     }
 
     private String getColourStyleClass(TileColour tileColour) {
@@ -132,9 +137,10 @@ public class TileUI extends StackPane {
 
     private void showNewPiece(PieceSpriteFactory pieceSpriteFactory) {
         this.getChildren().add(pieceSpriteFactory.makePieceSprite(tile));
+        isShowingSprite = true;
     }
 
-    public TileParent getTile() {
+    public TileBase getTile() {
         return tile;
     }
 
@@ -144,6 +150,7 @@ public class TileUI extends StackPane {
     }
 
     public Node removePieceSprite() {
+        isShowingSprite = false;
         return this.getChildren().removeLast();
     }
 
@@ -152,8 +159,9 @@ public class TileUI extends StackPane {
     }
 
     public Node removeExistingPieceSprite() {
-        if (tile.hasPiece()) {
+        if (isShowingSprite) {
             System.out.println("Piece sprite exists and is being removed.");
+            isShowingSprite = false;
             return this.getChildren().removeLast();
         } else {
             System.out.println("Piece sprite doesn't exist.");
@@ -163,6 +171,7 @@ public class TileUI extends StackPane {
 
     public void showPieceSprite(Node pieceSprite) {
         this.getChildren().add(pieceSprite);
+        isShowingSprite = true;
     }
 
     public void setProspectiveMove(Move move) {
@@ -173,4 +182,5 @@ public class TileUI extends StackPane {
     public Move getProspectiveMove() {
         return prospectiveMove;
     }
+
 }

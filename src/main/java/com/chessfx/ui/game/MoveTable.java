@@ -1,6 +1,6 @@
 package com.chessfx.ui.game;
 
-import com.chessfx.engine.MoveTableData;
+import com.chessfx.engine.moves.MoveTableData;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -16,18 +16,22 @@ public class MoveTable extends StackPane {
     MoveTableData ref;
 
     GridPane grid = new GridPane();
-    int rowIdx = 1;
+    //    int rowIdx = 1;
+    final int START_FULLMOVE_NUMBER;
+    private final Button tableVisibilityButton;
 
 
-    public MoveTable(MoveTableData ref) {
+    public MoveTable(MoveTableData ref, Button tableVisibilityButton) {
         super();
         this.ref = ref;
+        START_FULLMOVE_NUMBER = ref.fullmoveCounterProperty().get();
+        this.tableVisibilityButton = tableVisibilityButton;
         this.ref.setRemoveListenersRunnable(initialiseListeners());
 
         ScrollPane tableScroller = new ScrollPane();
         tableScroller.setContent(makeTableGridPane());
 
-        grid.add(rowLabel(this.ref.fullmoveCounterProperty().get()), 0, rowIdx);
+        grid.add(rowLabel(this.ref.fullmoveCounterProperty().get()), 0, rowIdx());
 
         this.getChildren().add(makeHBox(tableScroller));
     }
@@ -40,11 +44,12 @@ public class MoveTable extends StackPane {
      * @return removeListenersRunnable runnable to remove the listeners in this class.
      */
     private Runnable initialiseListeners() {
-        ChangeListener<Number> fullmoveNumListener = (observable, oldValue, newValue) -> handleFullmoveNumChange(newValue);
+        ChangeListener<Number> fullmoveNumListener = (observable, oldValue, newValue)
+                -> handleFullmoveNumChange(newValue.intValue(), oldValue.intValue());
         ref.fullmoveCounterProperty().addListener(fullmoveNumListener);
 
         InvalidationListener currentMoveInvalidationListener = inv ->
-                handleMoveMade(ref.fullmoveCounterProperty(), ref.previousMoveProperty());
+                handleMovePropertyChanged(ref.fullmoveCounterProperty(), ref.previousMoveProperty());
         ref.previousMoveProperty().addListener(currentMoveInvalidationListener);
 
         return () -> removeListeners(ref.fullmoveCounterProperty(), fullmoveNumListener,
@@ -56,18 +61,54 @@ public class MoveTable extends StackPane {
         currentMoveProperty.removeListener(currentMoveInvalidationListener);
     }
 
-    private void handleFullmoveNumChange(Number fullmoveNum) {
-        System.out.println("MOVE TABLE: FULL MOVE NUM CHANGED");
-        addRowNumber(fullmoveNum.intValue(), rowIdx + 1);
+    private void handleFullmoveNumChange(int fullmoveNum, int oldFullmoveNum) {
+
+        int difference = fullmoveNum - oldFullmoveNum;
+        System.out.println("MOVE TABLE: FULL MOVE NUM CHANGED: " + difference);
+        if (difference == 0) {
+            // do nothing
+        } else if (difference == 1) {
+            addRowNumber(fullmoveNum, rowIdx());
+        } else {
+            removeRowNumber(rowIdx());
+        }
+    }
+
+    private void removeRowNumber(int rowIdx) {
+        grid.getChildren().removeIf(node -> {
+            int row = GridPane.getRowIndex(node);
+            if (row > rowIdx) {
+                System.out.println("REMOVING col: " + GridPane.getColumnIndex(node).toString() + " row: " + GridPane.getRowIndex(node));
+            }
+            return row > rowIdx;
+        });
     }
 
 
-    private void handleMoveMade(IntegerProperty fullmoveNumProperty, StringProperty currentMoveProperty) {
-        System.out.println("MoveTable: moveProperty changed");
-        if (ref.isTeamEndOfCycle()) {
-            rowIdx++;
+    private void handleMovePropertyChanged(IntegerProperty fullmoveNumProperty, StringProperty currentMoveProperty) {
+        System.out.println("--".repeat(10) + "MoveTable: moveProperty changed");
+        boolean wasUndo = ref.isMoveUndo();
+        if (wasUndo) {
+            System.out.println("    Removing row...");
+            removeGridEntry(ref.getTeamIdx() + 1, rowIdx());
+            System.out.println("    Move removing over.");
+            return;
         }
+
         addMove(ref.getTeamIdx(), currentMoveProperty);
+    }
+
+    private void removeGridEntry(int col, int row) {
+        System.out.println("Trying to remove at col " + col + ", row " + row);
+        grid.getChildren().removeIf(node -> {
+            int colIndex = GridPane.getColumnIndex(node);
+            int rowIndex = GridPane.getRowIndex(node);
+            System.out.println("col: " + colIndex + " row: " + rowIndex);
+
+            if (colIndex == col && rowIndex == row)
+                System.out.println("REMOVED SUCCESSFULLY!");
+            return colIndex == col && rowIndex == row;
+        });
     }
 
     private void addRowNumber(int fullmoveNum, int rowIdx) {
@@ -104,15 +145,21 @@ public class MoveTable extends StackPane {
     }
 
     private Button makeSideBarToggleButton(Node tableScroller) {
-        Button button = new Button("<");
-        button.getStyleClass().add("sidebar-button");
-        button.setOnAction(event -> tableScroller.setManaged(!tableScroller.isManaged()));
-        return button;
+        tableVisibilityButton.getStyleClass().add("sidebar-button");
+        tableVisibilityButton.setOnMouseClicked(event -> {
+            tableScroller.setVisible(!tableScroller.isVisible());
+            tableScroller.setManaged(!tableScroller.isManaged());
+        });
+        return tableVisibilityButton;
     }
 
 
     private void addMove(int teamIdx, StringProperty currentMoveProperty) {
-        grid.add(moveLabel(currentMoveProperty.get()), teamIdx + 1, rowIdx);
+        grid.add(moveLabel(currentMoveProperty.get()), teamIdx + 1, rowIdx());
+    }
+
+    private int rowIdx() {
+        return ref.fullmoveCounterProperty().get() - START_FULLMOVE_NUMBER + 1;
     }
 
     private Node moveLabel(String s) {

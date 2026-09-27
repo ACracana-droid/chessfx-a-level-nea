@@ -1,10 +1,9 @@
-package com.chessfx.engine;
+package com.chessfx.engine.moves;
 
-import com.chessfx.engine.pieces.Team;
-import javafx.beans.InvalidationListener;
+import com.chessfx.engine.board.GameStateModel;
+import com.chessfx.engine.board.Team;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 
 import java.util.List;
 
@@ -15,23 +14,17 @@ public class MoveTableData {
     private final StringProperty previousMoveProperty;
     private Runnable removeListeners;
 
-    public MoveTableData(GameStateModel gameModel, IntegerProperty fullmoveCounterProperty
-            , StringProperty previousMoveProperty) {
+    public MoveTableData(GameStateModel gameModel, IntegerProperty fullmoveCounterProperty,
+                         StringProperty previousMoveProperty) {
 
         this.gameModel = gameModel;
         this.fullmoveCounterProperty = fullmoveCounterProperty;
         this.previousMoveProperty = previousMoveProperty;
     }
 
-
     public IntegerProperty fullmoveCounterProperty() {
         return fullmoveCounterProperty;
     }
-
-    public boolean isTeamEndOfCycle() {
-        return gameModel.isTeamEndOfCycle();
-    }
-
 
     public StringProperty previousMoveProperty() {
         return previousMoveProperty;
@@ -53,11 +46,20 @@ public class MoveTableData {
         if (removeListeners != null)
             removeListeners.run();
     }
+
     public Runnable getRemoveListenersRunnable() {
         return removeListeners;
     }
 
     public void setRemoveListenersRunnable(Runnable r) {
         removeListeners = r;
+    }
+
+    public int getMoveTableDifference() {
+        return gameModel.getFullmoveDifference();
+    }
+
+    public boolean isMoveUndo() {
+        return gameModel.isMoveUndo();
     }
 }

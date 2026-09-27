@@ -1,44 +1,41 @@
 package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
-import com.chessfx.ui.game.ChessBoardOrnamentBuilder;
-import javafx.collections.ObservableList;
+import com.chessfx.ui.game.board.ChessBoardOrnamentBuilder;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
-import javafx.util.Builder;
 
-public class MenuLayoutBuilder implements Builder<Region> {
+import static com.chessfx.ui.menu.LayoutManager.Layout.*;
+import static com.chessfx.ui.menu.LayoutManager.Layout.GAME_OPTIONS;
+import static com.chessfx.ui.menu.LayoutManager.Layout.MENU;
 
-
-    private Runnable changeLayoutToGame;
-    private final Runnable changeLayoutToSettings;
-    private final PopupManager popupManager;
-    private final Runnable changeLayoutToMoreOptions;
+public class MenuLayoutBuilder extends LayoutBuilder {
 
     BorderPane rootPane;
-
     ChessConfigModel chessConfig;
 
-    public MenuLayoutBuilder(Runnable changeLayoutToGame, Runnable changeLayoutToSettings,
-                             Runnable changeLayoutToMoreOptions, ChessConfigModel chessConfig, PopupManager popupManager) {
-        this.changeLayoutToMoreOptions = changeLayoutToMoreOptions;
+    public MenuLayoutBuilder(LayoutManager layoutManager,
+                             ChessConfigModel chessConfig) {
+        super(chessConfig, layoutManager, MENU);
+
         this.chessConfig = chessConfig;
-        this.changeLayoutToGame = changeLayoutToGame;
-        this.changeLayoutToSettings = changeLayoutToSettings;
-        this.popupManager = popupManager;
-        rootPane = new BorderPane(createOptionsVBox());
-        rootPane.setTop(makeBoardOrnament());
     }
 
     private Node createOptionsVBox() {
         VBox vBox = new VBox(
-                makeQuickGameButton(),
+                makeDefaultGameButton(),
                 makeWildCardButton(),
                 makeSettingsButton(),
                 makeMoreOptionsButton());
         vBox.getStyleClass().add("options-vbox");
         return vBox;
+    }
+
+    private Button makeDefaultGameButton() {
+        Button button = makeQuickGameButton("defaultPvP.properties");
+        button.setText("Default Game");
+        return button;
     }
 
     private Node makeBoardOrnament() {
@@ -47,38 +44,38 @@ public class MenuLayoutBuilder implements Builder<Region> {
     }
 
     private Node makeSettingsButton() {
-        Button button = new Button("Settings");
-        button.setOnAction(event -> {
-            changeLayoutToSettings.run();
-        });
+        Button button = makeMenuButton("Settings");
+        button.setOnAction(gameButtonAction(() -> layoutManager.startup(SETTINGS)));
         return button;
+    }
+
+    private Button makeMenuButton(String text) {
+        return applyDisableSync(new Button(text));
     }
 
     private Node makeMoreOptionsButton() {
-        Button button = new Button("See more (doesn't work yet)");
-        button.setOnAction(event -> changeLayoutToMoreOptions.run());
+        Button button = makeMenuButton("See more");
+        button.setOnAction(gameButtonAction(() -> layoutManager.startup(GAME_OPTIONS)));
         return button;
     }
 
+
     private Node makeWildCardButton() {
-        PlayButton button = new PlayButton(changeLayoutToGame,
-                () -> chessConfig.setChessConfigFromPropertiesResource("reallyBigBasicChess.properties"));
+        Button button = makeQuickGameButton("reallyBigBasicChess.properties");
         button.setText("Wildcard 2 player");
         return button;
     }
 
-    private Node makeQuickGameButton() {
-        Button button = new PlayButtonWithPlayerTypeSelector(changeLayoutToGame,
-                chessConfig, () -> {
-            chessConfig.setChessConfigFromPropertiesResource("defaultPvB.properties");
-        }, popupManager);
-
-        button.setText("Quick Game");
-        return button;
-    }
 
     @Override
     public Region build() {
+        rootPane = new BorderPane(createOptionsVBox());
+        rootPane.setTop(makeBoardOrnament());
         return rootPane;
+    }
+
+    @Override
+    public void startup() {
+        super.startup();
     }
 }

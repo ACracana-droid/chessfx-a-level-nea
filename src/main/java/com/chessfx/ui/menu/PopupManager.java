@@ -1,6 +1,7 @@
 package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
+import com.chessfx.log.Log;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -26,6 +27,7 @@ public class PopupManager {
 
     public void askGameTypeAndWait(Runnable changeLayoutToGame, ChessConfigModel chessConfig) {
         // GamePopup class destroys itself upon completion, and switches layout if necessary.
+        Log.info("PopupManager", "Made new popup.");
         GamePopup popup = new GamePopup(changeLayoutToGame,
                 this::pop, chessConfig);
         double size = 0.3;

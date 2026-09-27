@@ -1,8 +1,10 @@
-package com.chessfx.engine;
+package com.chessfx.engine.board;
 
+import com.chessfx.engine.moves.Move;
+import com.chessfx.engine.moves.MoveVector;
 import com.chessfx.engine.pieces.King;
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.engine.tiles.TileParent;
+import com.chessfx.engine.tiles.TileBase;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Set;
 
 public class ChessEngine {
 
-    public static boolean givesCheck(TileParent[][] board, int y, int x) {
+    public static boolean givesCheck(TileBase[][] board, int y, int x) {
 
         return false;
     }
@@ -39,13 +41,13 @@ public class ChessEngine {
         return moves;
     }
 
-    private static TileParent getTile(int[] coOrds, TileParent[][] board) {
+    private static TileBase getTile(int[] coOrds, TileBase[][] board) {
         return board[coOrds[0]][coOrds[1]];
     }
 
 
     // TODO: DOCUMENT Fix turns
-    public static BoardState getBoardState(GameStateModel gameModel, TileParent[][] board) {
+    public static BoardState getBoardState(GameStateModel gameModel, TileBase[][] board) {
 
         if (true)
             return BoardState.DEFAULT;
@@ -72,7 +74,7 @@ public class ChessEngine {
         return false;
     }
 
-    private static boolean checkmate(King king, List<Piece> enemies, TileParent[][] board) {
+    private static boolean checkmate(King king, List<Piece> enemies, TileBase[][] board) {
 
 
         return false;
@@ -81,7 +83,7 @@ public class ChessEngine {
     // This is quite messy. This whole class is a major work in progress.
     private static boolean underThreat(King king,
                                        Map<String, Set<MoveVector>> moveSets,
-                                       Set<String> instantiatedPieceNames, TileParent[][] board) {
+                                       Set<String> instantiatedPieceNames, TileBase[][] board) {
         int[] kingCoOrds = king.getCoOrds();
         Set<?> set = moveSets.get("k");
         for (String name : instantiatedPieceNames) {

@@ -1,7 +1,7 @@
 package com.chessfx.ui.game.pieces;
 
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.engine.tiles.TileParent;
+import com.chessfx.engine.tiles.TileBase;
 import javafx.scene.Node;
 
 import java.io.IOException;
@@ -51,9 +51,11 @@ public class PieceSpriteFactory {
     }
 
 
-    public Node makePieceSprite(TileParent tile) {
-        Piece piece = tile.getPiece();
+    public Node makePieceSprite(TileBase tile) {
+        return makePieceSprite(tile.getPiece());
+    }
 
+    public Node makePieceSprite(Piece piece) {
         String svgFileString = svgStringMap.get(piece.getName());
         PieceSpriteBuilder sprite = new PieceSpriteBuilder(svgFileString, piece.getTeam());
         return sprite.build();

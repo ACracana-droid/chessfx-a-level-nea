@@ -1,6 +1,8 @@
 package com.chessfx.engine.pieces;
 
-import com.chessfx.engine.MoveVector;
+import com.chessfx.engine.moves.MoveVector;
+import com.chessfx.engine.board.Team;
+import com.chessfx.log.Log;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,15 +24,15 @@ public class PieceData {
         fenId = data[1];
         value = Integer.parseInt(data[2]);
         makeMoveSetFromData(data[3]);
-        System.out.println("PieceData: All moves for " + name + ":" + moveSet);
+        Log.debug("PieceData", "All moves for " + name + ":" + moveSet);
     }
 
     private void makeMoveSetFromData(String moveData) {
-        System.out.println("Initial move data: " + moveData);
+        Log.debug("Initial move data: " + moveData);
         moveSet = new HashSet<>();
         if (moveData.charAt(0) == '"' && moveData.charAt(moveData.length() - 1) == '"') {
             moveData = moveData.substring(1, moveData.length() - 1);
-            System.out.println("Trimming speech marks: " + moveData);
+            Log.debug("Trimming speech marks: " + moveData);
         }
 
         for (String move : moveData.split(";")) {
@@ -71,7 +73,7 @@ public class PieceData {
         processConditionsAndMoveTypes(move); // handles flags
 
         int distance = getSteps(move, len, -1);
-        System.out.println("PieceData: distance is " + distance);
+        Log.debug("PieceData", "distance is " + distance);
 
         if (move.charAt(i) == '/') {
             int vector1 = distance;

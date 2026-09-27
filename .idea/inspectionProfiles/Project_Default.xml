@@ -10,7 +10,7 @@
       <option name="myIgnoreVendorSpecificProperties" value="false" />
       <option name="myCustomPropertiesList">
         <value>
-          <list size="15">
+          <list size="16">
             <item index="0" class="java.lang.String" itemvalue="-fx-border-color" />
             <item index="1" class="java.lang.String" itemvalue="-fx-alignment" />
             <item index="2" class="java.lang.String" itemvalue="-fx-spacing" />
@@ -26,6 +26,7 @@
             <item index="12" class="java.lang.String" itemvalue="-fx-fill" />
             <item index="13" class="java.lang.String" itemvalue="-fx-stroke" />
             <item index="14" class="java.lang.String" itemvalue="-fx-color" />
+            <item index="15" class="java.lang.String" itemvalue="-fx-base" />
           </list>
         </value>
       </option>

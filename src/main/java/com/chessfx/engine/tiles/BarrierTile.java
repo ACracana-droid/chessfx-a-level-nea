@@ -1,14 +1,14 @@
 package com.chessfx.engine.tiles;
 
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.engine.pieces.Team;
+import com.chessfx.engine.board.Team;
 import com.chessfx.ui.game.tiles.TileUI;
 
 /**
  * This is the ancestor of tiles which other pieces cannot go on.
  * These tiles have no field to hold pieces and will return 'false'
  */
-public class BarrierTile extends TileParent {
+public class BarrierTile extends TileBase {
 
     public BarrierTile() {
 

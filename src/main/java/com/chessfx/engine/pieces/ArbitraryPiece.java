@@ -1,6 +1,7 @@
 package com.chessfx.engine.pieces;
 
-import com.chessfx.engine.MoveVector;
+import com.chessfx.engine.moves.MoveVector;
+import com.chessfx.engine.board.Team;
 
 public class ArbitraryPiece extends Piece {
 

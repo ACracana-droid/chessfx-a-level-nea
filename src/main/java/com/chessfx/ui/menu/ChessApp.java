@@ -1,15 +1,17 @@
 package com.chessfx.ui.menu;
 
+import com.chessfx.chessconfig.AppSettings;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class ChessApp extends Application {
-    final static String THEME_DIR = "/css/themes/";
+
+    public final static String THEME_DIR = "/css/themes/";
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -31,4 +33,20 @@ public class ChessApp extends Application {
         stage.show();
     }
 
+    @Override
+    public void init() throws Exception {
+        super.init();
+        // This happens before the start() method
+//        Parameters param = getParameters();
+//
+//        Log.warn(getParameters().getRaw().toString());
+//        Log.debug("In init method...");
+//        Log.debug(System.getProperty("log.level", "INFO"));
+//        String key = "log-threshold";
+//        if (param.getRaw().contains(key)) {
+//            int t = Integer.parseInt(param.getNamed().get("log-threshold"));
+//            Log.setThreshold(t);
+//        }
+
+    }
 }

@@ -2,9 +2,10 @@ package com.chessfx.chessconfig;
 
 import com.chessfx.engine.pieces.ArbitraryPieceFactory;
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.engine.pieces.Team;
+import com.chessfx.engine.board.Team;
 import com.chessfx.engine.tiles.Tile;
-import com.chessfx.engine.tiles.TileParent;
+import com.chessfx.engine.tiles.TileBase;
+import com.chessfx.log.Log;
 
 
 import java.util.HashSet;
@@ -16,8 +17,7 @@ public class FenManager {
     char[] fen;
     String fenStyle;
     private final TeamConf teamConf;
-    //    int fullmoveNumber;
-//    int halfmoveClock;
+
     int fullmoveNumber = 1;
     int halfmoveClock = 0;
     int startingTeamIdx;
@@ -28,7 +28,7 @@ public class FenManager {
 
     Map<String, String> fenIdToNameMap;
 
-    TileParent[][] board;
+    TileBase[][] board;
 
 
     // FEN stands for Forsyth-Edwards notation.
@@ -52,10 +52,10 @@ public class FenManager {
 
     private void makeBoard() {
         if (fenStyle.equals("case")) {
-            System.out.println("Fen Manager: Using cased fen.");
+            Log.debug("FenManager", "Using 'cased fen'.");
             makeBoardFromCasedTeamsFen();
         } else {
-            System.out.println("Fen Manager: Using complex FEN: UNFINISHED!!!!");
+            Log.debug("FenManager", "Using 'complex fen'.");
             makeBoardFromComplexFen();
         }
     }
@@ -68,9 +68,9 @@ public class FenManager {
         return halfmoveClock;
     }
 
-    public TileParent[][] getGameBoard() {
+    public TileBase[][] getGameBoard() {
         if (board == null)
-            System.out.println("Fen Manager: Board is null!");
+            Log.warn("FenManager", "Board is null");
         return board;
     }
 
@@ -80,7 +80,6 @@ public class FenManager {
      * this into a 2D array. Supports variable board size, more players and special tiles,
      * but is not compatible with real world FEN.
      *
-     * @return 2D array which represents a full board state.
      */
     private void makeBoardFromComplexFen() {
         //TODO: Make new FEN-inspired notation supporting different tile types.
@@ -95,7 +94,7 @@ public class FenManager {
      *
      */
     private void makeBoardFromCasedTeamsFen() {
-        board = new TileParent[height][width];
+        board = new TileBase[height][width];
 
         // 0 indexed internally. (rank == row and file == column)
         i = 0;
@@ -120,12 +119,11 @@ public class FenManager {
         halfmoveClock = getHalfmoveNumber();
         i++;
         fullmoveNumber = getFullmoveNumber();
-        System.out.println("Fen Manager: Parsed whole FEN String.");
+        Log.debug("FenManager", "Parsed whole FEN string.");
     }
 
     private void parseStartingTeam() {
         startingTeamIdx = (fen[i] == 'w') ? teamConf.whiteIdx : teamConf.blackIdx;
-        System.out.println("Team: " + startingTeamIdx);
         i += 2;
     }
 
@@ -164,7 +162,7 @@ public class FenManager {
             halfmove = halfmove * 10 + Character.getNumericValue(fen[i]);
             i++;
         }
-        System.out.println("halfmove clock: " + halfmove);
+        Log.debug("Halfmove clock: " + halfmove);
         return halfmove;
     }
 
@@ -175,22 +173,21 @@ public class FenManager {
             fullmove = fullmove * 10 + Character.getNumericValue(fen[i]);
             i++;
         }
-        System.out.println("fullmove number: " + fullmoveNumber);
+        Log.debug("fullmove number: " + fullmoveNumber);
         return fullmove;
     }
 
     private void temporaryBoardChecks() {
-        System.out.println("Fen Manager: doing temporary board checks ");
+        Log.debug("Fen Manager", "Doing temporary board checks...");
         int count = 0;
         for (int idx = 0; idx < height; idx++) {
             for (int j = 0; j < width; j++) {
                 if (board[idx][j] == null) {
                     count++;
-                    System.out.println("" + idx + " " + j);
                 }
             }
         }
-        System.out.println("Fen Manager: Null count: " + count);
+        Log.debug("Fen Manager", "Null count: " + count);
     }
 
     public Piece makePieceFromAscii(char c, int rank, int file) {

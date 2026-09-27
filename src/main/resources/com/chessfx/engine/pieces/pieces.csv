@@ -6,3 +6,4 @@ queen,Q,9,n*
 king,K,-1,1*
 chancellor,C,10,n+;~1/2
 archbishop,A,10,nX;~1/2
+amazon,Z,13,n*;~1/2

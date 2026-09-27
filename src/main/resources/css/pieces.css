@@ -25,8 +25,8 @@
     /*-fx-opacity: 1;*/
     /*-fx-fill-rule: nonzero;*/
     /*-fx-stroke-width: 1.5;*/
-    /*-fx-stroke-linecap: round;*/
-    /*!*-fx-stroke-linejoin: round;*!*/
+    -fx-stroke-linecap: round;
+    /*-fx-stroke-linejoin: round;*/
     /*-fx-stroke-miterlimit: 4;*/
     /*-fx-stroke-dasharray: none;*/
 
@@ -55,8 +55,13 @@
     -fx-stroke: -light-piece-fill;
 }
 
+
 .no-fill {
-    -fx-fill: none;
+    -fx-fill: none !important;
+}
+
+.no-stroke {
+    -fx-stroke: none !important;
 }
 
 .dark .light-pattern {

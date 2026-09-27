@@ -1,4 +1,6 @@
-package com.chessfx.ui.menu;
+package com.chessfx.chessconfig;
+
+import com.chessfx.log.Log;
 
 import javafx.collections.ObservableList;
 
@@ -22,6 +24,8 @@ import static com.chessfx.ui.menu.ChessApp.THEME_DIR;
  *
  */
 public class AppSettings {
+    // TODO: MOVE this to chessconfig dir?
+
     // Config file should be convenient and hidden from user.
     // This is quite primitive.
     String PROPERTIES_FILE_PATH = System.getProperty("user.home") + "/.chessFXAppData/settings.properties";
@@ -37,7 +41,7 @@ public class AppSettings {
             properties.load(fileInputStream);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("First properties check failed.\nPath was " + PROPERTIES_FILE_PATH);
+            Log.warn("First properties check failed.\nPath was " + PROPERTIES_FILE_PATH);
             createDefaultPropertiesFile();
         }
     }
@@ -51,15 +55,17 @@ public class AppSettings {
     private void writePropertiesToFile() {
         // Try to save the properties to the file
         Path path = Paths.get(PROPERTIES_FILE_PATH);
+
         try {
+
             if (path.getParent() != null) {
                 Files.createDirectories(path.getParent());
             }
             properties.store(new FileOutputStream(PROPERTIES_FILE_PATH), null);
-            System.out.println("Successfully wrote properties to: " + PROPERTIES_FILE_PATH);
+            Log.info("Successfully wrote properties to: " + PROPERTIES_FILE_PATH);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Error that should never happen.\nPath to file was: "
+            Log.error("AppSettings", "Error that should never happen.\nPath to file was: "
                     + PROPERTIES_FILE_PATH);
         }
     }

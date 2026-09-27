@@ -1,6 +1,6 @@
-package com.chessfx.engine;
+package com.chessfx.engine.moves;
 
-public class MoveVector implements Cloneable {
+public class MoveVector {
 
 
     // 1 1 1 1 1 1 1 int int int
@@ -72,7 +72,6 @@ public class MoveVector implements Cloneable {
         return steps;
     }
 
-
     public boolean isCaptureOnly() {
         return flags[1];
     }
@@ -97,14 +96,4 @@ public class MoveVector implements Cloneable {
         return dy > 1 || dx > 1;
     }
 
-    @Override
-    public MoveVector clone() {
-        try {
-            MoveVector clone = (MoveVector) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
 }

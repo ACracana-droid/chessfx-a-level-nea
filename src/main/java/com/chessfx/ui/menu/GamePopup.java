@@ -1,15 +1,16 @@
 package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
+import com.chessfx.log.Log;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 
-public class GamePopup extends DraggableRegion {
-
+public class GamePopup extends Region {
 
     private final Runnable changeLayoutToGame;
     private final Runnable removePopup;
@@ -17,6 +18,7 @@ public class GamePopup extends DraggableRegion {
 
     public GamePopup(Runnable changeLayoutToGame, Runnable removePopup, ChessConfigModel chessConfig) {
         super();
+//        makeDraggableNode(this);
         this.changeLayoutToGame = changeLayoutToGame;
         this.removePopup = removePopup;
         this.chessConfig = chessConfig;
@@ -52,6 +54,7 @@ public class GamePopup extends DraggableRegion {
         chessConfig.setGameType(gameType);
         removePopup.run();
         changeLayoutToGame.run();
+        Log.info("Popup removed.");
     }
 
     private Label makeDescriptionLabel() {

@@ -1,10 +1,10 @@
 package com.chessfx.engine.tiles;
 
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.engine.pieces.Team;
+import com.chessfx.engine.board.Team;
 import com.chessfx.ui.game.tiles.TileUI;
 
-public class Tile extends TileParent {
+public class Tile extends TileBase {
     Piece piece;
 
     public Tile(Piece piece) {

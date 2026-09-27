@@ -1,7 +1,6 @@
-package com.chessfx.ui.game;
+package com.chessfx.ui.game.board;
 
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
 

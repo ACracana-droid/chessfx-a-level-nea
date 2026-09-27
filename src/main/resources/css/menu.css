@@ -19,9 +19,9 @@
     -fx-font-size: 60px;
     -fx-alignment: center;
     -fx-font-family: Fira Sans Bold;
-    -fx-stroke: -fg1;
+    -fx-stroke: -fg3;
     -fx-fill: -fg1;
-    -fx-stroke-width: 6;
+    -fx-stroke-width: 0.03em;
 }
 
 .title-ornament {
@@ -34,6 +34,7 @@
 .game-top-wrapper {
     -fx-spacing: 40px;
     -fx-alignment: center;
+    -fx-border-color: green;
 }
 
 
@@ -48,6 +49,24 @@
     -fx-alignment: center;
 }
 
+.board-state-label {
+    -fx-alignment: center;
+}
+
+.board-state-label:check {
+    -fx-text-fill: red;
+
+
+}
+
+.board-state-label:stalemate {
+    -fx-color: blue;
+}
+
+.board-state-label:checkmate {
+    -fx-color: orange;
+}
+
 .current-turn-label {
     -fx-alignment: center;
     /*-fx-pref-height: 0.5em;*/
@@ -59,6 +78,7 @@
 
 .move-table {
     -fx-font-size: 1.4em;
+    -fx-alignment: center-right;
 }
 
 .table-label {
@@ -68,7 +88,7 @@
 }
 
 .movetable-hbox {
-    /*No spacing*/
+    /*No spacing. For button that shows/hides the movetable*/
     -fx-alignment: center;
 }
 
@@ -90,8 +110,8 @@
 }
 
 .return-vbox {
-    -fx-spacing: 10px;
-    -fx-padding: 20px;
+    -fx-spacing: 1em;
+    -fx-padding: 2em;
 }
 
 
@@ -129,4 +149,23 @@
     -fx-background-color: -bg2;
     -fx-border-color: -active;
     -fx-alignment: center;
+}
+
+.game-button {
+
+}
+
+.game-screen-centre {
+    -fx-alignment: center;
+    -fx-spacing: 0.7em;
+    -fx-padding: 0;
+    /*2em*/
+    -fx-border-color: red;
+}
+
+.undo-button {
+    -fx-alignment: center-right;
+    -fx-spacing: 1em;
+    -fx-padding: 2em;
+    -fx-base: red;
 }

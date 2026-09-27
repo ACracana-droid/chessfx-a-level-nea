@@ -1,6 +1,8 @@
-package com.chessfx.engine.pieces;
+package com.chessfx.engine.board;
 
-import com.chessfx.engine.MoveVector;
+import com.chessfx.engine.moves.MoveVector;
+import com.chessfx.engine.pieces.King;
+import com.chessfx.engine.pieces.Piece;
 
 import java.util.*;
 
@@ -23,9 +25,7 @@ public class Team {
     public Team(String styleClass, int[] moveTransform) {
         this.styleClass = styleClass;
         this.moveTransform = moveTransform;
-        this.playerType = playerType;
     }
-
 
     public List<Piece> getPieceList() {
         return pieceList;
@@ -33,10 +33,6 @@ public class Team {
 
     public String getStyleClassString() {
         return styleClass;
-    }
-
-    public void addCapture(Piece capture) {
-        capturedPieceList.add(capture);
     }
 
     public int[] getMoveTransform() {
@@ -75,7 +71,6 @@ public class Team {
         return moveSets;
     }
 
-
     public void addMoveSetToList(String fenId, Set<MoveVector> set) {
         moveSets.put(fenId, set);
     }
@@ -83,4 +78,10 @@ public class Team {
     public void removeCapture(Piece capture) {
         capturedPieceList.remove(capture);
     }
+
+
+    public List<Piece> getCapturedPieces() {
+        return capturedPieceList;
+    }
+
 }

@@ -11,6 +11,12 @@ For the chessboard:
     -frame: red;
 }
 
+/* WRAPPER WRAPPER (StackPane) */
+.chessboard-wrapper {
+    -fx-alignment: center;
+    -fx-border-color: orange;
+}
+
 /* WRAPPER (GridPane) */
 .chessboard {
     -fx-alignment: center;

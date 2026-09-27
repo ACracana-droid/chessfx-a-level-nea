@@ -16,7 +16,6 @@ public class PlayButton extends Button {
     }
 
     private void changeLayoutToGame(Runnable changeLayoutToGame, Runnable setChessConfig) {
-
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {

@@ -1,39 +1,50 @@
 package com.chessfx.ui.game;
 
 import com.chessfx.chessconfig.ChessConfigModel;
-import com.chessfx.engine.GameStateModel;
-import com.chessfx.engine.ReactiveChessContainer;
-import com.chessfx.ui.menu.ReturnButton;
+import com.chessfx.engine.board.GameStateModel;
+import com.chessfx.engine.board.ReactiveChessContainer;
+import com.chessfx.log.Log;
+import com.chessfx.ui.game.board.BoardUIModel;
+import com.chessfx.ui.game.board.ChessBoardBuilder;
+import com.chessfx.chessconfig.AppSettings;
+import com.chessfx.ui.menu.LayoutBuilder;
+import com.chessfx.ui.menu.LayoutManager;
+import com.chessfx.ui.menu.ThemeDropDown;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.*;
-import javafx.util.Builder;
 
 
-public class GameLayoutBuilder implements Builder<Region> {
+public class GameLayoutBuilder extends LayoutBuilder {
 
-    Runnable changeLayoutToMenu;
-    BorderPane rootPane;
-    private ReactiveChessContainer boardModel;
-    ChessConfigModel chessConfig;
+    private final BorderPane rootPane;
+    private ReactiveChessContainer boardContainer;
 
+    private final ChessConfigModel chessConfig;
+    private final AppSettings appSettings;
+    private BoardUIModel boardUIModel;
 
-    public GameLayoutBuilder(Runnable changeLayoutToMenu, ChessConfigModel chessConfig) {
-        this.changeLayoutToMenu = handleGameTermination(changeLayoutToMenu);
+    public GameLayoutBuilder(LayoutManager layoutManager, ChessConfigModel chessConfig, AppSettings appSettings) {
+        super(chessConfig, layoutManager, LayoutManager.Layout.GAME);
         this.chessConfig = chessConfig;
+        this.appSettings = appSettings;
         rootPane = new BorderPane();
         warmUpHeavyClasses();
     }
 
-    private Runnable handleGameTermination(Runnable changeLayoutToMenu) {
+    private Runnable endAndReturnAction() {
         return () -> {
             terminate();
-            changeLayoutToMenu.run();
+            layoutManager.startup(LayoutManager.Layout.MENU);
         };
     }
 
@@ -43,17 +54,48 @@ public class GameLayoutBuilder implements Builder<Region> {
      * a good idea to force the classes to compile before loading them with user input. This method does just that.
      */
     private void warmUpHeavyClasses() {
-        rootPane.setTop(makeGameTopWrapper(new SimpleIntegerProperty()));
+        rootPane.setTop(makeGameTopWrapper(new SimpleIntegerProperty(), new SimpleStringProperty()));
         rootPane.setCenter(new ChessBoardBuilder().build());
         rootPane.layout();
         rootPane.applyCss();
-
     }
 
-    private HBox makeTurnCounterHBox(IntegerProperty turnCountProperty) {
-        HBox hBox = new HBox(makeTimer(), makeTurnCounter(turnCountProperty));
+    private HBox makeTurnCounterHBox(IntegerProperty turnCountProperty, StringProperty boardStateProperty) {
+        HBox hBox = new HBox(makeTimer(), makeTurnCounter(turnCountProperty), makeBoardStateLabel(boardStateProperty));
         hBox.getStyleClass().add("game-top-hbox");
         return hBox;
+    }
+
+    private Label makeBoardStateLabel(StringProperty boardStateProperty) {
+        Label label = new Label();
+        label.textProperty().bind(boardStateProperty);
+        setUpBoardStatePseudoClasses(boardStateProperty, label);
+        label.getStyleClass().add("board-state-label");
+        return label;
+    }
+
+    private void setUpBoardStatePseudoClasses(StringProperty boardStateProperty, Label label) {
+        PseudoClass check = PseudoClass.getPseudoClass("check");
+        PseudoClass stalemate = PseudoClass.getPseudoClass("stalemate");
+        PseudoClass checkmate = PseudoClass.getPseudoClass("checkmate");
+        boardStateProperty.addListener(inv -> {
+            String state = boardStateProperty.get();
+            label.pseudoClassStateChanged(stalemate, false);
+            label.pseudoClassStateChanged(checkmate, false);
+            label.pseudoClassStateChanged(check, false);
+            switch (state.toLowerCase()) {
+                case "check":
+                    Log.warn("BOARD STATE PROPERTY IS CHECK!!");
+                    label.pseudoClassStateChanged(check, true);
+                    break;
+                case "stalemate":
+                    label.pseudoClassStateChanged(stalemate, true);
+                    break;
+                case "checkmate":
+                    label.pseudoClassStateChanged(checkmate, true);
+                    break;
+            }
+        });
     }
 
 
@@ -72,8 +114,6 @@ public class GameLayoutBuilder implements Builder<Region> {
 
     @Override
     public Region build() {
-
-//        rootPane.setOnMouseClicked(event -> handleGlobalInGameMouseClick());
         return rootPane;
     }
 
@@ -84,46 +124,88 @@ public class GameLayoutBuilder implements Builder<Region> {
      * <p>
      * Due to threading, this likely happens during the `manageLayoutAnimation()`
      * in RootWrapperBuilder.
+     *
+     * @return runnable which starts the game properly.
      */
-    public void startup(Runnable fadeInLayout) {
-
-
+    @Override
+    public void startup() {
         Task<Void> loadBoardModel = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                boardModel = new ReactiveChessContainer(new GameStateModel(chessConfig), chessConfig.getGameBoard());
-
+                Log.debug("GameLayoutBuilder", "Creating ReactiveChessContainer off the FXAT...");
+                boardContainer = new ReactiveChessContainer(new GameStateModel(chessConfig), chessConfig.getGameBoard());
+                Log.debug("Finished making ReactiveChessContainer");
                 return null;
             }
         };
         loadBoardModel.setOnSucceeded(event -> {
-            rootPane.setCenter(new ChessBoardBuilder(boardModel, chessConfig).build());
-            rootPane.setTop(makeGameTopWrapper(boardModel.fullmoveCounterProperty()));
-            rootPane.setBottom(makeTurnLabel(boardModel.currentTeamStringProperty()));
-            rootPane.setRight(makeMoveTableSideBar(
-                    new MoveTable(boardModel.getMoveTableData())
-            ));
+            Log.debug("GameLayoutBuilder", "Successfully created backend board.");
+            ChessBoardBuilder boardBuilder = (new ChessBoardBuilder(boardContainer, chessConfig));
+            boardUIModel = boardBuilder.getBoardUIModel();
+            rootPane.setCenter(screenCentreHBox(boardBuilder.build(), makeMoveTableSideBar(
+                    new MoveTable(boardContainer.getMoveTableData(), makeGameButton("<"))
+            )));
+            rootPane.setTop(makeGameTopWrapper(boardContainer.fullmoveCounterProperty(), boardContainer.boardStateProperty()));
+            rootPane.setBottom(makeTurnLabel(boardContainer.currentTeamStringProperty()));
 
-            fadeInLayout.run();
+            super.startup();
         });
         Thread thread = new Thread(loadBoardModel);
         thread.start();
     }
 
-    private Node makeMoveTableSideBar(MoveTable moveTable) {
+    private Node screenCentreHBox(Node board, Node moveTable) {
+        HBox hBox = new HBox(board, moveTable);
+        // Otherwise board is tiny!
+        HBox.setHgrow(board, Priority.ALWAYS);
 
+        hBox.getStyleClass().add("game-screen-centre");
+        return hBox;
+    }
+
+    private Node makeMoveTableSideBar(MoveTable moveTable) {
+        // Styling to make the button work better.
         return moveTable;
     }
 
 
-    private Node makeGameTopWrapper(IntegerProperty fullmoveCounterProperty) {
-        StackPane pane = new StackPane(
-                makeTurnCounterHBox(fullmoveCounterProperty),
-                new ReturnButton(changeLayoutToMenu, "Exit").getAsVBox()
-        );
+    private Node makeGameTopWrapper(IntegerProperty fullmoveCounterProperty, StringProperty boardStateProperty) {
+        BorderPane pane = new BorderPane();
+
+        pane.setLeft(makeTopLeftHBox());
+        pane.setRight(makeUndoButton());
+        pane.setCenter(makeTurnCounterHBox(fullmoveCounterProperty, boardStateProperty));
 
         pane.getStyleClass().add("game-top-wrapper");
         return pane;
+    }
+
+    private HBox makeTopLeftHBox() {
+        Button returnButton = returnButton("Exit", endAndReturnAction());
+        returnButton.setFocusTraversable(false);
+
+        HBox hBox = new HBox(returnButton, makeThemeDropDown());
+        hBox.getStyleClass().add("return-vbox");
+        return hBox;
+    }
+
+    private Node makeThemeDropDown() {
+        MenuButton dropdown = new ThemeDropDown(appSettings).build();
+        dropdown.setFocusTraversable(false);
+        return dropdown;
+    }
+
+
+    private Node makeUndoButton() {
+        Button button = makeGameButton("Undo", () -> {
+            if (boardContainer == null) return;
+            boardUIModel.undoLastMoveIfPossible();
+        });
+        // Vbox does not take up horizontal space on layout
+        button.getStyleClass().add("undo-button");
+        VBox box = new VBox(button);
+        box.getStyleClass().add("undo-button");
+        return box;
     }
 
 
@@ -138,11 +220,13 @@ public class GameLayoutBuilder implements Builder<Region> {
         Task<Void> terminate = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                boardModel.terminate();
+                boardContainer.terminate();
                 return null;
             }
         };
         Thread thread = new Thread(terminate);
         thread.start();
     }
+
 }
+
