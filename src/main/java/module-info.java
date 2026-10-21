@@ -25,4 +25,6 @@ module com.chess.chessfx {
     exports com.chessfx.ui.game.board;
     opens com.chessfx.ui.game.board to javafx.fxml;
     opens com.chessfx.chessconfig to javafx.fxml;
+    exports com.chessfx.ui.util;
+    opens com.chessfx.ui.util to javafx.fxml;
 }

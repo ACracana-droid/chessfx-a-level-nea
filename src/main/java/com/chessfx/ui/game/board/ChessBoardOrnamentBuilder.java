@@ -8,9 +8,9 @@ public class ChessBoardOrnamentBuilder extends ChessBoardBuilder {
 
     public ChessBoardOrnamentBuilder() {
         super();
-        container.setRotate(45.0);
-        container.getStyleClass().add("title-ornament");
-        container.getChildren().add(makeTitleLabel());
+        view.setRotate(45.0);
+        view.getStyleClass().add("title-ornament");
+        view.getChildren().add(makeTitleLabel());
     }
 
     private Node makeTitleLabel() {

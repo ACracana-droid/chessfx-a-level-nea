@@ -1,14 +1,12 @@
 package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
-import javafx.beans.binding.DoubleBinding;
+import com.chessfx.ui.util.LayoutManager;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.util.Builder;
 
-import static com.chessfx.ui.menu.LayoutManager.Layout.GAME_OPTIONS;
+import static com.chessfx.ui.util.LayoutManager.Layout.GAME_OPTIONS;
 
 
 public class AllGameOptionsLayoutBuilder extends LayoutBuilder {

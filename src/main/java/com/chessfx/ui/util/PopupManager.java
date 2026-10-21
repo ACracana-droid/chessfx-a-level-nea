@@ -1,7 +1,8 @@
-package com.chessfx.ui.menu;
+package com.chessfx.ui.util;
 
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
+import com.chessfx.ui.menu.GamePopup;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -50,4 +51,8 @@ public class PopupManager {
         rootChildren.add(popupIndex, popup);
     }
 
+    private void push(Node node) {
+        popupIndex++;
+        rootChildren.add(popupIndex, node);
+    }
 }

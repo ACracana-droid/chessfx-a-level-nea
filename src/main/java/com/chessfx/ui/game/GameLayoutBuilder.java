@@ -8,7 +8,7 @@ import com.chessfx.ui.game.board.BoardUIModel;
 import com.chessfx.ui.game.board.ChessBoardBuilder;
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.ui.menu.LayoutBuilder;
-import com.chessfx.ui.menu.LayoutManager;
+import com.chessfx.ui.util.LayoutManager;
 import com.chessfx.ui.menu.ThemeDropDown;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -140,7 +140,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
         };
         loadBoardModel.setOnSucceeded(event -> {
             Log.debug("GameLayoutBuilder", "Successfully created backend board.");
-            ChessBoardBuilder boardBuilder = (new ChessBoardBuilder(boardContainer, chessConfig));
+            ChessBoardBuilder boardBuilder = (new ChessBoardBuilder(boardContainer, chessConfig, layoutManager));
             boardUIModel = boardBuilder.getBoardUIModel();
             rootPane.setCenter(screenCentreHBox(boardBuilder.build(), makeMoveTableSideBar(
                     new MoveTable(boardContainer.getMoveTableData(), makeGameButton("<"))

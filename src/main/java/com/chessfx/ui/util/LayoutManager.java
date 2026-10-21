@@ -1,16 +1,17 @@
-package com.chessfx.ui.menu;
+package com.chessfx.ui.util;
 
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
 import com.chessfx.ui.game.GameLayoutBuilder;
+import com.chessfx.ui.menu.*;
 import javafx.animation.FadeTransition;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.util.Duration;
 
-import static com.chessfx.ui.menu.LayoutManager.Layout.*;
+import static com.chessfx.ui.util.LayoutManager.Layout.*;
 
 /**
  * An alternative to my runnables.
@@ -27,7 +28,6 @@ public class LayoutManager {
 
     private final PopupManager popupManager;
 
-
     // Backend
     private final ChessConfigModel chessConfig;
     private final AppSettings appSettings;
@@ -40,12 +40,12 @@ public class LayoutManager {
         this.popupManager = popupManager;
         this.chessConfig = chessConfig;
         this.appSettings = appSettings;
-        init();
-        startup(MENU);
+        initialiseLayouts();
+        startup(currentLayout);
         Log.debug("LayoutManager", "Finished constructing.");
     }
 
-    private void init() {
+    private void initialiseLayouts() {
         GAME.layoutBuilder = new GameLayoutBuilder(
                 this, chessConfig, appSettings);
 
@@ -97,6 +97,7 @@ public class LayoutManager {
     public PopupManager getPopupManager() {
         return popupManager;
     }
+
 
     public enum Layout {
         MENU,

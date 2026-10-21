@@ -2,6 +2,8 @@ package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.AppSettings;
 
+import com.chessfx.chessconfig.ChessConfigModel;
+import com.chessfx.log.Log;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,11 +15,14 @@ public class ChessApp extends Application {
 
     public final static String THEME_DIR = "/css/themes/";
 
+    AppSettings appSettings;
+    ChessConfigModel chessConfig;
+
+
     @Override
     public void start(Stage stage) throws IOException {
-        AppSettings appSettings = new AppSettings();
 
-        Scene scene = new Scene(new RootWrapperBuilder(appSettings).build(), 628, 746);
+        Scene scene = new Scene(new RootWrapperBuilder(appSettings, chessConfig).build(), 628, 746);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
                 THEME_DIR + appSettings.getThemeName() + ".css"
         )).toExternalForm());
@@ -36,6 +41,12 @@ public class ChessApp extends Application {
     @Override
     public void init() throws Exception {
         super.init();
+        Log.debug("Running init() function...");
+        appSettings = new AppSettings();
+        chessConfig = new ChessConfigModel();
+        Log.debug("Finished init() function.");
+
+
         // This happens before the start() method
 //        Parameters param = getParameters();
 //

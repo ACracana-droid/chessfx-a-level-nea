@@ -3,7 +3,7 @@
     -bg1: #1a1b26;
     -fg2: #f7768e;
     -fg2-opacity: #f7768e3E;
-    -bg2:  #24283b;
+    -bg2: #24283b;
     -fg3: #7dcfff;
     -bg3: #1a1b26;
     -outline1: #f7768e;
@@ -28,9 +28,13 @@
 
     /* Tile States */
     -active: #7dcfff;
+    -active-h: #afd4ea;
     -capture: #f7768e;
+    -capture-h: #f194a5;
     -capture-shadow: #f7768e33;
     -valid-move: #7aa2f7;
+    -valid-move-h: #a4bff3;
+
 
     -shadow: -bg-var2;
 

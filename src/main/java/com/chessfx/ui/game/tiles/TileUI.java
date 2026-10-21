@@ -4,6 +4,7 @@ import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.tiles.BarrierTile;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.engine.tiles.VoidTile;
+import com.chessfx.log.Log;
 import com.chessfx.ui.game.board.BoardUIModel;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import javafx.beans.binding.NumberBinding;
@@ -12,16 +13,19 @@ import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 
 
 public class TileUI extends StackPane {
 
-    TileBase tile;
-    StringProperty uiState = new SimpleStringProperty("");
-    BoardUIModel uiModel;
-    Move prospectiveMove;
-    boolean isShowingSprite;
+    private TileBase tile;
+    private final StringProperty uiState = new SimpleStringProperty("");
+    private BoardUIModel uiModel;
+    private Move prospectiveMove;
+
+    private boolean isShowingSprite;
+    private Region pieceSprite;
 
     public TileUI(TileBase tile, TileColour tileColour, NumberBinding tileSizeBinding,
                   PieceSpriteFactory pieceSpriteFactory, BoardUIModel uiModel, int i, int j) {
@@ -35,11 +39,11 @@ public class TileUI extends StackPane {
         if (tile != null)
             tile.style(this);
         else {
-            System.out.println("TileUI: This TileParent is null!");
+            Log.error("TileUI", "This TileParent is null!");
             getStyleClass().add("null-tile"); // for debugging
         }
 
-        /// temporarily show array numberings.
+        /// show array numbering (ADD SETTING)
 //        Label numbering = new Label(i + ", " + j);
 //        numbering.setVisible(true);
 //        this.getChildren().add(numbering);
@@ -50,17 +54,10 @@ public class TileUI extends StackPane {
 
         if (!(tile instanceof BarrierTile)) {
             setUpPseudoClasses();
-            this.setOnMouseClicked(event -> handleTileClick());
-            this.setOnMouseDragged(event -> handleTileDrag(event));
-        }
-
-    }
-
-    private void handleTileDrag(MouseEvent event) {
-        if (isShowingSprite && tile.hasPiece()){
-
+            this.setOnMousePressed(event -> handleTilePressed(event));
         }
     }
+
 
     private String getColourStyleClass(TileColour tileColour) {
         switch (tileColour) {
@@ -93,11 +90,13 @@ public class TileUI extends StackPane {
         PseudoClass active = PseudoClass.getPseudoClass("active");
         PseudoClass validMove = PseudoClass.getPseudoClass("valid-move");
         PseudoClass capture = PseudoClass.getPseudoClass("capture");
+
         uiState.addListener(inv -> {
             String state = this.uiState.get();
             this.pseudoClassStateChanged(validMove, false);
             this.pseudoClassStateChanged(capture, false);
             this.pseudoClassStateChanged(active, false);
+
             switch (state) {
                 case "active":
                     this.pseudoClassStateChanged(active, true);
@@ -110,10 +109,12 @@ public class TileUI extends StackPane {
                     break;
             }
         });
+
     }
 
-    private void handleTileClick() {
-        uiModel.handleTileClick(this, tile, prospectiveMove);
+
+    private void handleTilePressed(MouseEvent event) {
+        uiModel.handleTilePressed(this, tile, prospectiveMove, event);
     }
 
     public void setActive() {
@@ -136,7 +137,8 @@ public class TileUI extends StackPane {
     }
 
     private void showNewPiece(PieceSpriteFactory pieceSpriteFactory) {
-        this.getChildren().add(pieceSpriteFactory.makePieceSprite(tile));
+        pieceSprite = pieceSpriteFactory.makePieceSprite(tile);
+        this.getChildren().add(pieceSprite);
         isShowingSprite = true;
     }
 
@@ -149,27 +151,31 @@ public class TileUI extends StackPane {
         else uiState.set("valid-move");
     }
 
-    public Node removePieceSprite() {
+    public Region removePieceSprite() {
         isShowingSprite = false;
-        return this.getChildren().removeLast();
+        this.getChildren().remove(pieceSprite);
+
+        Region temp = pieceSprite;
+        pieceSprite = null;
+        return temp;
     }
 
     public boolean hasPiece() {
         return tile.hasPiece();
     }
 
-    public Node removeExistingPieceSprite() {
+    public Region removeExistingPieceSprite() {
         if (isShowingSprite) {
             System.out.println("Piece sprite exists and is being removed.");
-            isShowingSprite = false;
-            return this.getChildren().removeLast();
+            return removePieceSprite();
         } else {
             System.out.println("Piece sprite doesn't exist.");
         }
         return null;
     }
 
-    public void showPieceSprite(Node pieceSprite) {
+    public void showPieceSprite(Region pieceSprite) {
+        this.pieceSprite = pieceSprite;
         this.getChildren().add(pieceSprite);
         isShowingSprite = true;
     }
@@ -183,4 +189,15 @@ public class TileUI extends StackPane {
         return prospectiveMove;
     }
 
+    public Region getPieceSprite() {
+        return pieceSprite;
+    }
+
+    public Region swapSprites(Region swapSprite) {
+        Region temp = pieceSprite;
+        this.getChildren().remove(pieceSprite);
+        this.getChildren().add(swapSprite);
+        pieceSprite = swapSprite;
+        return temp;
+    }
 }

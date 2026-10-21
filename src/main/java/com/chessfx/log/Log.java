@@ -13,11 +13,16 @@ import static com.chessfx.log.Log.LogType.*;
 public enum Log {
     LOG;
 
-
     private static int threshold = 0;
+    private static LogType prevState = DEBUG;
 
     public static void setThreshold(int threshold) {
         Log.threshold = threshold;
+    }
+
+    public static void cont(String s) {
+        if (threshold(prevState.priority))
+            System.out.println("-> " + s);
     }
 
 
@@ -116,7 +121,7 @@ public enum Log {
         }
     }
 
-    private boolean threshold(Priority priority) {
+    private static boolean threshold(Priority priority) {
         return priority.getNum() > threshold;
     }
 
@@ -128,5 +133,4 @@ public enum Log {
         if (threshold(type.priority))
             System.out.println(type.colour() + className + ": " + message);
     }
-
 }

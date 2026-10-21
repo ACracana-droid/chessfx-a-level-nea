@@ -2,6 +2,7 @@ package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
+import com.chessfx.ui.util.LayoutManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Task;

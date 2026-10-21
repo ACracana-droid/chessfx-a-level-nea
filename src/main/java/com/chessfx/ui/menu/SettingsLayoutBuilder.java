@@ -1,6 +1,7 @@
 package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.AppSettings;
+import com.chessfx.ui.util.LayoutManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Orientation;
@@ -9,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 
-import static com.chessfx.ui.menu.LayoutManager.Layout.MENU;
+import static com.chessfx.ui.util.LayoutManager.Layout.MENU;
 
 
 public class SettingsLayoutBuilder extends LayoutBuilder {

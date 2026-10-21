@@ -125,6 +125,7 @@ public class MoveTable extends StackPane {
         grid = new GridPane();
         grid.getStyleClass().add("move-table");
         grid.add(headerLabel("#"), 0, 0);
+        grid.setFocusTraversable(false);
         for (int i = 0; i < ref.getTeams().size(); i++) {
             grid.add(headerLabel(ref.getTeams().get(i).getName()), i + 1, 0);
         }

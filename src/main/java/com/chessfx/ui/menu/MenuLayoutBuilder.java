@@ -2,13 +2,14 @@ package com.chessfx.ui.menu;
 
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.ui.game.board.ChessBoardOrnamentBuilder;
+import com.chessfx.ui.util.LayoutManager;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 
-import static com.chessfx.ui.menu.LayoutManager.Layout.*;
-import static com.chessfx.ui.menu.LayoutManager.Layout.GAME_OPTIONS;
-import static com.chessfx.ui.menu.LayoutManager.Layout.MENU;
+import static com.chessfx.ui.util.LayoutManager.Layout.*;
+import static com.chessfx.ui.util.LayoutManager.Layout.GAME_OPTIONS;
+import static com.chessfx.ui.util.LayoutManager.Layout.MENU;
 
 public class MenuLayoutBuilder extends LayoutBuilder {
 

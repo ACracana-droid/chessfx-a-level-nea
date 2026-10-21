@@ -7,14 +7,19 @@ For the chessboard:
 */
 
 .root {
-    -this: red;
-    -frame: red;
+    -tile-colour: red; /* placeholders */
+    -tile-frame: red;
 }
 
 /* WRAPPER WRAPPER (StackPane) */
 .chessboard-wrapper {
     -fx-alignment: center;
     -fx-border-color: orange;
+}
+
+.drag-layer {
+    -fx-alignment: center;
+    -fx-border-color: green;
 }
 
 /* WRAPPER (GridPane) */
@@ -26,12 +31,12 @@ For the chessboard:
 /* COLOURS */
 
 .light-tile {
-    -this: -light-tile;
+    -tile-colour: -light-tile;
     /*-fx-background-color: -light-tile;*/
 }
 
 .dark-tile {
-    -this: -dark-tile;
+    -tile-colour: -dark-tile;
     /*-fx-background-color: -dark-tile;*/
 }
 
@@ -43,24 +48,38 @@ For the chessboard:
 /* of the standard `Tile` class */
 .chess-tile {
     /*-fx-background-insets: 0, 0;*/
-    /*-fx-background-color: -frame, -this;*/
-    -fx-background-color: -this;
+    /*-fx-background-color: -tile-frame, -tile-colour;*/
+    -fx-background-color: -tile-colour;
 }
 
 .chess-tile:active {
-    /*-fx-background-color: green;*/
-
-    -fx-background-color: -frame, -active;
+    -fx-background-color: -tile-frame, -active;
 }
 
 .chess-tile:valid-move {
     -fx-background-insets: 0px, 5px;
-    -fx-background-color: -this, -valid-move;
+    -fx-background-color: -tile-colour, -valid-move;
 }
 
 .chess-tile:capture {
     -fx-background-insets: 0px, 5px;
-    -fx-background-color: -this, -capture;
+    -fx-background-color: -tile-colour, -capture;
+}
+
+.chess-tile:active:hover {
+    -fx-background-color: -tile-frame, -active-h;
+}
+
+.chess-tile:valid-move:hover {
+    -fx-background-color: -tile-colour, -valid-move-h;
+}
+
+.chess-tile:capture:hover {
+    -fx-background-color: -tile-colour, -capture-h;
+}
+
+.chess-tile:hover {
+
 }
 
 .barrier-tile {

@@ -2,7 +2,9 @@ package com.chessfx.ui.game.pieces;
 
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
-import javafx.scene.Node;
+import com.chessfx.log.Log;
+import com.chessfx.ui.game.board.BoardUIModel;
+import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -38,11 +40,11 @@ public class PieceSpriteFactory {
             svgContent = new String(Objects.requireNonNull(getClass().getResourceAsStream(
                     name + ".svg")).readAllBytes(), StandardCharsets.UTF_8);
         } catch (NullPointerException e) {
-            System.out.println("PieceImageController: path at piece identifier was null");
-            System.out.println("Running as placeholder.");
+            Log.error("PieceImageController", "path at piece identifier was null");
+            Log.cont("Running as placeholder.");
             return getSVGFileAsString("placeholder");
         } catch (IOException e) {
-            System.out.println("PieceImageController: IO Exception");
+            Log.error("PieceImageController", "IO Exception");
             e.printStackTrace();
         }
 
@@ -51,13 +53,14 @@ public class PieceSpriteFactory {
     }
 
 
-    public Node makePieceSprite(TileBase tile) {
+    public Region makePieceSprite(TileBase tile) {
         return makePieceSprite(tile.getPiece());
     }
 
-    public Node makePieceSprite(Piece piece) {
+    public Region makePieceSprite(Piece piece) {
         String svgFileString = svgStringMap.get(piece.getName());
         PieceSpriteBuilder sprite = new PieceSpriteBuilder(svgFileString, piece.getTeam());
         return sprite.build();
     }
+
 }
