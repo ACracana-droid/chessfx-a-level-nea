@@ -3,6 +3,7 @@ package com.chessfx.engine.board;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,31 @@ public class GameStateModel implements Cloneable {
     private boolean isUndo = true;
 
     private BoardState boardState = BoardState.DEFAULT; // This is bad for cases where the starting board state is check or something...
+
+    public GameStateModel(GameStateModel gameModel, List<Team> teamList) {
+        chessConfig = gameModel.getChessConfig();
+        plyCount = gameModel.getPlyCount();
+        fullmoveCounter = gameModel.getFullmoveCounter();
+        halfmoveClock = gameModel.halfmoveClock;
+        halfmoveClockRuleNumber = gameModel.halfmoveClockRuleNumber;
+        teamIdx = gameModel.getCurrentTeamIdx();
+        isUndo = gameModel.isUndo;
+        fullmoveDifference = gameModel.fullmoveDifference;
+        boardState = gameModel.getBoardState();
+        this.teams = teamList;
+    }
+
+    public Team getEnemyTeam() {
+        return getNextTeam();
+    }
+
+    public List<Team> copyTeams() {
+        List<Team> copy = new ArrayList<>();
+        for (int i = 0; i < teams.size(); i++) {
+            copy.add(new Team(teams.get(i)));
+        }
+        return copy;
+    }
 
     enum FullmoveDifference {
         LESS(-1),
@@ -122,6 +148,7 @@ public class GameStateModel implements Cloneable {
     public GameStateModel clone() {
         try {
             GameStateModel clone = (GameStateModel) super.clone();
+
             // Must copy mutable state here, so the clone can't change the internals of the original
             clone.fullmoveCounter = fullmoveCounter;
             clone.plyCount = plyCount;
@@ -136,8 +163,8 @@ public class GameStateModel implements Cloneable {
         }
     }
 
-    public String getBoardState() {
-        return boardState.getText();
+    public BoardState getBoardState() {
+        return boardState;
     }
 
     public void resetHalfMoveCounter() {
@@ -150,6 +177,10 @@ public class GameStateModel implements Cloneable {
 
     public int getCurrentTeamIdx() {
         return teamIdx;
+    }
+
+    public int getNextTeamIdx() {
+        return (teamIdx + 1) % teams.size();
     }
 
     public int getPlyCount() {

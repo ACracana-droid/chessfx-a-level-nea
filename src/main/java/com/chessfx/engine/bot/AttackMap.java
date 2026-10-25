@@ -1,10 +1,11 @@
 package com.chessfx.engine.bot;
 
-import com.chessfx.engine.board.BoardContainer;
-import com.chessfx.engine.board.Team;
+import com.chessfx.engine.board.*;
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
-import com.chessfx.engine.pieces.King;
 import com.chessfx.engine.pieces.Piece;
+import com.chessfx.log.AnsiColourCode;
+import com.chessfx.log.Log;
 
 import java.util.List;
 
@@ -16,16 +17,72 @@ import java.util.List;
  * If the list is empty, the square is safe.
  * </p>
  */
-public class AttackMap {
+public class AttackMap implements Cloneable {
 
-    private final MoveListWrapper[][] board;
     private final int HEIGHT;
     private final int WIDTH;
+    private final boolean[][] boolBoard;
 
-    public AttackMap(BoardContainer boardContainer) {
+    protected AttackMap(int height, int width, boolean[][] boolBoard) {
+        HEIGHT = height;
+        WIDTH = width;
+        this.boolBoard = copyBoard(boolBoard);
+    }
+
+    private boolean[][] copyBoard(boolean[][] board) {
+        if (board.length < 1) return new boolean[][]{};
+        int n = board.length;
+        int m = board[0].length;
+        boolean[][] copy = new boolean[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                copy[i][j] = board[i][j];
+            }
+        }
+        return copy;
+    }
+
+    public String logOutputStringRepresentation() {
+        Log sb = Log.LOG; //
+
+        sb.append("\n");
+        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
+        sb.append("\n");
+        // must traverse board from 8, downwards.
+        boolean checkerPattern = true;
+        //// using i to make rank index
+        for (int i = HEIGHT; i > 0; ) {
+            sb.append("" + i).append(" | "); // length 4
+            i--;
+            for (boolean tile : boolBoard[i]) {
+                sb.append(" ");
+                sb.append(tile ? AnsiColourCode.GREEN + "T" + AnsiColourCode.RESET : AnsiColourCode.RED + "F" + AnsiColourCode.RESET);
+                sb.append(" ");
+
+            }
+            sb.append(" |\n"); //length 2*
+            checkerPattern = !checkerPattern;
+        }
+        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
+        sb.append("\n").
+                append(" ".repeat(4 + 1));
+        //// making file index
+        for (char i = 'a'; i <= 'h'; i++) {
+            sb.append(" " + i).append(" ".repeat(2));
+        }
+        return sb.toString();
+    }
+
+    public enum AttackStatus {
+        ATTACK,
+        NO_ATTACK
+    }
+
+
+    public AttackMap(BoardContainerBase boardContainer) {
         HEIGHT = boardContainer.HEIGHT;
         WIDTH = boardContainer.WIDTH;
-        board = initialiseMap();
+        boolBoard = new boolean[HEIGHT][WIDTH];
     }
 
     private MoveListWrapper[][] initialiseMap() {
@@ -41,52 +98,56 @@ public class AttackMap {
     public void clear() {
         for (int i = 0; i < HEIGHT; i++) {
             for (int j = 0; j < WIDTH; j++) {
-                board[i][j].clear();
+                boolBoard[i][j] = false;
             }
         }
 
     }
 
-    public void addAttacks() {
-
-    }
 
     // TODO: FINISH, and split for multiple reams.
     public void calculate(BoardContainer boardContainer) {
-        calculate(boardContainer, boardContainer.getCurrentTeam());
+        calculateBools(boardContainer, boardContainer.getEnemyTeam());
     }
 
-    public void calculate(BoardContainer boardContainer, Team team) {
+    public void calculate(BoardContainerBase boardContainer, Team team) {
+        calculateBools(boardContainer, team);
+    }
+
+    private void calculateBools(BoardContainerBase boardContainer, Team team) {
         clear();
+        Log.debug("Calculating bools...");
         for (Piece piece : team.getPieceList()) {
-            for (Move move : piece.captures(boardContainer)) {
-                putOnMap(move);
+            for (Move move : piece.threats(boardContainer)) {
+                addCapturesToBoolBoard(move);
             }
         }
+        Log.debug("Finished loop.");
     }
 
-    public List<Move> getMoves(int y, int x) {
-        return board[y][x].getList();
+    private void addCapturesToBoolBoard(Move move) {
+        if (move.isSuperCapture()) {
+            List<Piece> captures = move.getCaptures();
+            for (Piece capture : captures) {
+                Coordinate coOrds = capture.getCoOrds();
+                boolBoard[coOrds.y()][coOrds.x()] = true;
+            }
+        }
+        boolBoard[move.getEndY()][move.getEndX()] = true;
     }
 
-    private void putOnMap(Move move) {
-        for (Piece p : move.getCaptures())
-            board[p.getCoOrds()[0]][p.getCoOrds()[1]].add(move);
+
+    public boolean getTile(Coordinate coOrds) {
+        return boolBoard[coOrds.y()][coOrds.x()];
     }
 
-    public MoveListWrapper[][] board() {
-        return board;
+    public boolean getTile(int i, int j) {
+        return boolBoard[i][j];
     }
 
-    public List<Move> getMoves(int[] coOrds) {
-        return board[coOrds[0]][coOrds[1]].getList();
-    }
-
-    public boolean isTileThreatened(int[] coOrds) {
-        return !board[coOrds[0]][coOrds[1]].isEmpty();
-    }
-
-    public boolean isTileThreatened(King king) {
-        return isTileThreatened(king.getCoOrds());
+    @Override
+    public AttackMap clone() {
+        AttackMap clone = new AttackMap(HEIGHT, WIDTH, boolBoard);
+        return clone;
     }
 }

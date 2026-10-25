@@ -1,7 +1,7 @@
 package com.chessfx.ui.game.board;
 
 import com.chessfx.chessconfig.ChessConfigModel;
-import com.chessfx.engine.board.BoardContainer;
+import com.chessfx.engine.board.GameBoardContainer;
 import com.chessfx.engine.board.ReactiveChessContainer;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.ui.game.DragHandler;
@@ -11,6 +11,8 @@ import com.chessfx.ui.game.tiles.TileUI;
 import com.chessfx.ui.util.LayoutManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
@@ -20,9 +22,11 @@ public class ChessBoardBuilder implements Builder<StackPane> {
     protected ChessConfigModel chessConfig;
 
     protected final StackPane view = new StackPane();
+
     {
         view.getStyleClass().add("chessboard-wrapper");
     }
+
     protected final Pane dragLayer = new Pane();
 
     {
@@ -30,9 +34,10 @@ public class ChessBoardBuilder implements Builder<StackPane> {
         dragLayer.getStyleClass().add("drag-layer");
     }
 
-
     protected BoardUIModel boardUIModel;
-    protected BoardContainer boardContainer;
+    protected GameBoardContainer boardContainer;
+
+    protected DoubleProperty rotateProperty = new SimpleDoubleProperty(0.0);
 
     public ChessBoardBuilder() {
         view.getChildren().addAll(makeEmptyBoardUI());
@@ -71,11 +76,13 @@ public class ChessBoardBuilder implements Builder<StackPane> {
     public ChessBoardBuilder(ReactiveChessContainer chessContainer, ChessConfigModel chessConfig, LayoutManager layoutManager) {
         this.boardContainer = chessContainer;
         this.chessConfig = chessConfig;
-        view.getChildren().addAll(makeBoardUI(chessContainer), dragLayer);
+        Region board = makeBoardUI(chessContainer);
+        board.rotateProperty().bind(rotateProperty);
+        view.getChildren().addAll(board, dragLayer);
     }
 
 
-    private Node makeBoardUI(ReactiveChessContainer representation) {
+    private Region makeBoardUI(ReactiveChessContainer representation) {
         GridPane boardUI = makeGridPane();
 
 
@@ -88,7 +95,7 @@ public class ChessBoardBuilder implements Builder<StackPane> {
 
         PieceSpriteFactory pieceSpriteFactory = new PieceSpriteFactory(chessConfig.getInstantiatedPiecesNameSet());
         DragHandler dragHandler = new DragHandler(dragLayer, boardUI, pieceSpriteFactory);
-        boardUIModel = new BoardUIModel(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory);
+        boardUIModel = new BoardUIModel(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory, rotateProperty);
 
         NumberBinding tileSize = getTileSize(numOfRanks, numOfFiles, view);
         applyGridConstraints(boardUI, tileSize, numOfRanks, numOfFiles);
@@ -106,6 +113,9 @@ public class ChessBoardBuilder implements Builder<StackPane> {
                         tileColour.getCycle(),
                         tileSize, pieceSpriteFactory,
                         boardUIModel, i, j);
+
+                // pieces always appear upright.
+                cur.rotateProperty().bind(rotateProperty.negate());
 
                 boardUiArr[i][j] = cur;
 

@@ -1,4 +1,4 @@
-package com.chessfx.ui.menu;
+package com.chessfx.ui.util;
 
 import com.chessfx.chessconfig.AppSettings;
 import javafx.beans.property.SimpleStringProperty;

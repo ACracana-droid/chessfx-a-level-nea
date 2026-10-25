@@ -68,6 +68,7 @@ public abstract class LayoutBuilder implements Builder<Region> {
         Button button = new Button(text);
         button.getStyleClass().addAll("game-button");
         button.setFocusTraversable(false);
+        button.disableProperty().bind(layoutButtonDisabledProperty);
         return button;
     }
 
@@ -93,6 +94,7 @@ public abstract class LayoutBuilder implements Builder<Region> {
         Button button = new Button(text);
         button.setOnAction(gameButtonAction(goBack));
         button.getStyleClass().add("return-button");
+        button.disableProperty().bind(layoutButtonDisabledProperty);
         return button;
     }
 

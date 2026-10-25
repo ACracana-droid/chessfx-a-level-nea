@@ -2,15 +2,51 @@ package com.chessfx.engine.moves;
 
 public class MoveBase {
 
-    final protected int y1, x1, y2, x2;
+    final protected Coordinate orig, dest;
 
-    public MoveBase(int y1, int x1, int y2, int x2) {
-        // start
-        this.y1 = y1;
-        this.x1 = x1;
+    public MoveBase(Coordinate orig, Coordinate dest) {
+        this.orig = orig;
+        this.dest = dest;
+    }
 
-        // destination
-        this.y2 = y2;
-        this.x2 = x2;
+    public String internalNotation() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("(").append(orig.y()).append(", ").append(orig.x()).append(")");
+        sb.append(" to ");
+        sb.append("(").append(dest.y()).append(", ").append(dest.x()).append(")");
+
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return internalNotation();
+    }
+
+
+
+    public Coordinate startCoOrds() {
+        return orig;
+    }
+
+    public Coordinate destCoOrds() {
+        return dest;
+    }
+
+    public int getStartY() {
+        return orig.y();
+    }
+
+    public int getStartX() {
+        return orig.x();
+    }
+
+
+    public int getEndY() {
+        return dest.y();
+    }
+
+    public int getEndX() {
+        return dest.x();
     }
 }

@@ -127,4 +127,8 @@ public class ChessConfigModel {
     public void setGameType(String s) {
         gameType = s;
     }
+
+    public ArbitraryPieceFactory getPieceFactory() {
+        return pieceFactory;
+    }
 }

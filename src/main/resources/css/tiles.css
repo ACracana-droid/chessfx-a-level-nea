@@ -52,8 +52,15 @@ For the chessboard:
     -fx-background-color: -tile-colour;
 }
 
+
+.chess-tile:threat {
+    -fx-background-insets: 0px, 5px;
+    -fx-background-color: blue, -tile-colour;
+}
+
 .chess-tile:active {
-    -fx-background-color: -tile-frame, -active;
+    -fx-background-color: -active;
+
 }
 
 .chess-tile:valid-move {
@@ -81,6 +88,7 @@ For the chessboard:
 .chess-tile:hover {
 
 }
+
 
 .barrier-tile {
     /*    Dimmed from usual colour   */

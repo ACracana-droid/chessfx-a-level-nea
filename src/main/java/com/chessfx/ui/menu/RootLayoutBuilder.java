@@ -9,31 +9,38 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Builder;
 
-public class RootWrapperBuilder implements Builder<Pane> {
-
+public class RootLayoutBuilder implements Builder<Pane> {
 
 
     // Although these are fields, I should never need to access them from outside.
     // All of their customisation should be handled by the respective classes.
 
 
-
     private final AppSettings appSettings;
     private final ChessConfigModel chessConfig;
+    private final BorderPane appPane;
+    private final Pane root;
 
-    public RootWrapperBuilder(AppSettings appSettings, ChessConfigModel chessConfig) {
+    public RootLayoutBuilder(AppSettings appSettings, ChessConfigModel chessConfig) {
         this.appSettings = appSettings;
         this.chessConfig = chessConfig;
+
+        root = new StackPane();
+        appPane = makeAppLevelBorderPane(
+                new PopupManager(root, root.heightProperty(), root.widthProperty()));
+        root.getChildren().add(appPane);
     }
 
 
     @Override
     public Pane build() {
-        Pane root = new StackPane();
-        root.getChildren().add(makeAppLevelBorderPane(
-                new PopupManager(root.getChildren(), root.heightProperty(), root.widthProperty())));
         return root;
     }
+
+    public BorderPane getAppPane() {
+        return appPane;
+    }
+
 
     private BorderPane makeAppLevelBorderPane(PopupManager popupManager) {
         BorderPane boarderPane = new BorderPane();
@@ -44,4 +51,5 @@ public class RootWrapperBuilder implements Builder<Pane> {
                 chessConfig, appSettings);
         return boarderPane;
     }
+
 }

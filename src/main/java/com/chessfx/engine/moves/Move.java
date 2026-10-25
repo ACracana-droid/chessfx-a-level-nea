@@ -1,8 +1,8 @@
 package com.chessfx.engine.moves;
 
 import com.chessfx.engine.pieces.Piece;
-import com.chessfx.log.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Move extends MoveBase {
@@ -11,83 +11,79 @@ public class Move extends MoveBase {
     captureList:
     The plan is to make a capture list that I can use to revive pieces at will.
      */
-    private final List<Piece> captures; // could be null
-    private final Piece piece;
+    protected final Piece piece;
+    private final boolean isCapture;
 
-//    private final boolean capturesKing;
 
-    public Move(Piece piece, int y, int x, List<Piece> captures) {
-        super(piece.getCoOrds()[0], piece.getCoOrds()[1], y, x);
+    protected Move(Piece piece, Coordinate dest, boolean isCapture) {
+        super(piece.getCoOrds(), dest);
         this.piece = piece;
-        this.captures = captures;
-//        capturesKing = calculateIsKingCapture();
-//        Log.warn("Calculated isCheck. Value: " + capturesKing);
+        this.isCapture = isCapture;
     }
 
-    public Move(Piece piece, int y, int x) {
-        super(piece.getCoOrds()[0], piece.getCoOrds()[1], y, x);
+    protected Move(Piece piece, int y, int x, boolean isCapture) {
+        super(piece.getCoOrds(), new Coordinate(y, x));
         this.piece = piece;
-        captures = null;
-//        capturesKing = false;
+        this.isCapture = isCapture;
     }
 
+    public static Move make(Piece piece, int y, int x) {
+        return new Move(piece, y, x, false);
+    }
+
+    public static Move make(Piece piece, int y, int x, List<Piece> captures) {
+        return new ComplexMove(piece, y, x, captures);
+    }
+
+    public static Move capture(Piece piece, int y, int x) {
+        return new Move(piece, y, x, true);
+    }
+
+
+    /**
+     * Does the move remove one or more enemy piece?
+     * It does not matter whether it removes the piece at the move destination or another piece.
+     *
+     * @return bool
+     */
     public boolean isCapture() {
-        return captures != null && !captures.isEmpty();
-    }
-
-    public int getEndY() {
-        return y2;
-    }
-
-    public int getEndX() {
-        return x2;
+        return isCapture;
     }
 
 
+    /**
+     * Does the move remove an enemy piece which is on the destination tile?
+     *
+     * @return bool
+     */
+    public boolean isBasicCapture() {
+        return isCapture;
+    }
+
+    /**
+     * Does the move remove a piece which is not at the destination tile?
+     * @return bool
+     */
+    public boolean isSuperCapture() {
+        return false;
+    }
+
+    public List<Piece> getCaptures() {
+        return new ArrayList<>();
+    }
+
+
+    @Override
     public String internalNotation() {
         StringBuffer sb = new StringBuffer();
         if (isCapture())
             sb.append("x");
-        sb.append("(").append(y1).append(", ").append(x1).append(")");
+        sb.append("(").append(orig.y()).append(", ").append(orig.x()).append(")");
         sb.append(" to ");
-        sb.append("(").append(y2).append(", ").append(x2).append(")");
+        sb.append("(").append(dest.y()).append(", ").append(dest.x()).append(")");
 
         return sb.toString();
     }
-
-    @Override
-    public String toString() {
-        return internalNotation();
-    }
-
-    public int getStartX() {
-        return x1;
-    }
-
-    public int getStartY() {
-        return y1;
-    }
-
-    public List<Piece> getCaptures() {
-        return captures;
-    }
-
-    private boolean calculateIsKingCapture() {
-        if (isCapture()) {
-            Piece enemyKing = captures.getFirst().getTeam().getKing();
-            int[] enemyKingCoOrds = enemyKing.getCoOrds();
-            for (Piece piece : captures) {
-                int[] coOrds = piece.getCoOrds();
-                if (enemyKingCoOrds[0] == coOrds[0]
-                        && enemyKingCoOrds[1] == coOrds[1]) return true;
-            }
-        }
-        return false;
-    }
-
-//    public boolean isKingCapture() {
-//        return capturesKing;
-//    }
 
     public Piece getPiece() {
         return piece;

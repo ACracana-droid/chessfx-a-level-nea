@@ -1,5 +1,6 @@
 package com.chessfx.engine.tiles;
 
+import com.chessfx.engine.pieces.ArbitraryPieceFactory;
 import com.chessfx.engine.pieces.King;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.board.Team;
@@ -34,9 +35,17 @@ abstract public class TileBase {
         return false;
     }
 
+    public TileBase copy(Team teamList, ArbitraryPieceFactory pieceFactory) {
+        return null;
+    }
+
     public boolean hasKing(Team currentTeam) {
         return hasPiece()
                 && (getPiece() instanceof King)
                 && getPiece().getTeam().equals(currentTeam);
+    }
+
+    public TileBase copy() {
+        return null;
     }
 }

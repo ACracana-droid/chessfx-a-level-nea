@@ -9,6 +9,7 @@ import java.util.*;
 public class Team {
 
     private int[] moveTransform;
+    private final int idx;
 
     //   p for player, b for bot
     private String name;
@@ -22,9 +23,16 @@ public class Team {
 
     final private String styleClass;
 
-    public Team(String styleClass, int[] moveTransform) {
+    public Team(String styleClass, int[] moveTransform, int idx) {
         this.styleClass = styleClass;
         this.moveTransform = moveTransform;
+        this.idx = idx;
+    }
+
+    Team(Team team) {
+        this.styleClass = team.styleClass;
+        this.moveTransform = team.moveTransform;
+        this.idx = team.idx;
     }
 
     public List<Piece> getPieceList() {
@@ -79,9 +87,12 @@ public class Team {
         capturedPieceList.remove(capture);
     }
 
-
     public List<Piece> getCapturedPieces() {
         return capturedPieceList;
     }
 
+
+    public int idx() {
+        return idx;
+    }
 }

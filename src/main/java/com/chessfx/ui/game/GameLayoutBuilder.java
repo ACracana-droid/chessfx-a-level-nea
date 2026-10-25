@@ -8,8 +8,9 @@ import com.chessfx.ui.game.board.BoardUIModel;
 import com.chessfx.ui.game.board.ChessBoardBuilder;
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.ui.menu.LayoutBuilder;
+import com.chessfx.ui.util.SettingsLayoutUtil;
 import com.chessfx.ui.util.LayoutManager;
-import com.chessfx.ui.menu.ThemeDropDown;
+import com.chessfx.ui.util.ThemeDropDown;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -125,7 +126,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
      * Due to threading, this likely happens during the `manageLayoutAnimation()`
      * in RootWrapperBuilder.
      *
-     * @return runnable which starts the game properly.
+     *
      */
     @Override
     public void startup() {
@@ -134,7 +135,9 @@ public class GameLayoutBuilder extends LayoutBuilder {
             protected Void call() throws Exception {
                 Log.debug("GameLayoutBuilder", "Creating ReactiveChessContainer off the FXAT...");
                 boardContainer = new ReactiveChessContainer(new GameStateModel(chessConfig), chessConfig.getGameBoard());
-                Log.debug("Finished making ReactiveChessContainer");
+                Log.debug("Finished making ReactiveChessContainer, calling start method...");
+                boardContainer.gameStart();
+                Log.debug("Finished.");
                 return null;
             }
         };
@@ -147,7 +150,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
             )));
             rootPane.setTop(makeGameTopWrapper(boardContainer.fullmoveCounterProperty(), boardContainer.boardStateProperty()));
             rootPane.setBottom(makeTurnLabel(boardContainer.currentTeamStringProperty()));
-
+            boardUIModel.gameStart();
             super.startup();
         });
         Thread thread = new Thread(loadBoardModel);
@@ -183,8 +186,10 @@ public class GameLayoutBuilder extends LayoutBuilder {
     private HBox makeTopLeftHBox() {
         Button returnButton = returnButton("Exit", endAndReturnAction());
         returnButton.setFocusTraversable(false);
+        Button settingsButton = SettingsLayoutUtil.makeIconButton(appSettings, layoutManager.getPopupManager());
+        settingsButton.setFocusTraversable(false);
 
-        HBox hBox = new HBox(returnButton, makeThemeDropDown());
+        HBox hBox = new HBox(returnButton, settingsButton);
         hBox.getStyleClass().add("return-vbox");
         return hBox;
     }
@@ -209,11 +214,15 @@ public class GameLayoutBuilder extends LayoutBuilder {
     }
 
 
-    private Label makeTurnLabel(StringProperty currentTeamStringProperty) {
+    private Region makeTurnLabel(StringProperty currentTeamStringProperty) {
+
         Label label = new Label();
         label.textProperty().bind(Bindings.concat(currentTeamStringProperty, "'s turn"));
         label.getStyleClass().add("current-turn-label");
-        return label;
+
+        HBox hBox = new HBox(label);
+        hBox.getStyleClass().add("current-turn-label");
+        return hBox;
     }
 
     public void terminate() {

@@ -25,6 +25,12 @@ public enum Log {
             System.out.println("-> " + s);
     }
 
+    public static Log append(String s) {
+        if (threshold(prevState.priority))
+            System.out.print(s);
+        return LOG;
+    }
+
 
     enum LogType {
         INFO("INFO", CYAN, Priority.MED),
@@ -59,7 +65,7 @@ public enum Log {
     public enum Priority {
         LOW(1),
         MED(10),
-        HIGH(100);
+        HIGH(100), LOWEST(0);
 
         private final int num;
 

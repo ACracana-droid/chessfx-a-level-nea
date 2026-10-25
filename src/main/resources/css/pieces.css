@@ -107,3 +107,8 @@
 /*    Could have a placeholder circle in GUI when piece isn't present. */
 }
 
+
+
+.chess-tile:check * {
+    -fx-effect: innershadow(three-pass-box, -capture-shadow, 10, 10, 0, 0);
+}

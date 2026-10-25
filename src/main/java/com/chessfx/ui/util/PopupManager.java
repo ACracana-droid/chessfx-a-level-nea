@@ -1,11 +1,18 @@
 package com.chessfx.ui.util;
 
+import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
 import com.chessfx.ui.menu.GamePopup;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+
 
 public class PopupManager {
 
@@ -15,9 +22,10 @@ public class PopupManager {
 
     // For stack logic
     private int popupIndex = 0;
+    boolean locked = false;
 
-    public PopupManager(ObservableList<Node> rootChildren, ReadOnlyDoubleProperty rootHeightProperty, ReadOnlyDoubleProperty rootWidthProperty) {
-        this.rootChildren = rootChildren;
+    public PopupManager(Pane popupLayer, ReadOnlyDoubleProperty rootHeightProperty, ReadOnlyDoubleProperty rootWidthProperty) {
+        this.rootChildren = popupLayer.getChildren();
         this.rootHeightProperty = rootHeightProperty;
         this.rootWidthProperty = rootWidthProperty;
     }
@@ -28,13 +36,17 @@ public class PopupManager {
 
     public void askGameTypeAndWait(Runnable changeLayoutToGame, ChessConfigModel chessConfig) {
         // GamePopup class destroys itself upon completion, and switches layout if necessary.
+        if (locked) return;
         Log.info("PopupManager", "Made new popup.");
         GamePopup popup = new GamePopup(changeLayoutToGame,
                 this::pop, chessConfig);
-        double size = 0.3;
-        popup.maxHeightProperty().bind(rootHeightProperty.multiply(size));
-        popup.maxWidthProperty().bind(rootWidthProperty.multiply(size));
+        rescale(0.3, popup);
         push(popup);
+        toggleLock();
+    }
+
+    private void toggleLock() {
+        locked = !locked;
     }
 
     private void pop() {
@@ -54,5 +66,36 @@ public class PopupManager {
     private void push(Node node) {
         popupIndex++;
         rootChildren.add(popupIndex, node);
+    }
+
+    public Node closeButton() {
+        Button button = new Button("Close");
+        HBox hBox = new HBox(button);
+        hBox.getStyleClass().add("close-popup-button");
+        button.setOnAction(event -> {
+            pop();
+            toggleLock();
+        });
+        return hBox;
+    }
+
+    public void makeSettingsPopup(AppSettings appSettings) {
+        if (locked) {
+            pop();
+            toggleLock();
+            return;
+        }
+        BorderPane popup = new BorderPane();
+        popup.getStyleClass().add("settings-popup");
+        popup.setTop(closeButton());
+        popup.setCenter(SettingsLayoutUtil.makeSettingsVbox(appSettings));
+        rescale(0.5, popup);
+        push(popup);
+        toggleLock();
+    }
+
+    private void rescale(double scale, Region popup) {
+        popup.maxHeightProperty().bind(rootHeightProperty.multiply(scale));
+        popup.maxWidthProperty().bind(rootWidthProperty.multiply(scale));
     }
 }

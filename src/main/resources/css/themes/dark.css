@@ -14,17 +14,14 @@
 
     -surface: #c0caf5;
 
-    /*mOnSurfaceVariant: #a9b1d6;*/
-    /*mOutline: #414868;*/
-    /*mShadow: #101014;*/
-    /*mHover: #292e42;*/
-    /*mOnHover: #c0caf5;*/
 
     -menu-active: -fg3;
 
     /* Tiles */
-    -light-tile: #c0caf5;
-    -dark-tile: -bg1;
+    /*-light-tile: #c0caf5;*/
+    /*-dark-tile: #1a1b26;*/
+    -light-tile: #334155;
+    -dark-tile: #1e293b;
 
     /* Tile States */
     -active: #7dcfff;
@@ -42,12 +39,14 @@
     /*PIECES*/
 
     /*Dark Pieces*/
-    -dark-piece-fill: -bg-var2;
-    -dark-piece-stroke: #a9b1d6;
+    /*-dark-piece-fill: #101529;*/
+    /*-dark-piece-stroke: #a9b1d6;*/
+    -dark-piece-fill: #020617;
+    -dark-piece-stroke: #cbd5e1;
 
     /*Light Pieces*/
     -light-piece-fill: #a9b1d6;
-    -light-piece-stroke: -bg-var2;
+    -light-piece-stroke: #101529;
 
 
     /*

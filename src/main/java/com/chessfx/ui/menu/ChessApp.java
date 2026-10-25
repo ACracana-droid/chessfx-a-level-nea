@@ -6,6 +6,9 @@ import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.log.Log;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,7 +25,9 @@ public class ChessApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        Scene scene = new Scene(new RootWrapperBuilder(appSettings, chessConfig).build(), 628, 746);
+        RootLayoutBuilder rootBuilder = new RootLayoutBuilder(appSettings, chessConfig);
+        Pane root = rootBuilder.build();
+        Scene scene = new Scene(root, 628, 746);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
                 THEME_DIR + appSettings.getThemeName() + ".css"
         )).toExternalForm());
@@ -31,6 +36,8 @@ public class ChessApp extends Application {
 
         appSettings.setSceneStyleSheets(scene.getStylesheets());
 //...
+        scene.setOnKeyPressed(event -> handleKeyPressed(event, rootBuilder.getAppPane()));
+
         stage.setTitle("Chess App");
         stage.setMinHeight(400);
         stage.setMinWidth(400);
@@ -59,5 +66,31 @@ public class ChessApp extends Application {
 //            Log.setThreshold(t);
 //        }
 
+    }
+
+    private void handleKeyPressed(KeyEvent event, Pane root) {
+        final double SCALE_DIFF = 0.1;
+        if (event.isControlDown()) {
+
+            if (event.getCode().equals(KeyCode.MINUS)) {
+                if (root.getScaleX() < 0.5) return;
+                scaleDown(root, SCALE_DIFF);
+            } else if (event.getCode().equals(KeyCode.EQUALS)) {
+                if (root.getScaleX() > 1.5) return;
+
+                scaleUp(root, SCALE_DIFF);
+            }
+        }
+
+    }
+
+    private void scaleUp(Pane root, double scaleDiff) {
+        root.setScaleX(root.getScaleX() + scaleDiff);
+        root.setScaleY(root.getScaleY() + scaleDiff);
+    }
+
+    private void scaleDown(Pane root, double scaleDiff) {
+        root.setScaleX(root.getScaleX() - scaleDiff);
+        root.setScaleY(root.getScaleY() - scaleDiff);
     }
 }

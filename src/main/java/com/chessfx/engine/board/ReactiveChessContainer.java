@@ -7,23 +7,23 @@ import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
 import javafx.beans.property.*;
 
-public class ReactiveChessContainer extends BoardContainer {
+public class ReactiveChessContainer extends GameBoardContainer {
 
     private final StringProperty currentTeamProperty = new SimpleStringProperty();
-    public final IntegerProperty fullmoveCounterProperty = new SimpleIntegerProperty();
+    private final IntegerProperty fullmoveCounterProperty = new SimpleIntegerProperty();
     private final StringProperty previousMoveProperty = new SimpleStringProperty("");
     private final StringProperty boardStateProperty = new SimpleStringProperty("");
 
-
     Runnable removeListeners = null;
 
-    public ReactiveChessContainer(GameStateModel gameModel, TileBase[][] board) {
+    public ReactiveChessContainer(GameStateModel gameModel,
+                                  TileBase[][] board) {
         super(gameModel, board);
         Log.debug("Constructing ReactiveChessContainer");
         // Set properties to initial values. This is before reactive elements are established
         fullmoveCounterProperty.set(gameModel.getFullmoveCounter());
         currentTeamProperty.set(gameModel.getCurrentTeam().getName());
-        boardStateProperty.set(gameModel.getBoardState());
+        boardStateProperty.set(gameModel.getBoardState().getText());
     }
 
     public IntegerProperty fullmoveCounterProperty() {
@@ -52,13 +52,17 @@ public class ReactiveChessContainer extends BoardContainer {
     }
 
     @Override
-    protected void updateGame(Move move) {
+    protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
         Log.info("Updating game...");
-        super.updateGame(move);
+        super.updateGame(move, origPiece, directCapture);
         // other reactive stuff...
-
-
+        debugQuery();
 //        setBoardState(gameModel, board);
+    }
+
+    private void debugQuery() {
+        boolean b = board[3][0].hasPiece();
+        Log.warn("Piece at 3,0? -> " + b);
     }
 
     @Override
@@ -69,16 +73,16 @@ public class ReactiveChessContainer extends BoardContainer {
 
 
     @Override
-    public void undoUpdatePiecePosition(Move move, boolean hasMoved) {
+    public void undoUpdatePiecePosition(Move move, boolean hasMoved, Piece piece) {
         // TODO: DO THIS (the super) AS TASK?
-        super.undoUpdatePiecePosition(move, hasMoved);
+        super.undoUpdatePiecePosition(move, hasMoved, piece);
 
         if (plyStack.isEmpty()) {
             updateMoveProperty(true, "");
             return;
         }
         PlyData previous = plyStack.peek();
-        updateMoveProperty(true, longAlgebraicNotation(previous.getMove()));
+        updateMoveProperty(true, longAlgebraicNotation(previous.move()));
 
     }
 
@@ -87,12 +91,12 @@ public class ReactiveChessContainer extends BoardContainer {
         gameModel.setIsMoveUndo(isUndo);
         previousMoveProperty.set(moveString);
     }
-
-    private void setBoardState(GameStateModel gameModel, TileBase[][] board) {
-        BoardState state = ChessEngine.getBoardState(gameModel, board);
-        gameModel.setBoardState(state);
-
-    }
+//
+//    private void setBoardState(GameStateModel gameModel, TileBase[][] board) {
+//        BoardState state = ChessEngine.getBoardState(gameModel, board);
+//        gameModel.setBoardState(state);
+//
+//    }
 
 
     /**
@@ -158,7 +162,6 @@ public class ReactiveChessContainer extends BoardContainer {
     public void terminate() {
         removeListeners.run();
     }
-
 
 
     public final StringProperty boardStateProperty() {

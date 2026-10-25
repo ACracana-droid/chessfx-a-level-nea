@@ -1,9 +1,11 @@
 package com.chessfx.engine.board;
 
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.tiles.TileBase;
+import com.chessfx.log.Log;
 
-public class BoardContainerBase {
+public class BoardContainerBase implements GridContainer<TileBase> {
 
     protected final TileBase[][] board;
     public final int HEIGHT;
@@ -16,18 +18,6 @@ public class BoardContainerBase {
         WIDTH = board[0].length;
     }
 
-    protected static TileBase[][] copyOfBoard(TileBase[][] board) {
-        if (board.length < 1) return new TileBase[][]{};
-        int n = board.length;
-        int m = board[0].length;
-        TileBase[][] copy = new TileBase[n][m];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                copy[i][j] = board[i][j];
-            }
-        }
-        return copy;
-    }
 
     public boolean inBoardBounds(int y, int x) {
         return 0 <= y && y < HEIGHT
@@ -52,8 +42,9 @@ public class BoardContainerBase {
         return board[y][x];
     }
 
-    public TileBase getTile(int[] coOrds) {
-        return board[coOrds[0]][coOrds[1]];
+    @Override
+    public TileBase getTile(Coordinate coOrds) {
+        return board[coOrds.y()][coOrds.x()];
     }
 
     /**
@@ -61,12 +52,15 @@ public class BoardContainerBase {
      * @return the TileBase at the end co-ordinates of the move.
      */
     public TileBase getTile(Move move) {
-        return board[move.getEndY()][move.getEndX()];
+        return getTile(move.destCoOrds());
     }
 
 
+    @Override
     public TileBase[][] getBoard() {
         return board;
     }
+
+
 
 }

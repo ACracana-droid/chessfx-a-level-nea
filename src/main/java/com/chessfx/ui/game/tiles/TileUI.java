@@ -1,5 +1,6 @@
 package com.chessfx.ui.game.tiles;
 
+import com.chessfx.engine.board.BoardState;
 import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.tiles.BarrierTile;
 import com.chessfx.engine.tiles.TileBase;
@@ -11,7 +12,7 @@ import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
-import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -44,9 +45,9 @@ public class TileUI extends StackPane {
         }
 
         /// show array numbering (ADD SETTING)
-//        Label numbering = new Label(i + ", " + j);
-//        numbering.setVisible(true);
-//        this.getChildren().add(numbering);
+        Label numbering = new Label(i + ", " + j);
+        numbering.setVisible(true);
+        this.getChildren().add(numbering);
 
         /// Tile should never ever be null, but (for now) maybe it is.
         if (tile != null && tile.hasPiece())
@@ -160,9 +161,6 @@ public class TileUI extends StackPane {
         return temp;
     }
 
-    public boolean hasPiece() {
-        return tile.hasPiece();
-    }
 
     public Region removeExistingPieceSprite() {
         if (isShowingSprite) {
@@ -200,4 +198,41 @@ public class TileUI extends StackPane {
         pieceSprite = swapSprite;
         return temp;
     }
+
+    public void setQuasiHover(boolean b) {
+        PseudoClass quasiHover = PseudoClass.getPseudoClass("hover");
+        this.pseudoClassStateChanged(quasiHover, b);
+    }
+
+    public void setThreatened(boolean b) {
+        PseudoClass threat = PseudoClass.getPseudoClass("threat");
+        this.pseudoClassStateChanged(threat, b);
+    }
+
+    public void check(boolean b) {
+        PseudoClass check = PseudoClass.getPseudoClass("check");
+        this.pseudoClassStateChanged(check, b);
+    }
+    private void checkmate(boolean b) {
+        PseudoClass checkmate = PseudoClass.getPseudoClass("checkmate");
+        this.pseudoClassStateChanged(checkmate, b);
+    }
+
+    public void showBoardStateEffect(BoardState boardState) {
+        check(false);
+        checkmate(false);
+        stale(false);
+        switch (boardState) {
+            case CHECK -> check(true);
+            case CHECKMATE -> checkmate(true);
+            case STALEMATE -> stale(true);
+        }
+    }
+
+    private void stale(boolean b) {
+        PseudoClass stale = PseudoClass.getPseudoClass("stalemate");
+        this.pseudoClassStateChanged(stale, b);
+    }
+
+
 }

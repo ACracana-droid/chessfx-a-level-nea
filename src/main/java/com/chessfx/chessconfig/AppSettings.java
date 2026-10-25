@@ -32,7 +32,7 @@ public class AppSettings {
     Properties properties;
 
     List<String> sceneStyleSheets;
-    List<String> themes = new ArrayList<>(List.of("light", "dark", "wood", "chess"));
+    List<String> themes = new ArrayList<>(List.of("light", "dark", "wood", "chess", "ai-dark"));
 
     public AppSettings() {
         properties = new Properties();

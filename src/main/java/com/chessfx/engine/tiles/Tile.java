@@ -1,11 +1,14 @@
 package com.chessfx.engine.tiles;
 
+import com.chessfx.engine.pieces.ArbitraryPieceFactory;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.board.Team;
+import com.chessfx.log.Log;
 import com.chessfx.ui.game.tiles.TileUI;
 
 public class Tile extends TileBase {
-    Piece piece;
+
+    private Piece piece;
 
     public Tile(Piece piece) {
         super();
@@ -50,5 +53,17 @@ public class Tile extends TileBase {
         return removed;
     }
 
+    @Override
+    public TileBase copy(Team team, ArbitraryPieceFactory pieceFactory) {
+        Piece pieceCopy = pieceFactory.copy(piece, team);
+        Log.warn("Copied piece: " + pieceCopy.getName());
+        Tile tile = new Tile(pieceCopy);
+        return tile;
 
+    }
+
+    @Override
+    public TileBase copy() {
+        return new Tile(null);
+    }
 }

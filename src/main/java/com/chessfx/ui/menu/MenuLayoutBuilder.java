@@ -3,6 +3,7 @@ package com.chessfx.ui.menu;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.ui.game.board.ChessBoardOrnamentBuilder;
 import com.chessfx.ui.util.LayoutManager;
+import com.chessfx.ui.util.SwitchButton;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
@@ -28,9 +29,18 @@ public class MenuLayoutBuilder extends LayoutBuilder {
                 makeDefaultGameButton(),
                 makeWildCardButton(),
                 makeSettingsButton(),
-                makeMoreOptionsButton());
+                makeMoreOptionsButton(),
+                makeToggleSwitch());
         vBox.getStyleClass().add("options-vbox");
         return vBox;
+    }
+
+    private Node makeToggleSwitch() {
+        Node buttonSwitch = new SwitchButton();
+        double scale = 1.0;
+        buttonSwitch.setScaleX(scale);
+        buttonSwitch.setScaleY(scale);
+        return buttonSwitch;
     }
 
     private Button makeDefaultGameButton() {

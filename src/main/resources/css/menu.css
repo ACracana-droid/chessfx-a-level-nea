@@ -1,3 +1,23 @@
+.button-switch {
+    -fx-alignment: center;
+    -fx-background-color: blue;
+    -fx-border-color: beige;
+    /* Dynamic data */
+    -fx-border-radius: 1em;
+    -fx-border-width: 0.1em;
+    -fx-background-radius: 1em;
+    -fx-background-insets: 0.1em;
+}
+
+.button-switch-circle {
+    -fx-fill: beige;
+}
+
+
+.button-switch:active {
+    -fx-background-color: green;
+}
+
 
 .root-wrapper-pane {
     /*-fx-border-color: -accent1;*/
@@ -27,6 +47,25 @@
 .title-ornament {
     -fx-spacing: 20;
     -fx-indent: 20;
+}
+
+.close-popup-button {
+    -fx-spacing: 1.5em;
+    -fx-padding: 1em;
+}
+
+.settings {
+    -fx-focus-traversable: false;
+}
+
+.settings-popup {
+    -fx-alignment: center;
+    -fx-background-color: -bg2;
+    -fx-background-radius: 2em;
+    -fx-border-radius: 0.9em;
+    -fx-border-width: 0.4em;
+    -fx-border-color: red;
+
 }
 
 
@@ -69,7 +108,14 @@
 
 .current-turn-label {
     -fx-alignment: center;
+    -fx-padding: 0.3em, 0.1em;
+    -fx-spacing: 0.3em;
     /*-fx-pref-height: 0.5em;*/
+}
+.current-turn-label * {
+    -fx-background-color: -bg2;
+    -fx-background-radius: 2em;
+    /*-fx-padding: 0.2em;*/
 }
 
 .sidebar-button {

@@ -2,6 +2,7 @@ package com.chessfx.engine.pieces;
 
 import com.chessfx.engine.moves.MoveVector;
 import com.chessfx.engine.board.Team;
+import com.chessfx.log.Log;
 
 import java.util.*;
 
@@ -14,14 +15,28 @@ public class ArbitraryPieceFactory {
     }
 
     public Piece create(String name, Team team, int rank, int file, boolean hasMoved) {
-
         PieceData pieceData = getPieceEngineData(name);
         Set<MoveVector> moveSet = pieceData.getAllMoveVectors(team);
 
-        if (name.equals("king"))
-            return new King(team, rank, file, pieceData, moveSet.toArray(new MoveVector[0]), hasMoved);
+        Piece piece = makePiece(name, team, rank, file, hasMoved, pieceData, moveSet);
 
-        return new ArbitraryPiece(name, team, rank, file, pieceData, moveSet.toArray(new MoveVector[0]), hasMoved);
+        team.getPieceList().add(piece);
+        return piece;
+    }
+
+    private Piece makePiece(String name, Team team, int rank, int file,
+                            boolean hasMoved, PieceData pieceData, Collection<MoveVector> moveSet) {
+        if (name.equals("king")) {
+            return new King(team, rank, file, pieceData, moveSet.toArray(new MoveVector[0]), hasMoved);
+        } else {
+            return new Piece(name, pieceData.fenId, team, pieceData.value, rank, file, moveSet.toArray(new MoveVector[0]), hasMoved);
+        }
+    }
+
+    public Piece copy(Piece piece, Team team) {
+        Piece copy = makePiece(piece.name, team, piece.coOrds.y(), piece.coOrds.x(), piece.hasMoved, getPieceEngineData(piece.getName()), List.of(piece.moveSet));
+        team.getPieceList().add(piece);
+        return copy;
     }
 
 
@@ -29,7 +44,7 @@ public class ArbitraryPieceFactory {
         if (piecesMap.containsKey(identifier)) {
             return piecesMap.get(identifier);
         } else {
-            System.out.println("ArbitraryPiece Factory: There either is not a file containing information about this piece" +
+            Log.warn("ArbitraryPieceFactory", "There either is not a file containing information about this piece" +
                     "\nor it could not be found.");
             return piecesMap.get("placeholder");
         }

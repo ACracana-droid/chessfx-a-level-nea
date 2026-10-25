@@ -1,67 +1,30 @@
 package com.chessfx.engine.board;
 
-import com.chessfx.engine.bot.AttackMap;
-import com.chessfx.engine.bot.Bot;
 import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
 
 import java.util.ArrayDeque;
-import java.util.List;
-
 
 public class BoardContainer extends BoardContainerBase {
 
-    protected final GameStateModel gameModel;
-    protected Bot bot;
 
+    // ENSURE TEAMS ARE READ ONLY (so it does not affect the child class).
+    protected final GameStateModel gameModel;
     protected ArrayDeque<PlyData> plyStack = new ArrayDeque<>();
 
-    AttackMap attackMap;
 
     public BoardContainer(GameStateModel gameModel, TileBase[][] board) {
         super(board);
         this.gameModel = gameModel;
-        attackMap = new AttackMap(this);
     }
 
-    public boolean tileHasPieceMatchingTeam(int y, int x) {
-        return board[y][x].hasPieceMatchingTeam(gameModel.getCurrentTeam());
-    }
-
-    public void terminate() {
-        // do nothing. Equivalent to an abstract method
-    }
-
-    public Team getCurrentTeam() {
-        return gameModel.getCurrentTeam();
-    }
-
-    /**
-     *
-     * <p>
-     * Completes a move in its entirety. It does this by updating the position of the moved piece to the end
-     * location of the move and by removing any pieces 'captured' by this move from the board.
-     * <p/>
-     * <p>
-     * Also updates the game state and pushes the completed move to the moveStack so that it can be undone.
-     * </p>
-     * <p>
-     * If the current team after the game update is a bot, then this method also calls for the bot to take
-     * its turn.
-     * </p>
-     *
-     * @param move the move being done
-     */
     public void doMove(Move move) {
-        updatePiecePosition(move);
-        updateGame(move);
-        if (getCurrentTeam().isBot()) {
-            takeTurnAsBot();
-        }
+        Piece origPiece = getTile(move.startCoOrds()).getPiece();
+        Piece directCapture = updatePiecePosition(move);
+        updateGame(move, origPiece, directCapture);
     }
-
 
     /**
      * Internally completes the move on the TileParent array board.
@@ -71,20 +34,49 @@ public class BoardContainer extends BoardContainerBase {
      * <p/>
      *
      * @param move the move being made
+     * @return the enemy piece at the destination of the move
      */
-    protected void updatePiecePosition(Move move) {
-        Piece piece = getTile(move.getStartY(), move.getStartX()).removePiece();
-        piece.setCoOrds(move.getEndY(), move.getEndX());
+    protected Piece updatePiecePosition(Move move) {
+        Piece piece = getTile(move.startCoOrds()).removePiece();
+        Log.warn(move.getStartY() + ", " + move.getStartX());
+        piece.setCoOrds(move.destCoOrds());
         // piece's 'hasMoved' is set in updateGame.
+        TileBase dest = getTile(move.destCoOrds());
 
-        if (move.isCapture()) {
-            // for things like en passant
-            getCurrentTeam().getCapturedPieces().addAll(move.getCaptures());
-            // handle capture
+
+        if (move.isSuperCapture()) {
+            for (Piece enemy : move.getCaptures()) {
+                getTile(enemy.getCoOrds()).removePiece();
+                captureListUpdate(enemy);
+            }
         }
-        getTile(move).setPiece(piece);
+
+        Piece directCapture = null;
+
+        if (dest.hasPieceMatchingTeam(getEnemyTeam())) {
+            // is capture
+            directCapture = dest.getPiece();
+            captureListUpdate(directCapture);
+            dest.removePiece();
+        }
+
+        dest.setPiece(piece);
+        return directCapture;
     }
 
+    protected void captureListUpdate(Piece enemy) {
+    }
+
+    protected void undoCaptureListUpdate(Piece enemy) {
+    }
+
+    public GameStateModel getGameModel() {
+        return gameModel;
+    }
+
+    public Team getEnemyTeam() {
+        return gameModel.getEnemyTeam();
+    }
 
     /**
      * <p>
@@ -97,62 +89,21 @@ public class BoardContainer extends BoardContainerBase {
      *
      * @return move the move being undone
      */
-    public Move undoLastMove() {
+    public PlyData undoLastMove() {
         if (plyStack.isEmpty()) return null;
         PlyData ply = plyStack.pop();
-        Move move = ply.getMove();
+        Move move = ply.move();
 
         undoUpdateGame();
-        undoUpdatePiecePosition(move, ply.hasPieceMovedBefore());
-        return move;
-    }
-
-    private void undoUpdateGame() {
-        switchTeam(false);
-    }
-
-    protected void updateGame(Move move) {
-        Piece piece = move.getPiece();
-        plyStack.push(new PlyData(move, piece.hasMoved(), getCurrentTeam()));
-        piece.setHasMoved(true);
-        switchTeam(true);
-        // MUST CHECK REPERCUSSIONS OF MOVE.
-        // TODO: REPLACE WITH SUPERIOR VER BELOW
-//        if (Bot.isCheck(this)) {
-//            setBoardState(BoardState.CHECK);
-//        }
-        attackMap.calculate(this);
-        setBoardState(queryBoardState());
-
-//        Log.info("Board Container", "King is threatened? " + bot.isKingThreatenedThorough(this));
-
-    }
-
-    private BoardState queryBoardState() {
-        if (isCheck()) {
-            if (isCheckmate()) {
-                return BoardState.CHECKMATE;
-            }
-            return BoardState.CHECK;
-        }
-
-        return BoardState.DEFAULT;
-    }
-
-    public boolean isCheck() {
-        return !attackMap.isTileThreatened(getCurrentTeam().getKing());
-    }
-
-    public boolean isCheckmate() {
-        return false;
+        undoUpdatePiecePosition(move, ply.hasPieceMovedBefore(), ply.directCapture());
+        return ply;
     }
 
 
-    protected void setBoardState(BoardState boardState) {
-        Log.info("BoardState is " + boardState.getText());
-        gameModel.setBoardState(boardState);
-    }
 
+    public Team getCurrentTeam() {
+        return gameModel.getCurrentTeam();
+    }
 
     protected void takeTurnAsBot() {
         // TODO: TAKE TURN AS BOT.
@@ -165,34 +116,72 @@ public class BoardContainer extends BoardContainerBase {
         gameModel.cycleTeam(isForwards);
     }
 
-    protected void undoUpdatePiecePosition(Move move, boolean hasMoved) {
+    protected void undoUpdatePiecePosition(Move move, boolean hasMoved, Piece directCapture) {
         Log.info("Undoing move...");
         Piece piece = getTile(move).removePiece();
-        piece.setCoOrds(move.getStartY(), move.getStartX());
+        piece.setCoOrds(move.startCoOrds());
         piece.setHasMoved(hasMoved);
 
-        if (move.isCapture()) {
+        if (move.isSuperCapture()) {
             // for things like en passant
-            getCurrentTeam().getCapturedPieces().removeAll(move.getCaptures());
             // handle capture removeCapture
-            for (Piece p : move.getCaptures()) {
-                getTile(p.getCoOrds()).setPiece(p);
+            for (Piece enemy : move.getCaptures()) {
+                undoCaptureListUpdate(enemy);
+                getTile(enemy.getCoOrds()).setPiece(enemy);
             }
         }
-        getTile(move.getStartY(), move.getStartX()).setPiece(piece);
+        if (directCapture != null) {
+            undoCaptureListUpdate(directCapture);
+            getTile(move.destCoOrds()).setPiece(directCapture);
+        }
+
+        getTile(move.startCoOrds()).setPiece(piece);
     }
 
-    public GameStateModel getGameModel() {
-        return gameModel;
+    protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
+        plyStack.push(new PlyData(move, origPiece.hasMoved(), directCapture, getCurrentTeam()));
+        origPiece.setHasMoved(true);
+        switchTeam(true);
     }
 
-    public List<Move> getValidatedMoves(List<Move> unvalidatedMoves) {
-        // validate moves by checking if causes team side check.
-        // gotta move hypothetically.
-        // need hypothetical board.
+    protected void undoUpdateGame() {
+        switchTeam(false);
+    }
 
+    public String getStringRepresentation() {
+        StringBuilder sb = new StringBuilder(); //
 
-        return unvalidatedMoves;
+        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
+        sb.append("\n");
+        // must traverse board from 8, downwards.
+        boolean checkerPattern = true;
+        //// using i to make rank index
+        for (int i = HEIGHT; i > 0; ) {
+            sb.append(i).append(" | "); // length 4
+            i--;
+            for (TileBase tile : board[i]) {
+                sb.append(" ");
+                if (tile.hasPiece()) {
+                    sb.append(tile.getPiece().getFenID());
+                } else {
+                    sb.append(checkerPattern ? '#' : '-'); //// white symbol, black symbol
+                }
+                checkerPattern = !checkerPattern;
+
+                sb.append(" ");
+
+            }
+            sb.append(" |\n"); //length 2*
+            checkerPattern = !checkerPattern;
+        }
+        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
+        sb.append("\n").
+                append(" ".repeat(4 + 1));
+        //// making file index
+        for (char i = 'a'; i <= 'h'; i++) {
+            sb.append(i).repeat(" ", 2);
+        }
+        return sb.reverse().toString();
     }
 
 }
