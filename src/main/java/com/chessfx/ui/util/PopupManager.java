@@ -2,7 +2,9 @@ package com.chessfx.ui.util;
 
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.chessconfig.ChessConfigModel;
+import com.chessfx.engine.board.Team;
 import com.chessfx.log.Log;
+import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import com.chessfx.ui.menu.GamePopup;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
@@ -12,6 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+
+import java.util.List;
 
 
 public class PopupManager {
@@ -98,4 +102,16 @@ public class PopupManager {
         popup.maxHeightProperty().bind(rootHeightProperty.multiply(scale));
         popup.maxWidthProperty().bind(rootWidthProperty.multiply(scale));
     }
+
+    public void promotionPopup(PieceSpriteFactory pieceSpriteFactory, Team promotingTeam) {
+        if (locked) {
+            Log.info("Cannot close promotion popup without promoting");
+        }
+        Region popup = new PromotionPopupBuilder(pieceSpriteFactory,
+                List.of("queen", "rook", "knight", "bishop"), promotingTeam).build();
+
+        push(popup);
+        toggleLock();
+    }
+
 }

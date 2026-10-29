@@ -3,12 +3,14 @@ package com.chessfx.ui.game.board;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.engine.board.GameBoardContainer;
 import com.chessfx.engine.board.ReactiveChessContainer;
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.ui.game.DragHandler;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import com.chessfx.ui.game.tiles.TileColourPatternManager;
 import com.chessfx.ui.game.tiles.TileUI;
 import com.chessfx.ui.util.LayoutManager;
+import com.chessfx.ui.util.PopupManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
@@ -36,8 +38,11 @@ public class ChessBoardBuilder implements Builder<StackPane> {
 
     protected BoardUIModel boardUIModel;
     protected GameBoardContainer boardContainer;
+    protected PopupManager popupManager;
 
     protected DoubleProperty rotateProperty = new SimpleDoubleProperty(0.0);
+
+
 
     public ChessBoardBuilder() {
         view.getChildren().addAll(makeEmptyBoardUI());
@@ -63,8 +68,7 @@ public class ChessBoardBuilder implements Builder<StackPane> {
             for (int j = 0; j < numOfFiles; j++) {
                 boardUI.add(
                         boardUiArr[i][j] = new TileUI(
-                                tileColour.getCycle(),
-                                tileSize),
+                                tileColour.getCycle()),
                         j, i
                 );
             }
@@ -73,10 +77,11 @@ public class ChessBoardBuilder implements Builder<StackPane> {
         return boardUI;
     }
 
-    public ChessBoardBuilder(ReactiveChessContainer chessContainer, ChessConfigModel chessConfig, LayoutManager layoutManager) {
-        this.boardContainer = chessContainer;
+    public ChessBoardBuilder(ReactiveChessContainer boardContainer, ChessConfigModel chessConfig, LayoutManager layoutManager) {
+        this.boardContainer = boardContainer;
         this.chessConfig = chessConfig;
-        Region board = makeBoardUI(chessContainer);
+        this.popupManager = layoutManager.getPopupManager();
+        Region board = makeBoardUI(boardContainer);
         board.rotateProperty().bind(rotateProperty);
         view.getChildren().addAll(board, dragLayer);
     }
@@ -95,24 +100,23 @@ public class ChessBoardBuilder implements Builder<StackPane> {
 
         PieceSpriteFactory pieceSpriteFactory = new PieceSpriteFactory(chessConfig.getInstantiatedPiecesNameSet());
         DragHandler dragHandler = new DragHandler(dragLayer, boardUI, pieceSpriteFactory);
-        boardUIModel = new BoardUIModel(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory, rotateProperty);
+        boardUIModel = new BoardUIModel(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory, rotateProperty, popupManager);
 
         NumberBinding tileSize = getTileSize(numOfRanks, numOfFiles, view);
         applyGridConstraints(boardUI, tileSize, numOfRanks, numOfFiles);
 
-        initialiseBoard(numOfRanks, numOfFiles, boardUI, boardUiArr, board, tileSize, pieceSpriteFactory, new TileColourPatternManager(chessConfig.getTileCheckerboardOffset()));
+        initialiseBoard(numOfRanks, numOfFiles, boardUI, boardUiArr, board, pieceSpriteFactory, new TileColourPatternManager(chessConfig.getTileCheckerboardOffset()));
         return boardUI;
     }
 
     private void initialiseBoard(int numOfRanks, int numOfFiles, GridPane boardUI,
-                                 TileUI[][] boardUiArr, TileBase[][] board, NumberBinding tileSize,
+                                 TileUI[][] boardUiArr, TileBase[][] board,
                                  PieceSpriteFactory pieceSpriteFactory, TileColourPatternManager tileColour) {
         for (int i = 0; i < numOfRanks; i++) {
             for (int j = 0; j < numOfFiles; j++) {
                 TileUI cur = new TileUI(board[i][j],
-                        tileColour.getCycle(),
-                        tileSize, pieceSpriteFactory,
-                        boardUIModel, i, j);
+                        tileColour.getCycle(), pieceSpriteFactory,
+                        boardUIModel, boardContainer.posString(new Coordinate(i, j)));
 
                 // pieces always appear upright.
                 cur.rotateProperty().bind(rotateProperty.negate());

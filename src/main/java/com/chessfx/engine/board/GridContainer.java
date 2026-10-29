@@ -5,7 +5,6 @@ import com.chessfx.engine.tiles.TileBase;
 
 public interface GridContainer<T> {
 
-
     T getTile(Coordinate coOrds);
 
     T[][] getBoard();

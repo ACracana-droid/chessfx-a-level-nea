@@ -38,13 +38,19 @@ public class ChessConfigModel {
         setUpPieceData();
     }
 
+    public ChessConfigModel(boolean acceptDelay) {
+        if (!acceptDelay) {
+            setUpPieceData();
+        } else {
+            CompletableFuture.runAsync(this::setUpPieceData);
+        }
+    }
+
     private void setUpPieceData() {
-        CompletableFuture.runAsync(() -> {
-            PieceDataManager pieceDataManager = new PieceDataManager();
-            pieceMap = pieceDataManager.getPieceDataMap();
-            fenIdToNameMap = pieceDataManager.getFenIdToNameMap();
-            pieceFactory = new ArbitraryPieceFactory(pieceMap);
-        });
+        PieceDataManager pieceDataManager = new PieceDataManager();
+        pieceMap = pieceDataManager.getPieceDataMap();
+        fenIdToNameMap = pieceDataManager.getFenIdToNameMap();
+        pieceFactory = new ArbitraryPieceFactory(pieceMap);
     }
 
 

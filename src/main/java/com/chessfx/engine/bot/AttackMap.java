@@ -35,42 +35,41 @@ public class AttackMap implements Cloneable {
         int m = board[0].length;
         boolean[][] copy = new boolean[n][m];
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                copy[i][j] = board[i][j];
-            }
+            System.arraycopy(board[i], 0, copy[i], 0, m);
         }
         return copy;
     }
 
-    public String logOutputStringRepresentation() {
-        Log sb = Log.LOG; //
+    public void logOutputRepresentation() {
 
-        sb.append("\n");
-        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
-        sb.append("\n");
+        Log.append("\n");
+        Log.append("_".repeat((3 * WIDTH) + 4 + 2));
+        Log.append("\n");
         // must traverse board from 8, downwards.
         boolean checkerPattern = true;
         //// using i to make rank index
         for (int i = HEIGHT; i > 0; ) {
-            sb.append("" + i).append(" | "); // length 4
+            Log.append("" + i);
+            Log.append(" | "); // length 4
             i--;
             for (boolean tile : boolBoard[i]) {
-                sb.append(" ");
-                sb.append(tile ? AnsiColourCode.GREEN + "T" + AnsiColourCode.RESET : AnsiColourCode.RED + "F" + AnsiColourCode.RESET);
-                sb.append(" ");
+                Log.append(" ");
+                Log.append(tile ? AnsiColourCode.GREEN + "T" + AnsiColourCode.RESET : AnsiColourCode.RED + "F" + AnsiColourCode.RESET);
+                Log.append(" ");
 
             }
-            sb.append(" |\n"); //length 2*
+            Log.append(" |\n"); //length 2*
             checkerPattern = !checkerPattern;
         }
-        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
-        sb.append("\n").
-                append(" ".repeat(4 + 1));
+        Log.append("_".repeat((3 * WIDTH) + 4 + 2));
+        Log.append("\n");
+        Log.append(" ".repeat(4 + 1));
         //// making file index
         for (char i = 'a'; i <= 'h'; i++) {
-            sb.append(" " + i).append(" ".repeat(2));
+            Log.append(" " + i);
+            Log.append(" ".repeat(2));
         }
-        return sb.toString();
+        Log.append("\n");
     }
 
     public enum AttackStatus {
@@ -106,23 +105,17 @@ public class AttackMap implements Cloneable {
 
 
     // TODO: FINISH, and split for multiple reams.
-    public void calculate(BoardContainer boardContainer) {
-        calculateBools(boardContainer, boardContainer.getEnemyTeam());
-    }
-
-    public void calculate(BoardContainerBase boardContainer, Team team) {
+    public void calculate(BoardContainer boardContainer, Team team) {
         calculateBools(boardContainer, team);
     }
 
-    private void calculateBools(BoardContainerBase boardContainer, Team team) {
+    private void calculateBools(BoardContainer boardContainer, Team team) {
         clear();
-        Log.debug("Calculating bools...");
         for (Piece piece : team.getPieceList()) {
             for (Move move : piece.threats(boardContainer)) {
                 addCapturesToBoolBoard(move);
             }
         }
-        Log.debug("Finished loop.");
     }
 
     private void addCapturesToBoolBoard(Move move) {

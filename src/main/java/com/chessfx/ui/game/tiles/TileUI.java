@@ -12,6 +12,8 @@ import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -28,8 +30,8 @@ public class TileUI extends StackPane {
     private boolean isShowingSprite;
     private Region pieceSprite;
 
-    public TileUI(TileBase tile, TileColour tileColour, NumberBinding tileSizeBinding,
-                  PieceSpriteFactory pieceSpriteFactory, BoardUIModel uiModel, int i, int j) {
+    public TileUI(TileBase tile, TileColour tileColour,
+                  PieceSpriteFactory pieceSpriteFactory, BoardUIModel uiModel, String placeString) {
         super();
         this.tile = tile;
         this.uiModel = uiModel;
@@ -45,9 +47,11 @@ public class TileUI extends StackPane {
         }
 
         /// show array numbering (ADD SETTING)
-        Label numbering = new Label(i + ", " + j);
-        numbering.setVisible(true);
-        this.getChildren().add(numbering);
+//        Label numbering = new Label(i + ", " + j);
+//        numbering.setVisible(true);
+//        this.getChildren().add(numbering);
+
+        this.getChildren().add(placeLabel(placeString));
 
         /// Tile should never ever be null, but (for now) maybe it is.
         if (tile != null && tile.hasPiece())
@@ -57,6 +61,13 @@ public class TileUI extends StackPane {
             setUpPseudoClasses();
             this.setOnMousePressed(event -> handleTilePressed(event));
         }
+    }
+
+    private Label placeLabel(String placeString) {
+        Label label = new Label(placeString);
+        label.getStyleClass().add("tile-coordinate-label");
+        StackPane.setAlignment(label, Pos.TOP_LEFT);
+        return label;
     }
 
 
@@ -76,13 +87,13 @@ public class TileUI extends StackPane {
         this.tile = tile;
     }
 
-    public TileUI(TileColour tileColour, NumberBinding tileSize) {
+    public TileUI(TileColour tileColour) {
         super();
         // Styling for UI
         this.getStyleClass().addAll(getColourStyleClass(tileColour), "chess-tile");
-        this.setMinSize(30, 30);
-        this.prefHeightProperty().bind(tileSize);
-        this.prefWidthProperty().bind(tileSize);
+//        this.setMinSize(30, 30);
+//        this.prefHeightProperty().bind(tileSize);
+//        this.prefWidthProperty().bind(tileSize);
         setUpPseudoClasses();
 
     }
@@ -213,6 +224,7 @@ public class TileUI extends StackPane {
         PseudoClass check = PseudoClass.getPseudoClass("check");
         this.pseudoClassStateChanged(check, b);
     }
+
     private void checkmate(boolean b) {
         PseudoClass checkmate = PseudoClass.getPseudoClass("checkmate");
         this.pseudoClassStateChanged(checkmate, b);

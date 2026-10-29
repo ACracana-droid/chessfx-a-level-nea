@@ -2,6 +2,7 @@ package com.chessfx.engine.board;
 
 import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
+import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
 
@@ -32,12 +33,6 @@ public class BoardContainerBase implements GridContainer<TileBase> {
         return board[y][x].hasPieceMatchingTeam(team);
     }
 
-    // shouldn't have to pass the team, it must be currentTeam
-    public boolean isPossibleMove(Team team, int rank, int file) {
-        return !board[rank][file].hasPieceMatchingTeam(team);
-    }
-
-
     public TileBase getTile(int y, int x) {
         return board[y][x];
     }
@@ -59,6 +54,34 @@ public class BoardContainerBase implements GridContainer<TileBase> {
     @Override
     public TileBase[][] getBoard() {
         return board;
+    }
+
+    protected String getYAxisNum(int y) {
+        int num = (y - HEIGHT) * -1;
+        return Integer.toString(num);
+    }
+
+    protected char getXAxisLetter(int x) {
+        return (char) (x + 'a');
+    }
+
+    public Coordinate pos(String str) {
+        Log.debug("", posString(new Coordinate(getInternalY(str.charAt(1)), getInternalX(str.charAt(0)))));
+        return new Coordinate(getInternalY(str.charAt(1)), getInternalX(str.charAt(0)));
+    }
+
+    public String posString(Coordinate coordinate) {
+        return getXAxisLetter(coordinate.x()) + getYAxisNum(coordinate.y());
+    }
+
+    private int getInternalX(char c) {
+        int num = (int) c - 'a';
+        return num;
+    }
+
+    private int getInternalY(char c) {
+        int num = (HEIGHT - Character.getNumericValue(c));
+        return num;
     }
 
 

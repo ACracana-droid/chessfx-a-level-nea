@@ -1,5 +1,6 @@
 package com.chessfx.engine.pieces;
 
+import com.chessfx.engine.board.BoardContainer;
 import com.chessfx.engine.board.GameBoardContainer;
 import com.chessfx.engine.board.BoardContainerBase;
 import com.chessfx.engine.board.Team;
@@ -13,12 +14,11 @@ import java.util.List;
 
 public class Piece extends PieceBase implements Cloneable {
 
-
     protected List<Move> movesCache;
     final protected MoveVector[] moveSet;
 
     Piece(String name, String fenId, Team team, int value,
-                 int rank, int file, MoveVector[] moveSet, boolean hasMoved) {
+          int rank, int file, MoveVector[] moveSet, boolean hasMoved) {
         super(name, fenId, value, team, new Coordinate(rank, file));
         this.moveSet = moveSet;
         this.hasMoved = hasMoved;
@@ -49,7 +49,7 @@ public class Piece extends PieceBase implements Cloneable {
         return hasMoved;
     }
 
-    public List<Move> moves(GameBoardContainer boardModel) {
+    public List<Move> moves(BoardContainer boardModel) {
 //        if (isMovesCacheValid(boardModel)) {
 //            movesCache = calculateMoves(boardModel);
 //        }
@@ -65,7 +65,7 @@ public class Piece extends PieceBase implements Cloneable {
         return false;
     }
 
-    private List<Move> calculateMoves(GameBoardContainer boardModel) {
+    private List<Move> calculateMoves(BoardContainer boardModel) {
         Log.info("Querying moves: " + team + " " + name);
         List<Move> ls = new ArrayList<>();
         for (MoveVector mv : filterInitialMoveVectors()) {
@@ -86,11 +86,11 @@ public class Piece extends PieceBase implements Cloneable {
         return ls;
     }
 
-    private void handleConditionsCheckingInterval(MoveVector mv, GameBoardContainer boardModel, List<Move> ls) {
+    private void handleConditionsCheckingInterval(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
         Log.warn("Piece", "Unimplemented method");
     }
 
-    private void handleConditions(MoveVector mv, GameBoardContainer boardModel, List<Move> ls) {
+    private void handleConditions(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
         if (mv.isCaptureOnly()) {
             captureMoves(mv, boardModel, ls);
         } else if (mv.isNotCapture()) {
@@ -101,17 +101,17 @@ public class Piece extends PieceBase implements Cloneable {
         }
     }
 
-    private void standardMoves(MoveVector mv, BoardContainerBase boardModel, List<Move> ls) {
+    private void standardMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
         int y = coOrds.y() + mv.getDy(), x = coOrds.x() + mv.getDx();
         int steps = mv.getSteps();
         while (steps != 0 && boardModel.inBoardBounds(y, x)) {
             if (boardModel.tileHasPiece(y, x)) {
                 if (!boardModel.tileHasPieceMatchingTeam(y, x, getTeam())) {
-                    ls.add(Move.capture(this, y, x));
+                    ls.add(capture(this, y, x));
                 }
                 return; // is stopped by allied piece and will stop after capturing enemy.
             } else {
-                ls.add(Move.make(this, y, x));
+                ls.add(make(this, y, x));
             }
             y += mv.getDy();
             x += mv.getDx();
@@ -119,13 +119,21 @@ public class Piece extends PieceBase implements Cloneable {
         }
     }
 
-    private void nonCaptureMoves(int dy, int dx, int steps, GameBoardContainer boardModel, List<Move> ls) {
+    private Move capture(Piece piece, int y, int x) {
+        return Move.capture(piece, y, x);
+    }
+
+    private Move make(Piece piece, int y, int x) {
+        return Move.make(piece, y, x);
+    }
+
+    private void nonCaptureMoves(int dy, int dx, int steps, BoardContainer boardModel, List<Move> ls) {
         int y = coOrds.y() + dy, x = coOrds.x() + dx;
         while (steps != 0 && boardModel.inBoardBounds(y, x)) {
             if (boardModel.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(Move.make(this, y, x));
+            ls.add(make(this, y, x));
 
             y += dy;
             x += dx;
@@ -133,12 +141,12 @@ public class Piece extends PieceBase implements Cloneable {
         }
     }
 
-    private void nonCaptureMoves(MoveVector mv, GameBoardContainer boardModel, List<Move> ls) {
+    private void nonCaptureMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
         nonCaptureMoves(mv.getDy(), mv.getDx(), mv.getSteps(), boardModel, ls);
     }
 
     // finish this.
-    private void captureMoves(MoveVector mv, GameBoardContainer boardModel, List<Move> ls) {
+    private void captureMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
         int y = coOrds.y() + mv.getDy(), x = coOrds.x() + mv.getDx();
         int steps = mv.getSteps();
         while (steps != 0 && boardModel.inBoardBounds(y, x)) {
@@ -146,13 +154,12 @@ public class Piece extends PieceBase implements Cloneable {
                     || !boardModel.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(Move.capture(this, y, x));
+            ls.add(capture(this, y, x));
             y += mv.getDy();
             x += mv.getDx();
             steps--;
         }
     }
-
 
 
     private void captureMovesThreat(MoveVector mv, BoardContainerBase boardModel, List<Move> ls) {
@@ -162,7 +169,7 @@ public class Piece extends PieceBase implements Cloneable {
             if (boardModel.tileHasPieceMatchingTeam(y, x, getTeam())) {
                 return;
             }
-            ls.add(Move.capture(this, y, x));
+            ls.add(capture(this, y, x));
             y += mv.getDy();
             x += mv.getDx();
             steps--;
@@ -192,7 +199,6 @@ public class Piece extends PieceBase implements Cloneable {
             throw new RuntimeException(e);
         }
     }
-
 
 
     public Coordinate getCoOrds() {
@@ -257,7 +263,7 @@ public class Piece extends PieceBase implements Cloneable {
         return ls;
     }
 
-    public List<Move> threats(BoardContainerBase boardContainer) {
+    public List<Move> threats(BoardContainer boardContainer) {
         List<Move> ls = new ArrayList<>();
         for (MoveVector mv : filterInitialAndNonCaptureMoveVectors()) {
             if (mv.hasInterval()) {

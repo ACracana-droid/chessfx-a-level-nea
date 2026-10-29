@@ -3,6 +3,7 @@ package com.chessfx.ui.util;
 import javafx.css.PseudoClass;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 
 public class SwitchButton extends Pane {
@@ -29,23 +30,19 @@ public class SwitchButton extends Pane {
         this.setMaxHeight(RECTANGLE_HEIGHT);
         this.setMaxWidth(RECTANGLE_WIDTH + OFFSET);
 
-//        this.setStyle("-fx-border-width: " + OFFSET + ";"
-//                + "-fx-border-radius: " + CIRCLE_RADIUS + ";"
-//                + "-fx-background-radius: " + CIRCLE_RADIUS + ";"
-//        );
-
+        this.setStyle(
+                "-fx-border-width: " + OFFSET * 0.1 + ";" +
+                        "-fx-border-radius: " + RECTANGLE_HEIGHT + ";"
+                        + "-fx-background-radius: " + RECTANGLE_HEIGHT + ";"
+        );
         circle = makeCircleButton();
+
         this.getChildren().addAll(circle);
         this.getStyleClass().add("button-switch");
 
-
-//        Border
-//        this.setBorder(new Border(new BorderStroke(Color.BEIGE, BorderStrokeStyle.SOLID, new CornerRadii(CIRCLE_RADIUS), new BorderWidths(OFFSET * 10))));
-//        this.setBackground(new Background(new BackgroundFill(Color.BLUE, new CornerRadii(CIRCLE_RADIUS), new Insets(0.0))));
         this.setOnMouseClicked(event -> {
             toggleSwitch();
         });
-
         circle.setLayoutX(OFFSET);
     }
 

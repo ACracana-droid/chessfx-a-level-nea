@@ -141,6 +141,7 @@ public class DragHandler {
 
 
     public TileUI endDrag(MouseEvent event) {
+        if (draggedPiece == null) return null;
         Region piece = draggedPiece;
         draggedPiece = null;
 
@@ -153,7 +154,7 @@ public class DragHandler {
 
 
         double x = event.getSceneX(), y = event.getSceneY();
-        TileUI tile = findTile( x, y);
+        TileUI tile = findTile(x, y);
         return tile;
     }
 

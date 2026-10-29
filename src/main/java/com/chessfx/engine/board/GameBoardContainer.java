@@ -1,8 +1,8 @@
 package com.chessfx.engine.board;
 
 import com.chessfx.engine.bot.AttackMap;
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
-import com.chessfx.engine.pieces.King;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
@@ -30,18 +30,30 @@ public class GameBoardContainer extends BoardContainer {
     protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
         super.updateGame(move, origPiece, directCapture);
 
-        attackMap.calculate(virtualBoard, virtualBoard.getEnemyTeam());
+//        attackMap.calculate(virtualBoard, virtualBoard.getEnemyTeam());
         setBoardState(queryBoardState());
+        if (gameModel.isGameOver()) {
+            endGame();
+            return;
+        }
 
         if (getCurrentTeam().isBot()) {
             takeTurnAsBot();
         }
     }
 
+    protected void endGame() {
+        Log.info("Game has ended by " + getBoardState().getText() + "!");
+        if (getBoardState().equals(BoardState.CHECKMATE)) {
+            Log.info(getEnemyTeam().getName() + " has won.");
+        }
+    }
+
+
     @Override
     protected void undoUpdateGame() {
         super.undoUpdateGame();
-        attackMap.calculate(virtualBoard);
+//        attackMap.calculate(virtualBoard);
         setBoardState(queryBoardState());
     }
 
@@ -54,21 +66,21 @@ public class GameBoardContainer extends BoardContainer {
 
         virtualBoard = makeIsolatedBoardContainer();
 
-        attackMap.calculate(virtualBoard);
+//        attackMap.calculate(virtualBoard);
 
         setBoardState(queryBoardState());
     }
 
     private BoardContainer makeIsolatedBoardContainer() {
         List<Team> teamList = gameModel.copyTeams();
-        TileBase[][] board = boardCopy(this.board, teamList);
         GameStateModel gameStateModel = new GameStateModel(gameModel, teamList);
+        TileBase[][] board = boardCopy(this.board, teamList);
 
-        BoardContainer isolatedBoardContainer = new IsolatedBoardContainer(gameStateModel, board);
+        BoardContainer isolatedBoardContainer = new BoardContainer(gameStateModel, board);
         return isolatedBoardContainer;
     }
 
-    public TileBase[][] boardCopy(TileBase[][] board, List<Team> teamList) {
+    private TileBase[][] boardCopy(TileBase[][] board, List<Team> teamList) {
         int m = board.length, n = board[0].length;
 
         TileBase[][] copy = new TileBase[m][n];
@@ -78,16 +90,9 @@ public class GameBoardContainer extends BoardContainer {
                 if (tile.hasPiece()) {
 
                     Piece piece = tile.getPiece();
-                    int teamIdx = piece.getTeam().idx();
-                    Team team = teamList.get(teamIdx);
+                    Team team = teamList.get(piece.getTeam().idx());
 
                     copy[i][j] = tile.copy(team, gameModel.getChessConfig().getPieceFactory());
-                    Piece copyPiece = copy[i][j].getPiece();
-                    if (copyPiece instanceof King) {
-                        Log.debug("King found...");
-                        team.setKing((King) copyPiece);
-                    }
-                    team.getPieceList().add(copyPiece);
                 } else {
                     copy[i][j] = tile.copy();
                 }
@@ -115,8 +120,37 @@ public class GameBoardContainer extends BoardContainer {
      */
     @Override
     public void doMove(Move move) {
-        super.doMove(move);
+        // This was a major bug when order is swapped...
         virtualBoard.doMove(move);
+        super.doMove(move);
+    }
+
+    public void doMoveWithValidation(Coordinate origin, Coordinate destination) {
+        Piece piece = getTile(origin).getPiece();
+        if (piece == null) {
+            Log.error("BoardContainer", "Piece does not exist at origin coordinate. Move not made.");
+            return;
+        }
+
+        Move desiredMove = null;
+
+        for (Move move : getValidatedMoves(piece.moves(this))) {
+            if (move.getStartX() == origin.x() && move.getStartY() == origin.y() && move.getEndX() == destination.x() && move.getEndY() == destination.y()) {
+                desiredMove = move;
+                break;
+            }
+        }
+        if (desiredMove == null) {
+            Log.error("BoardContainer", "Move is not a member of the list of valid moves of the piece at specified original coordinate. Move not made.");
+            return;
+        }
+        doMove(desiredMove);
+    }
+
+    public void playMoves(List<String> moveStrings) {
+        for (String moveString : moveStrings) {
+            doMoveWithValidation(pos(moveString.substring(0, 2)), pos(moveString.substring(3)));
+        }
     }
 
     @Override
@@ -134,48 +168,34 @@ public class GameBoardContainer extends BoardContainer {
         // But getting accurate king positions in the virtual board will be nigh impossible.
 
         for (Move move : unvalidatedMoves) {
-            Log.debug("VirtualBoard representation:\n", virtualBoard.getStringRepresentation());
+            // say team is black
+            Log.debug("(pre) TEAM is" + virtualBoard.getCurrentTeam().getName());
+
             virtualBoard.doMove(move);
             Log.debug("VirtualBoard representation:\n", virtualBoard.getStringRepresentation());
 
+            // now curr team is light
             attackMap.calculate(virtualBoard, virtualBoard.getCurrentTeam());
+            Log.debug("(post) TEAM is" + virtualBoard.getCurrentTeam().getName());
 
-            Log.debug("AttackMap", attackMap.logOutputStringRepresentation());
-            if (!isCheck(virtualBoard, virtualBoard.getEnemyTeam())) {
+            // thus enemy team is black again...
+            Log.debug("AttackMap");
+            attackMap.logOutputRepresentation();
+            if (!isCheck(virtualBoard.getEnemyTeam())) {
                 /// not check, therefore move is valid
                 validated.add(move);
             }
 
 
             virtualBoard.undoLastMove();
-            Log.debug("VirtualBoard representation:\n", virtualBoard.getStringRepresentation());
-
+//            Log.debug("VirtualBoard representation:\n", virtualBoard.getStringRepresentation());
         }
 
 
         return validated;
     }
 
-    protected void setBoardState(BoardState boardState) {
-        Log.info("BoardState is " + boardState.getText());
-        gameModel.setBoardState(boardState);
-    }
-
-
-    @Override
-    protected void captureListUpdate(Piece enemy) {
-        getCurrentTeam().getCapturedPieces().add(enemy);
-        gameModel.getEnemyTeam().getPieceList().remove(enemy);
-    }
-
-    @Override
-    protected void undoCaptureListUpdate(Piece enemy) {
-        getCurrentTeam().getCapturedPieces().remove(enemy);
-        gameModel.getEnemyTeam().getPieceList().add(enemy);
-    }
-
-
-    private boolean isCheck(BoardContainer board, Team team) {
+    private boolean isCheck(Team team) {
         return attackMap.getTile(team.getKing().getCoOrds());
     }
 
@@ -188,6 +208,7 @@ public class GameBoardContainer extends BoardContainer {
         return attackMap;
     }
 
+    // TODO: document pseudocode
     protected BoardState queryBoardState() {
         if (isCheck()) {
             if (noValidMoves()) {
@@ -203,12 +224,37 @@ public class GameBoardContainer extends BoardContainer {
     }
 
     public boolean isCheck() {
-        attackMap.calculate(this);
+        attackMap.calculate(this, this.getEnemyTeam());
         return attackMap.getTile(getCurrentTeam().getKing().getCoOrds());
     }
 
     public boolean noValidMoves() {
-        return false;
+        Log.info("All pieces: ");
+        for (Piece piece : getCurrentTeam().getPieceList()) {
+            Log.append(piece.getName());
+        }
+        for (Piece piece : getCurrentTeam().getPieceList()) {
+            Log.debug("GameBoardContainer", "Getting validated moves for " + piece.getName());
+            List<Move> moveList = getValidatedMoves(piece.moves(this));
+
+
+            if (!moveList.isEmpty()) {
+                Log.error("MoveList", "it was " + piece.getTeam().getName() + piece.getName() +
+                        " on " + posString(piece.getCoOrds()));
+                for (Move move : moveList) {
+                    Log.append(longAlgebraicNotation(move));
+                }
+                return false;
+
+
+            }
+        }
+        return true;
     }
 
+
+
+    public void doMoveWithValidation(String longAlgebraicNotation) {
+        doMoveWithValidation(pos(longAlgebraicNotation.substring(0, 2)), pos(longAlgebraicNotation.substring(3)));
+    }
 }

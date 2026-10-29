@@ -29,19 +29,11 @@ public class MenuLayoutBuilder extends LayoutBuilder {
                 makeDefaultGameButton(),
                 makeWildCardButton(),
                 makeSettingsButton(),
-                makeMoreOptionsButton(),
-                makeToggleSwitch());
+                makeMoreOptionsButton());
         vBox.getStyleClass().add("options-vbox");
         return vBox;
     }
 
-    private Node makeToggleSwitch() {
-        Node buttonSwitch = new SwitchButton();
-        double scale = 1.0;
-        buttonSwitch.setScaleX(scale);
-        buttonSwitch.setScaleY(scale);
-        return buttonSwitch;
-    }
 
     private Button makeDefaultGameButton() {
         Button button = makeQuickGameButton("defaultPvP.properties");

@@ -5,6 +5,7 @@ import com.chessfx.engine.moves.MoveTableData;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
+import com.chessfx.ui.game.board.BoardUIModel;
 import javafx.beans.property.*;
 
 public class ReactiveChessContainer extends GameBoardContainer {
@@ -15,6 +16,7 @@ public class ReactiveChessContainer extends GameBoardContainer {
     private final StringProperty boardStateProperty = new SimpleStringProperty("");
 
     Runnable removeListeners = null;
+    private BoardUIModel boardUIModel;
 
     public ReactiveChessContainer(GameStateModel gameModel,
                                   TileBase[][] board) {
@@ -49,6 +51,10 @@ public class ReactiveChessContainer extends GameBoardContainer {
         // Do as task.
 
         super.doMove(move);
+
+        if (gameModel.isPromotion()) {
+            boardUIModel.promotionPrompt();
+        }
     }
 
     @Override
@@ -56,19 +62,18 @@ public class ReactiveChessContainer extends GameBoardContainer {
         Log.info("Updating game...");
         super.updateGame(move, origPiece, directCapture);
         // other reactive stuff...
-        debugQuery();
 //        setBoardState(gameModel, board);
-    }
-
-    private void debugQuery() {
-        boolean b = board[3][0].hasPiece();
-        Log.warn("Piece at 3,0? -> " + b);
     }
 
     @Override
     protected void setBoardState(BoardState boardState) {
         super.setBoardState(boardState);
         boardStateProperty.set(boardState.getText());
+    }
+
+    @Override
+    protected void endGame() {
+        super.endGame();
     }
 
 
@@ -86,53 +91,20 @@ public class ReactiveChessContainer extends GameBoardContainer {
 
     }
 
+    @Override
+    protected void undoUpdateGame() {
+        super.undoUpdateGame();
+        // TODO: consider whether to use the boardUiModel...
+//        boardUIModel.showAttackMap(attackMap);
+    }
+
     private void updateMoveProperty(boolean isUndo, String moveString) {
         Log.info("moveProperty was:" + previousMoveProperty.get() + "\nmoveProperty is now:" + moveString);
         gameModel.setIsMoveUndo(isUndo);
         previousMoveProperty.set(moveString);
-    }
-//
-//    private void setBoardState(GameStateModel gameModel, TileBase[][] board) {
-//        BoardState state = ChessEngine.getBoardState(gameModel, board);
-//        gameModel.setBoardState(state);
-//
-//    }
 
-
-    /**
-     * Generates long algebraic notation that is valid on the standard 8x8 board and other more
-     * established variants such as Capablanca Chess.
-     *
-     * @param move the move which was completed
-     * @return algebraic notation string, e.g., e2e4
-     */
-    public String longAlgebraicNotation(Move move) {
-        Piece piece = move.getPiece();
-        //TODO: Add check (+), gameModelpromotion (e8=Q) and checkmate (#).
-        //TODO: DOCUMENT
-        StringBuilder sb = new StringBuilder();
-        if (!piece.getFenID().equals("P"))
-            sb.append(piece.getFenID());
-
-        sb.append(getXAxisLetter(move.getStartX())).append(getYAxisNum(move.getStartY()));
-        if (move.isCapture()) {
-            sb.append("x");
-        } else sb.append("-");
-
-        sb.append(getXAxisLetter(move.getEndX())).append(getYAxisNum(move.getEndY()));
-
-
-        return sb.toString();
     }
 
-    private String getYAxisNum(int y) {
-        int num = (y - HEIGHT) * -1;
-        return Integer.toString(num);
-    }
-
-    private char getXAxisLetter(int x) {
-        return (char) (x + 'a');
-    }
 
     @Override
     protected void switchTeam(boolean isForwards) {
@@ -166,5 +138,9 @@ public class ReactiveChessContainer extends GameBoardContainer {
 
     public final StringProperty boardStateProperty() {
         return boardStateProperty;
+    }
+
+    public void setUIModel(BoardUIModel boardUIModel) {
+        this.boardUIModel = boardUIModel;
     }
 }

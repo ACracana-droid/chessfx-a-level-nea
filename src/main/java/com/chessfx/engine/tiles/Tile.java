@@ -42,8 +42,8 @@ public class Tile extends TileBase {
     }
 
     @Override
-    public boolean hasPieceMatchingTeam(Team currentTeam) {
-        return hasPiece() && piece.getTeam().equals(currentTeam);
+    public boolean hasPieceMatchingTeam(Team team) {
+        return hasPiece() && piece.getTeam().equals(team);
     }
 
     @Override
@@ -56,7 +56,6 @@ public class Tile extends TileBase {
     @Override
     public TileBase copy(Team team, ArbitraryPieceFactory pieceFactory) {
         Piece pieceCopy = pieceFactory.copy(piece, team);
-        Log.warn("Copied piece: " + pieceCopy.getName());
         Tile tile = new Tile(pieceCopy);
         return tile;
 

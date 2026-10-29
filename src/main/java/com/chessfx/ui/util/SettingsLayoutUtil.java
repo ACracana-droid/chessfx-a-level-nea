@@ -6,15 +6,25 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.girod.javafx.svgimage.SVGContent;
+import org.girod.javafx.svgimage.SVGImage;
+import org.girod.javafx.svgimage.SVGLoader;
+
+import java.util.Objects;
 
 
 abstract public class SettingsLayoutUtil {
 
     public static Button makeIconButton(AppSettings appSettings, PopupManager popupManager) {
         Button button = new Button();
-        button.getStyleClass().add("settings");
+        SVGImage image = SVGLoader.load(Objects.requireNonNull
+                (popupManager.getClass().getResource("settings2.svg")));
+        button.setGraphic(image);
+        button.getStyleClass().add("settings-button");
         button.setOnAction(event -> {
             popupManager.makeSettingsPopup(appSettings);
         });

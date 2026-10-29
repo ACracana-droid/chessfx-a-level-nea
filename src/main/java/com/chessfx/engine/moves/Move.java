@@ -35,6 +35,8 @@ public class Move extends MoveBase {
         return new ComplexMove(piece, y, x, captures);
     }
 
+
+
     public static Move capture(Piece piece, int y, int x) {
         return new Move(piece, y, x, true);
     }

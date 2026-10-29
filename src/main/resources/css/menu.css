@@ -1,6 +1,6 @@
 .button-switch {
     -fx-alignment: center;
-    -fx-background-color: blue;
+    -fx-background-color: -bg-var2;
     -fx-border-color: beige;
     /* Dynamic data */
     -fx-border-radius: 1em;
@@ -15,7 +15,11 @@
 
 
 .button-switch:active {
-    -fx-background-color: green;
+    -fx-background-color: -fg1;
+}
+
+.button-switch:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.8), 10, 0.5, 0, 0);
 }
 
 
@@ -54,8 +58,16 @@
     -fx-padding: 1em;
 }
 
-.settings {
+.settings-button {
     -fx-focus-traversable: false;
+
+}
+
+.settings-button * {
+    -fx-stroke: -fx-text-fill;
+    -fx-fill: -fx-text-fill;
+
+/*    Crazy hack... */
 }
 
 .settings-popup {
@@ -80,7 +92,7 @@
 .game-top-hbox {
     -fx-alignment: center;
     -fx-spacing: 30px;
-    -fx-padding: 30px, 30px, 30px, 30px;
+    -fx-padding: 30px 30px 30px 30px;
     -fx-font-size: 30;
 }
 
@@ -108,44 +120,81 @@
 
 .current-turn-label {
     -fx-alignment: center;
-    -fx-padding: 0.3em, 0.1em;
+    -fx-padding: 0.3em 0.1em;
     -fx-spacing: 0.3em;
     /*-fx-pref-height: 0.5em;*/
 }
+
 .current-turn-label * {
     -fx-background-color: -bg2;
     -fx-background-radius: 2em;
     /*-fx-padding: 0.2em;*/
 }
 
-.sidebar-button {
+
+/*
+    __  ___                   ______      __    __
+   /  |/  /___ _   _____     /_  __/___ _/ /_  / /__
+  / /|_/ / __ \ | / / _ \     / / / __ `/ __ \/ / _ \
+ / /  / / /_/ / |/ /  __/    / / / /_/ / /_/ / /  __/
+/_/  /_/\____/|___/\___/    /_/  \__,_/_.___/_/\___/
+Move table
+*/
+
+
+.move-table {
+    -fx-padding: 0 1em;
+    -fx-font-size: 1.4em;
+
+}
+
+.move-table * {
+    -fx-font-family: "monospace";
+
+}
+
+.move-table .scroll-pane {
+    /*    Lets use background colour layers to create a nice boarder Maybe...*/
+    -fx-effect: dropshadow(three-pass-box, -shadow, 10, 10, 0, 0);
+    -fx-background-color: transparent;
+}
+
+.move-table .scroll-pane:focused {
+    -fx-background-color: transparent;
+
+}
+
+.move-table .hbox {
     -fx-alignment: center;
 }
 
-.move-table {
-    -fx-font-size: 1.4em;
-    -fx-alignment: center-right;
+.move-table .grid {
 }
 
-.table-label {
+.move-table .table-label {
     -fx-alignment: center;
     -fx-padding: 0em 1em;
     -fx-background-color: -bg1;
 }
 
-.movetable-hbox {
-    /*No spacing. For button that shows/hides the movetable*/
+.move-table .move-1 {
+    -fx-background-color: -bg1;
+}
+
+.move-table .move-2 {
+    -fx-background-color: -bg2;
+}
+
+.move-table .sidebar-button {
     -fx-alignment: center;
 }
 
-.row-label {
-
+.move-table .row-label {
     -fx-padding: 0em 0.5em 0em 1em;
 }
 
-.table-move {
+.move-table .table-move {
     /*Probably use Deja Vu Sans*/
-    -fx-font-family: "monospace";
     -fx-alignment: center-left;
 }
 
@@ -206,7 +255,6 @@
     -fx-spacing: 0.7em;
     -fx-padding: 0;
     /*2em*/
-    -fx-border-color: red;
 }
 
 .undo-button {

@@ -28,7 +28,7 @@ public class RootLayoutBuilder implements Builder<Pane> {
         root = new StackPane();
         appPane = makeAppLevelBorderPane(
                 new PopupManager(root, root.heightProperty(), root.widthProperty()));
-        root.getChildren().add(appPane);
+        root.getChildren().addAll(appPane);
     }
 
 

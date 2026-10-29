@@ -14,6 +14,7 @@ import com.chessfx.ui.game.DragHandler;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import com.chessfx.ui.game.tiles.DevTileUI;
 import com.chessfx.ui.game.tiles.TileUI;
+import com.chessfx.ui.util.PopupManager;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -32,7 +33,8 @@ public class BoardUIModel implements GridContainer<TileUI> {
     private final TileUI DEV_TILE;
     private final DragHandler dragHandler;
     private final DoubleProperty rotateDegreesProperty;
-    private final GameBoardContainer boardContainer;
+    private final PopupManager popupManager;
+    private final GameBoardContainer game;
     private final PieceSpriteFactory pieceSpriteFactory;
     private final TileUI[][] boardUiTiles;
 
@@ -40,13 +42,15 @@ public class BoardUIModel implements GridContainer<TileUI> {
     // CONFIG
     private boolean isDragEnabled = true;
 
-    public BoardUIModel(DragHandler dragHandler, GameBoardContainer boardContainer, TileUI[][] boardUiTiles,
-                        PieceSpriteFactory pieceSpriteFactory, DoubleProperty rotateDegreesProperty) {
-
+    public BoardUIModel(DragHandler dragHandler, GameBoardContainer game, TileUI[][] boardUiTiles,
+                        PieceSpriteFactory pieceSpriteFactory, DoubleProperty rotateDegreesProperty,
+                        PopupManager popupManager) {
         this.dragHandler = dragHandler;
         this.rotateDegreesProperty = rotateDegreesProperty;
+        this.popupManager = popupManager;
         dragHandler.addEndDragHandler(this::endDragConsequence);
-        this.boardContainer = boardContainer;
+        this.game = game;
+
         this.pieceSpriteFactory = pieceSpriteFactory;
         this.boardUiTiles = boardUiTiles;
 
@@ -94,9 +98,8 @@ public class BoardUIModel implements GridContainer<TileUI> {
     }
 
     private List<Move> getMovesToShow(TileUI tileUI) {
-        List<Move> unvalidatedMoves = tileUI.getTile().getPiece().moves(boardContainer);
-
-        return boardContainer.getValidatedMoves(unvalidatedMoves);
+        List<Move> unvalidatedMoves = tileUI.getTile().getPiece().moves(game);
+        return game.getValidatedMoves(unvalidatedMoves);
     }
 
     private void showMoves(List<Move> moves) {
@@ -131,6 +134,10 @@ public class BoardUIModel implements GridContainer<TileUI> {
     // TODO: Document new version
     public void handleTilePressed(TileUI tileUI, TileBase tile,
                                   Move prospectiveMove, MouseEvent event) {
+        if (game.getGameModel().isGameOver()) {
+            Log.info("Pressing tiles does not do anything, the game is over!");
+            return;
+        }
         Log.debug("Clicked tile: " + tileUI);
         Log.debug("Selected tile: " + selectedTile);
         if (prospectiveMove != null) { //// do move
@@ -143,7 +150,7 @@ public class BoardUIModel implements GridContainer<TileUI> {
         }
 
         if (selectedTile.equals(DEV_TILE)) {
-            if (tile.hasPieceMatchingTeam(boardContainer.getCurrentTeam())) { //// initiate move.
+            if (tile.hasPieceMatchingTeam(game.getCurrentTeam())) { //// initiate move.
                 Log.info("Initiating move...");
                 select(tileUI, event);
             }
@@ -152,7 +159,7 @@ public class BoardUIModel implements GridContainer<TileUI> {
             reselectFlag = true;
             select(selectedTile, event);
         } else { //// cancel move
-            if (tile.hasPieceMatchingTeam(boardContainer.getCurrentTeam())) { //// cancel, select new
+            if (tile.hasPieceMatchingTeam(game.getCurrentTeam())) { //// cancel, select new
                 Log.info("Cancelling move and selecting new piece");
                 deselect();
                 select(tileUI, event);
@@ -172,14 +179,13 @@ public class BoardUIModel implements GridContainer<TileUI> {
      */
     private void doMove(TileUI from, TileUI to) {
         /// PRE-MOVE
-
         Move move = to.getProspectiveMove();
 
         Region sprite = from.removeExistingPieceSprite();
         to.removeExistingPieceSprite();
 
         // backend logic for move
-        boardContainer.doMove(move);
+        game.doMove(move);
         // (backend) move completed
 
         /// POST-MOVE
@@ -188,37 +194,42 @@ public class BoardUIModel implements GridContainer<TileUI> {
         rotateDegreesProperty.set((rotateDegreesProperty.getValue() + 180) % 360);
 
         // (debug)
-        showAttackMap(boardContainer.getAttackMap());
-        boardStateEffect(boardContainer.getGameModel().getBoardState());
+//        showAttackMap(boardContainer.getAttackMap());
+        boardStateEffect(game.getGameModel().getBoardState());
     }
 
     private void boardStateEffect(BoardState boardState) {
-        Coordinate kingCoOrds = boardContainer.getCurrentTeam().getKing().getCoOrds();
+        Coordinate kingCoOrds = game.getCurrentTeam().getKing().getCoOrds();
         TileUI tile = getTile(kingCoOrds);
         tile.showBoardStateEffect(boardState);
+
+        // clear the effect from last round...
+        Coordinate enemyKingCoOrds = game.getEnemyTeam().getKing().getCoOrds();
+        TileUI otherTile = getTile(enemyKingCoOrds);
+        otherTile.showBoardStateEffect(BoardState.DEFAULT);
     }
 
 
-    private void showAttackMap(AttackMap attackMap) {
-        for (int i = 0; i < boardContainer.HEIGHT; i++) {
-            for (int j = 0; j < boardContainer.WIDTH; j++) {
+    public void showAttackMap(AttackMap attackMap) {
+        for (int i = 0; i < game.HEIGHT; i++) {
+            for (int j = 0; j < game.WIDTH; j++) {
                 boardUiTiles[i][j].setThreatened(attackMap.getTile(i, j));
             }
         }
     }
 
     public void undoLastMoveIfPossible() {
-        PlyData ply = boardContainer.undoLastMove();
+        PlyData ply = game.undoLastMove();
         if (ply == null) {
             Log.warn("Undo move failed.");
             // TODO: Show that the undo failed in the UI state.
+
             return;
         }
         deselect();
 
         // Move back the last moved piece.
         Move move = ply.move();
-
 
         TileUI from = getTile(move.destCoOrds());
         TileUI to = getTile(move.startCoOrds());
@@ -238,8 +249,6 @@ public class BoardUIModel implements GridContainer<TileUI> {
 
         // rotate board
         rotateDegreesProperty.set((rotateDegreesProperty.getValue() + 180) % 360);
-
-
     }
 
 
@@ -261,6 +270,11 @@ public class BoardUIModel implements GridContainer<TileUI> {
      * Called when class is fully constructed.
      */
     public void gameStart() {
-        showAttackMap(boardContainer.getAttackMap());
+//        showAttackMap(boardContainer.getAttackMap());
+    }
+
+
+    public void promotionPrompt() {
+        popupManager.promotionPopup(pieceSpriteFactory, game.getCurrentTeam());
     }
 }

@@ -27,7 +27,9 @@ public class ArbitraryPieceFactory {
     private Piece makePiece(String name, Team team, int rank, int file,
                             boolean hasMoved, PieceData pieceData, Collection<MoveVector> moveSet) {
         if (name.equals("king")) {
-            return new King(team, rank, file, pieceData, moveSet.toArray(new MoveVector[0]), hasMoved);
+            King king = new King(team, rank, file, pieceData, moveSet.toArray(new MoveVector[0]), hasMoved);
+            team.setKing(king);
+            return king;
         } else {
             return new Piece(name, pieceData.fenId, team, pieceData.value, rank, file, moveSet.toArray(new MoveVector[0]), hasMoved);
         }
@@ -35,7 +37,7 @@ public class ArbitraryPieceFactory {
 
     public Piece copy(Piece piece, Team team) {
         Piece copy = makePiece(piece.name, team, piece.coOrds.y(), piece.coOrds.x(), piece.hasMoved, getPieceEngineData(piece.getName()), List.of(piece.moveSet));
-        team.getPieceList().add(piece);
+        team.getPieceList().add(copy);
         return copy;
     }
 

@@ -48,4 +48,8 @@ abstract public class TileBase {
     public TileBase copy() {
         return null;
     }
+
+    public boolean reallyHasPieceOpposingTeam(Team team) {
+        return hasPiece() && !getPiece().getTeam().equals(team);
+    }
 }

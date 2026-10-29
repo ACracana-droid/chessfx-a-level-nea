@@ -14,12 +14,10 @@ For the chessboard:
 /* WRAPPER WRAPPER (StackPane) */
 .chessboard-wrapper {
     -fx-alignment: center;
-    -fx-border-color: orange;
 }
 
 .drag-layer {
     -fx-alignment: center;
-    -fx-border-color: green;
 }
 
 /* WRAPPER (GridPane) */
@@ -87,6 +85,10 @@ For the chessboard:
 
 .chess-tile:hover {
 
+}
+
+.tile-coordinate-label {
+    -fx-alignment: top-left;
 }
 
 

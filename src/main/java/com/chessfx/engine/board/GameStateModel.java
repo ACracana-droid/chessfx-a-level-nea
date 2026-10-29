@@ -23,6 +23,8 @@ public class GameStateModel implements Cloneable {
     private boolean isUndo = true;
 
     private BoardState boardState = BoardState.DEFAULT; // This is bad for cases where the starting board state is check or something...
+    private boolean isPromotion;
+    private String undoMoveFailedReason = "";
 
     public GameStateModel(GameStateModel gameModel, List<Team> teamList) {
         chessConfig = gameModel.getChessConfig();
@@ -32,9 +34,15 @@ public class GameStateModel implements Cloneable {
         halfmoveClockRuleNumber = gameModel.halfmoveClockRuleNumber;
         teamIdx = gameModel.getCurrentTeamIdx();
         isUndo = gameModel.isUndo;
+        isPromotion = gameModel.isPromotion();
         fullmoveDifference = gameModel.fullmoveDifference;
         boardState = gameModel.getBoardState();
+        undoMoveFailedReason = gameModel.getUndoMoveFailedReason();
         this.teams = teamList;
+    }
+
+    public String getUndoMoveFailedReason() {
+        return undoMoveFailedReason;
     }
 
     public Team getEnemyTeam() {
@@ -47,6 +55,22 @@ public class GameStateModel implements Cloneable {
             copy.add(new Team(teams.get(i)));
         }
         return copy;
+    }
+
+    public boolean isGameOver() {
+        return boardState.equals(BoardState.CHECKMATE) || boardState.equals(BoardState.STALEMATE);
+    }
+
+    public void setIsPromotion(boolean isPromotion) {
+        this.isPromotion = isPromotion;
+    }
+
+    public boolean isPromotion() {
+        return isPromotion;
+    }
+
+    public void setUndoMoveFailedReason(String msg) {
+        undoMoveFailedReason = msg;
     }
 
     enum FullmoveDifference {

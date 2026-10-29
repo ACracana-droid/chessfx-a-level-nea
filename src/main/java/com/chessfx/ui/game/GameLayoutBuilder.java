@@ -135,7 +135,6 @@ public class GameLayoutBuilder extends LayoutBuilder {
             protected Void call() throws Exception {
                 Log.debug("GameLayoutBuilder", "Creating ReactiveChessContainer off the FXAT...");
                 boardContainer = new ReactiveChessContainer(new GameStateModel(chessConfig), chessConfig.getGameBoard());
-                Log.debug("Finished making ReactiveChessContainer, calling start method...");
                 boardContainer.gameStart();
                 Log.debug("Finished.");
                 return null;
@@ -145,11 +144,13 @@ public class GameLayoutBuilder extends LayoutBuilder {
             Log.debug("GameLayoutBuilder", "Successfully created backend board.");
             ChessBoardBuilder boardBuilder = (new ChessBoardBuilder(boardContainer, chessConfig, layoutManager));
             boardUIModel = boardBuilder.getBoardUIModel();
+            boardContainer.setUIModel(boardUIModel);
             rootPane.setCenter(screenCentreHBox(boardBuilder.build(), makeMoveTableSideBar(
-                    new MoveTable(boardContainer.getMoveTableData(), makeGameButton("<"))
+                    new MoveTable(boardContainer.getMoveTableData(), makeGameButton("-"), makeGameButton("+"))
             )));
             rootPane.setTop(makeGameTopWrapper(boardContainer.fullmoveCounterProperty(), boardContainer.boardStateProperty()));
             rootPane.setBottom(makeTurnLabel(boardContainer.currentTeamStringProperty()));
+
             boardUIModel.gameStart();
             super.startup();
         });

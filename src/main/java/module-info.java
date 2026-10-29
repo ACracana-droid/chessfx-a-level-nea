@@ -5,8 +5,8 @@ module com.chess.chessfx {
     requires org.kordamp.ikonli.javafx;
     requires java.desktop;
     requires org.girod.javafx.svgimage;
-    requires jdk.incubator.vector;
     requires java.management;
+    requires org.junit.jupiter.api;
 
     opens com.chessfx.ui.menu to javafx.fxml;
     exports com.chessfx.chessconfig;
@@ -27,4 +27,6 @@ module com.chess.chessfx {
     opens com.chessfx.chessconfig to javafx.fxml;
     exports com.chessfx.ui.util;
     opens com.chessfx.ui.util to javafx.fxml;
+
+    opens com.chessfx.engine.board to org.junit.platform.commons;
 }
