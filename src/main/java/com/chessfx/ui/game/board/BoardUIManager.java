@@ -7,6 +7,7 @@ import com.chessfx.engine.board.PlyData;
 import com.chessfx.engine.bot.AttackMap;
 import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
+import com.chessfx.engine.moves.PromotionMove;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
@@ -141,6 +142,7 @@ public class BoardUIModel implements GridContainer<TileUI> {
         Log.debug("Clicked tile: " + tileUI);
         Log.debug("Selected tile: " + selectedTile);
         if (prospectiveMove != null) { //// do move
+
             Log.debug("Prospective move: " + prospectiveMove);
             Log.info("Doing move...");
             doMove(selectedTile, tileUI);
@@ -148,6 +150,7 @@ public class BoardUIModel implements GridContainer<TileUI> {
             deselect();
             return;
         }
+
 
         if (selectedTile.equals(DEV_TILE)) {
             if (tile.hasPieceMatchingTeam(game.getCurrentTeam())) { //// initiate move.
@@ -181,6 +184,17 @@ public class BoardUIModel implements GridContainer<TileUI> {
         /// PRE-MOVE
         Move move = to.getProspectiveMove();
 
+        if (move instanceof PromotionMove) {
+            /// abort move in engine... (just do with gui)
+            Region sprite = from.removeExistingPieceSprite();
+            to.removeExistingPieceSprite();
+            to.showPieceSprite(sprite);
+
+            // wait for user to choose piece to promote to.
+            promotionPrompt(move);
+            return;
+        }
+
         Region sprite = from.removeExistingPieceSprite();
         to.removeExistingPieceSprite();
 
@@ -191,6 +205,20 @@ public class BoardUIModel implements GridContainer<TileUI> {
         /// POST-MOVE
         to.showPieceSprite(sprite);
         // rotate board
+        rotateDegreesProperty.set((rotateDegreesProperty.getValue() + 180) % 360);
+
+        // (debug)
+//        showAttackMap(boardContainer.getAttackMap());
+        boardStateEffect(game.getGameModel().getBoardState());
+    }
+
+    public void finishPromotionMove(Move move, String pieceName) {
+        TileUI to = getTile(move.destCoOrds());
+
+        to.removePieceSprite();
+        game.doMove(new PromotionMove(move, pieceName));
+        to.showPieceSprite(pieceSpriteFactory.makePieceSprite(pieceName, move.getPiece().getTeam()));
+
         rotateDegreesProperty.set((rotateDegreesProperty.getValue() + 180) % 360);
 
         // (debug)
@@ -274,7 +302,9 @@ public class BoardUIModel implements GridContainer<TileUI> {
     }
 
 
-    public void promotionPrompt() {
-        popupManager.promotionPopup(pieceSpriteFactory, game.getCurrentTeam());
+    public void promotionPrompt(Move move) {
+        popupManager.promotionPopup(pieceSpriteFactory, game.getCurrentTeam(), game.getGameModel().getChessConfig().getPromotablePieces(), this, move);
     }
+
+
 }
