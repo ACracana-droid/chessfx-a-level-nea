@@ -2,7 +2,6 @@ package com.chessfx.ui.game.tiles;
 
 import com.chessfx.engine.tiles.VoidTile;
 
-
 public class DevTileUI extends TileUI {
 
     public DevTileUI() {

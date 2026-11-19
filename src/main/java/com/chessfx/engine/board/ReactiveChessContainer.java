@@ -1,13 +1,18 @@
 package com.chessfx.engine.board;
 
 import com.chessfx.engine.moves.Move;
-import com.chessfx.engine.moves.MoveTableData;
+import com.chessfx.ui.game.MoveTableData;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
-import com.chessfx.ui.game.board.BoardUIModel;
+import com.chessfx.ui.game.board.BoardUIManager;
 import javafx.beans.property.*;
 
+import java.util.List;
+
+/**
+ * Related both to the UI elements and the backend board representation.
+ */
 public class ReactiveChessContainer extends GameBoardContainer {
 
     private final StringProperty currentTeamProperty = new SimpleStringProperty();
@@ -16,7 +21,7 @@ public class ReactiveChessContainer extends GameBoardContainer {
     private final StringProperty boardStateProperty = new SimpleStringProperty("");
 
     Runnable removeListeners = null;
-    private BoardUIModel boardUIModel;
+    private BoardUIManager boardUIManager;
 
     public ReactiveChessContainer(GameStateModel gameModel,
                                   TileBase[][] board) {
@@ -51,16 +56,12 @@ public class ReactiveChessContainer extends GameBoardContainer {
         // Do as task.
 
         super.doMove(move);
-
-        if (gameModel.isPromotion()) {
-            boardUIModel.promotionPrompt();
-        }
     }
 
     @Override
-    protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
+    protected void updateGame(Move move, Piece origPiece, Piece directCapture, List<Piece> indirectCaptures) {
         Log.info("Updating game...");
-        super.updateGame(move, origPiece, directCapture);
+        super.updateGame(move, origPiece, directCapture, indirectCaptures);
         // other reactive stuff...
 //        setBoardState(gameModel, board);
     }
@@ -78,9 +79,9 @@ public class ReactiveChessContainer extends GameBoardContainer {
 
 
     @Override
-    public void undoUpdatePiecePosition(Move move, boolean hasMoved, Piece piece) {
+    public void undoUpdatePiecePosition(Move move, PlyData ply) {
         // TODO: DO THIS (the super) AS TASK?
-        super.undoUpdatePiecePosition(move, hasMoved, piece);
+        super.undoUpdatePiecePosition(move, ply);
 
         if (plyStack.isEmpty()) {
             updateMoveProperty(true, "");
@@ -140,7 +141,7 @@ public class ReactiveChessContainer extends GameBoardContainer {
         return boardStateProperty;
     }
 
-    public void setUIModel(BoardUIModel boardUIModel) {
-        this.boardUIModel = boardUIModel;
+    public void setUIModel(BoardUIManager boardUIManager) {
+        this.boardUIManager = boardUIManager;
     }
 }

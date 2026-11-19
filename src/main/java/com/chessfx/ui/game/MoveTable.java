@@ -1,6 +1,5 @@
 package com.chessfx.ui.game;
 
-import com.chessfx.engine.moves.MoveTableData;
 import com.chessfx.log.Log;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
@@ -8,7 +7,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 

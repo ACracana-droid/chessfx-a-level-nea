@@ -29,6 +29,8 @@ public class ChessConfigModel {
     private EnPassantRule enPassantRule = EnPassantRule.DEFAULT;
     private int tileCheckerboardOffset = 0;
 
+    private List<String> promotablePieces;
+
     private TileBase[][] board;
     String gameType;
 
@@ -79,6 +81,8 @@ public class ChessConfigModel {
         tileCheckerboardOffset = Integer.parseInt(properties.getProperty("tileCheckerboardOffset", "0"));
 
         board = fen.getGameBoard();
+
+        promotablePieces = Arrays.asList(properties.getOrDefault("promotablePieces", "queen,rook,knight,bishop").toString().split(","));
         Log.debug("ChessConfigModel", "Config has been loaded.");
     }
 
@@ -100,6 +104,10 @@ public class ChessConfigModel {
 
     public int getFullmoveNumber() {
         return fen.fullmoveNumberProperty();
+    }
+
+    public String getEnPassantTargetString() {
+        return fen.getEnPassantTileString();
     }
 
     public int getHalfmoveNumber() {
@@ -136,5 +144,18 @@ public class ChessConfigModel {
 
     public ArbitraryPieceFactory getPieceFactory() {
         return pieceFactory;
+    }
+
+    public List<String> getPromotablePieces() {
+        return promotablePieces;
+    }
+
+    public List<String> getPromotablePieceCodes() {
+        List<String> fenIds = new ArrayList<>();
+        for (String name : promotablePieces) {
+            PieceData pieceData = pieceMap.get(name);
+            fenIds.add(pieceData.getFenId());
+        }
+        return fenIds;
     }
 }

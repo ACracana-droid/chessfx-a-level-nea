@@ -8,7 +8,6 @@ import static com.chessfx.log.Log.LogType.*;
  * This implements the singleton pattern. See information here at
  * <a href="https://www.digitalocean.com/community/tutorials/java-singleton-design-pattern-best-practices-examples">digitalocean.com</a>.
  * This replaces my 'sout' statements.
- * This is basically a static class
  */
 public enum Log {
     LOG;
@@ -30,7 +29,6 @@ public enum Log {
             System.out.print(s);
         return LOG;
     }
-
 
     enum LogType {
         INFO("INFO", CYAN, Priority.MED),

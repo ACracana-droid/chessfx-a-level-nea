@@ -4,8 +4,6 @@ import com.chessfx.engine.board.Team;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
-import com.chessfx.ui.game.board.BoardUIModel;
-import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
 import java.io.IOException;

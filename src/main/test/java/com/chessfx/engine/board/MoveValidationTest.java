@@ -47,14 +47,14 @@ public class MoveValidationTest {
         // check...
         Log.setThreshold(-100);
 
-        List<Move> queenMoves = game.getValidatedMoves(game.getTile(game.pos("d8")).getPiece().moves(game));
+        List<Move> queenMoves = game.getValidatedMoves(game.getTile("d8").getPiece().moves());
         Log.warn("Queen moves", queenMoves.toString());
 //        assertFalse(game.attackMap.getTile(game.pos("e8")));
-        Log.warn("King moves", game.getValidatedMoves(game.getTile(game.pos("e8")).getPiece().moves(game)).toString());
+        Log.warn("King moves", game.getValidatedMoves(game.getTile("e8").getPiece().moves()).toString());
 
 
         assertFalse(queenMoves.isEmpty(), "Queen should have move to capture the enemy threat.");
-        assertFalse(game.getValidatedMoves(game.getTile(game.pos("e8")).getPiece().moves(game)).isEmpty(), "King should have move to capture enemy threat.");
-        assertTrue(game.getValidatedMoves(game.getTile(game.pos("a8")).getPiece().moves(game)).isEmpty(), "Rook should have no valid moves due to check.");
+        assertFalse(game.getValidatedMoves(game.getTile(game.pos("e8")).getPiece().moves()).isEmpty(), "King should have move to capture enemy threat.");
+        assertTrue(game.getValidatedMoves(game.getTile(game.pos("a8")).getPiece().moves()).isEmpty(), "Rook should have no valid moves due to check.");
     }
 }

@@ -46,6 +46,7 @@ public class LayoutManager {
     }
 
     private void initialiseLayouts() {
+
         GAME.layoutBuilder = new GameLayoutBuilder(
                 this, chessConfig, appSettings);
 
@@ -109,13 +110,6 @@ public class LayoutManager {
         private LayoutBuilder layoutBuilder;
 
     }
-//
-//    public Runnable getStartupRunnable(Layout layout) {
-//        if (layout.action == null) {
-//            Log.error("LayoutManager", "STARTUP RUNNABLE FOR " + layout.name() + " IS NULL!");
-//        }
-//        return layout.action;
-//    }
 
     private void fadeInLayout(Region layoutTo) {
         layoutTo.setOpacity(0.0);

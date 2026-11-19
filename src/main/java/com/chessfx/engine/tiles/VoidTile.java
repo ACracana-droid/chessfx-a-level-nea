@@ -5,13 +5,13 @@ import com.chessfx.engine.board.Team;
 import com.chessfx.ui.game.tiles.TileUI;
 
 /**
- * This is the ancestor of tiles which other pieces cannot go on.
+ * The class of tiles which other pieces cannot go on.
  * These tiles have no field to hold pieces and will return 'false'
  */
-public class BarrierTile extends TileBase {
+public class VoidTile extends TileBase {
 
-    public BarrierTile() {
-
+    public VoidTile() {
+        super();
     }
     @Override
     public boolean hasPiece() {
@@ -20,7 +20,7 @@ public class BarrierTile extends TileBase {
 
     @Override
     public void style(TileUI tileUI) {
-        tileUI.getStyleClass().add("barrier-tile");
+        tileUI.getStyleClass().add("void-tile");
     }
 
     @Override

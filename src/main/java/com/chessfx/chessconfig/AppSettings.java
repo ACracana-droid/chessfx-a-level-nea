@@ -24,10 +24,7 @@ import static com.chessfx.ui.menu.ChessApp.THEME_DIR;
  *
  */
 public class AppSettings {
-    // TODO: MOVE this to chessconfig dir?
 
-    // Config file should be convenient and hidden from user.
-    // This is quite primitive.
     String PROPERTIES_FILE_PATH = System.getProperty("user.home") + "/.chessFXAppData/settings.properties";
     Properties properties;
 

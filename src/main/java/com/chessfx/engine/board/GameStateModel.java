@@ -1,6 +1,7 @@
 package com.chessfx.engine.board;
 
 import com.chessfx.chessconfig.ChessConfigModel;
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.log.Log;
 
 import java.util.ArrayList;
@@ -22,6 +23,10 @@ public class GameStateModel implements Cloneable {
     FullmoveDifference fullmoveDifference = FullmoveDifference.SAME;
     private boolean isUndo = true;
 
+    private final String enPassantTargetString;
+
+
+    private Coordinate enPassantTarget;
     private BoardState boardState = BoardState.DEFAULT; // This is bad for cases where the starting board state is check or something...
     private boolean isPromotion;
     private String undoMoveFailedReason = "";
@@ -38,6 +43,8 @@ public class GameStateModel implements Cloneable {
         fullmoveDifference = gameModel.fullmoveDifference;
         boardState = gameModel.getBoardState();
         undoMoveFailedReason = gameModel.getUndoMoveFailedReason();
+        enPassantTargetString = gameModel.enPassantTargetString;
+        enPassantTarget = gameModel.enPassantTarget;
         this.teams = teamList;
     }
 
@@ -61,6 +68,15 @@ public class GameStateModel implements Cloneable {
         return boardState.equals(BoardState.CHECKMATE) || boardState.equals(BoardState.STALEMATE);
     }
 
+    public Coordinate getEnPassantTarget() {
+        return enPassantTarget;
+    }
+
+    public void setEnPassantTarget(Coordinate enPassantTarget) {
+        Log.debug("Setting enpassant target");
+        this.enPassantTarget = enPassantTarget;
+    }
+
     public void setIsPromotion(boolean isPromotion) {
         this.isPromotion = isPromotion;
     }
@@ -71,6 +87,11 @@ public class GameStateModel implements Cloneable {
 
     public void setUndoMoveFailedReason(String msg) {
         undoMoveFailedReason = msg;
+    }
+
+    public String getEnPassantTargetString() {
+        Log.debug("getting enpassant target str");
+        return enPassantTargetString;
     }
 
     enum FullmoveDifference {
@@ -97,6 +118,8 @@ public class GameStateModel implements Cloneable {
         fullmoveCounter = (chessConfig.getFullmoveNumber());
         halfmoveClock = (chessConfig.getHalfmoveNumber());
         halfmoveClockRuleNumber = chessConfig.getHalfmoveClockRuleNumber();
+        enPassantTargetString = chessConfig.getEnPassantTargetString();
+        enPassantTarget = null;
         teams = chessConfig.getTeams();
         teamIdx = (chessConfig.getStartingTeamIdx());
     }

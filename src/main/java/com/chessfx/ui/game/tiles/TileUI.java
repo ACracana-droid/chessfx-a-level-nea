@@ -2,18 +2,15 @@ package com.chessfx.ui.game.tiles;
 
 import com.chessfx.engine.board.BoardState;
 import com.chessfx.engine.moves.Move;
-import com.chessfx.engine.tiles.BarrierTile;
-import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.engine.tiles.VoidTile;
+import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
-import com.chessfx.ui.game.board.BoardUIModel;
+import com.chessfx.ui.game.board.BoardUIManager;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
-import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -24,14 +21,14 @@ public class TileUI extends StackPane {
 
     private TileBase tile;
     private final StringProperty uiState = new SimpleStringProperty("");
-    private BoardUIModel uiModel;
+    private BoardUIManager uiModel;
     private Move prospectiveMove;
 
     private boolean isShowingSprite;
     private Region pieceSprite;
 
     public TileUI(TileBase tile, TileColour tileColour,
-                  PieceSpriteFactory pieceSpriteFactory, BoardUIModel uiModel, String placeString) {
+                  PieceSpriteFactory pieceSpriteFactory, BoardUIManager uiModel, String placeString) {
         super();
         this.tile = tile;
         this.uiModel = uiModel;
@@ -57,7 +54,7 @@ public class TileUI extends StackPane {
         if (tile != null && tile.hasPiece())
             showNewPiece(pieceSpriteFactory);
 
-        if (!(tile instanceof BarrierTile)) {
+        if (!(tile instanceof VoidTile)) {
             setUpPseudoClasses();
             this.setOnMousePressed(event -> handleTilePressed(event));
         }

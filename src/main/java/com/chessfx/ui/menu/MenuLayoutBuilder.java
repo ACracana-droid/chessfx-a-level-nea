@@ -3,7 +3,6 @@ package com.chessfx.ui.menu;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.ui.game.board.ChessBoardOrnamentBuilder;
 import com.chessfx.ui.util.LayoutManager;
-import com.chessfx.ui.util.SwitchButton;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
@@ -26,12 +25,28 @@ public class MenuLayoutBuilder extends LayoutBuilder {
 
     private Node createOptionsVBox() {
         VBox vBox = new VBox(
-                makeDefaultGameButton(),
-                makeWildCardButton(),
-                makeSettingsButton(),
-                makeMoreOptionsButton());
+//                makeDefaultGameButton(),
+//                makeWildCardButton(),
+//                makeSettingsButton(),
+                makeGameConfigureButton(true),
+                makeGameConfigureButton(false),
+
+                makeMoreOptionsButton(),
+                makeSettingsButton());
         vBox.getStyleClass().add("options-vbox");
         return vBox;
+    }
+
+    private Button makeGameConfigureButton(boolean isVsBot) {
+        String text = "Vs " + (isVsBot ? "Bot" : "Player");
+        Button button = makeMenuButton(text);
+        button.setOnAction(event ->  layoutManager.getPopupManager().gameConfigurePopup(isVsBot));
+        return button;
+    }
+
+    private Button makeVsBotButton() {
+        Button button = makeMenuButton("Vs Bot");
+        return button;
     }
 
 

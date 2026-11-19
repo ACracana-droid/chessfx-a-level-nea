@@ -63,12 +63,13 @@
 
 }
 
-.settings-button * {
+.icon-button * {
     -fx-stroke: -fx-text-fill;
     -fx-fill: -fx-text-fill;
 
-/*    Crazy hack... */
+    /*    Crazy hack... */
 }
+
 
 .settings-popup {
     -fx-alignment: center;
@@ -77,6 +78,7 @@
     -fx-border-radius: 0.9em;
     -fx-border-width: 0.4em;
     -fx-border-color: red;
+
 
 }
 
@@ -240,11 +242,6 @@ Move table
     -fx-padding: 0 4em 0 4em;
 }
 
-.game-popup {
-    -fx-background-color: -bg2;
-    -fx-border-color: -active;
-    -fx-alignment: center;
-}
 
 .game-button {
 

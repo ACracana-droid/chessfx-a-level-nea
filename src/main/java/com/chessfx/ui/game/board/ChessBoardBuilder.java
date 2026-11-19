@@ -5,9 +5,8 @@ import com.chessfx.engine.board.GameBoardContainer;
 import com.chessfx.engine.board.ReactiveChessContainer;
 import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.tiles.TileBase;
-import com.chessfx.ui.game.DragHandler;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
-import com.chessfx.ui.game.tiles.TileColourPatternManager;
+import com.chessfx.ui.game.tiles.TileColour;
 import com.chessfx.ui.game.tiles.TileUI;
 import com.chessfx.ui.util.LayoutManager;
 import com.chessfx.ui.util.PopupManager;
@@ -36,13 +35,11 @@ public class ChessBoardBuilder implements Builder<StackPane> {
         dragLayer.getStyleClass().add("drag-layer");
     }
 
-    protected BoardUIModel boardUIModel;
+    protected BoardUIManager boardUIManager;
     protected GameBoardContainer boardContainer;
     protected PopupManager popupManager;
 
     protected DoubleProperty rotateProperty = new SimpleDoubleProperty(0.0);
-
-
 
     public ChessBoardBuilder() {
         view.getChildren().addAll(makeEmptyBoardUI());
@@ -61,18 +58,17 @@ public class ChessBoardBuilder implements Builder<StackPane> {
                 view);
 
         applyGridConstraints(boardUI, tileSize, numOfRanks, numOfFiles);
-
-        TileColourPatternManager tileColour = new TileColourPatternManager(1);
+        boolean squarePattern = true;
 
         for (int i = 0; i < numOfRanks; i++) {
             for (int j = 0; j < numOfFiles; j++) {
                 boardUI.add(
-                        boardUiArr[i][j] = new TileUI(
-                                tileColour.getCycle()),
+                        boardUiArr[i][j] = new TileUI(squarePattern ? TileColour.LIGHT : TileColour.DARK),
                         j, i
                 );
+                squarePattern = !squarePattern;
             }
-            tileColour.skipCycle();
+            squarePattern = !squarePattern;
         }
         return boardUI;
     }
@@ -100,24 +96,27 @@ public class ChessBoardBuilder implements Builder<StackPane> {
 
         PieceSpriteFactory pieceSpriteFactory = new PieceSpriteFactory(chessConfig.getInstantiatedPiecesNameSet());
         DragHandler dragHandler = new DragHandler(dragLayer, boardUI, pieceSpriteFactory);
-        boardUIModel = new BoardUIModel(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory, rotateProperty, popupManager);
+        boardUIManager = new BoardUIManager(dragHandler, boardContainer, boardUiArr, pieceSpriteFactory, rotateProperty, popupManager);
 
         NumberBinding tileSize = getTileSize(numOfRanks, numOfFiles, view);
         applyGridConstraints(boardUI, tileSize, numOfRanks, numOfFiles);
 
-        initialiseBoard(numOfRanks, numOfFiles, boardUI, boardUiArr, board, pieceSpriteFactory, new TileColourPatternManager(chessConfig.getTileCheckerboardOffset()));
+        initialiseBoard(numOfRanks, numOfFiles, boardUI, boardUiArr, board, pieceSpriteFactory);
         return boardUI;
     }
 
     private void initialiseBoard(int numOfRanks, int numOfFiles, GridPane boardUI,
                                  TileUI[][] boardUiArr, TileBase[][] board,
-                                 PieceSpriteFactory pieceSpriteFactory, TileColourPatternManager tileColour) {
+                                 PieceSpriteFactory pieceSpriteFactory) {
+        boolean squarePattern = true;
         for (int i = 0; i < numOfRanks; i++) {
             for (int j = 0; j < numOfFiles; j++) {
                 TileUI cur = new TileUI(board[i][j],
-                        tileColour.getCycle(), pieceSpriteFactory,
-                        boardUIModel, boardContainer.posString(new Coordinate(i, j)));
+                        squarePattern ? TileColour.LIGHT : TileColour.DARK,
+                        pieceSpriteFactory,
+                        boardUIManager, boardContainer.posString(new Coordinate(i, j)));
 
+                squarePattern = !squarePattern;
                 // pieces always appear upright.
                 cur.rotateProperty().bind(rotateProperty.negate());
 
@@ -125,7 +124,7 @@ public class ChessBoardBuilder implements Builder<StackPane> {
 
                 boardUI.add(cur, j, i);
             }
-            tileColour.skipCycle();
+            squarePattern = !squarePattern;
         }
     }
 
@@ -179,7 +178,7 @@ public class ChessBoardBuilder implements Builder<StackPane> {
         return view;
     }
 
-    public BoardUIModel getBoardUIModel() {
-        return boardUIModel;
+    public BoardUIManager getBoardUIModel() {
+        return boardUIManager;
     }
 }

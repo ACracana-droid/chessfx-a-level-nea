@@ -8,6 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.util.Builder;
 
 public class ThemeDropDown implements Builder<MenuButton> {
+
     AppSettings appSettings;
     StringProperty themeNameProperty;
 
@@ -21,7 +22,6 @@ public class ThemeDropDown implements Builder<MenuButton> {
         this.themeNameProperty = new SimpleStringProperty(appSettings.getThemeName());
     }
 
-
     @Override
     public MenuButton build() {
         MenuButton dropDown = new MenuButton();
@@ -33,7 +33,6 @@ public class ThemeDropDown implements Builder<MenuButton> {
 
         return dropDown;
     }
-
 
     private MenuItem makeThemeItem(String theme) {
         MenuItem menuItem = new MenuItem(theme);

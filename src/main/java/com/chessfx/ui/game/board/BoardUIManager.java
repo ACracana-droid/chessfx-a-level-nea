@@ -8,10 +8,8 @@ import com.chessfx.engine.bot.AttackMap;
 import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.moves.PromotionMove;
-import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
-import com.chessfx.ui.game.DragHandler;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import com.chessfx.ui.game.tiles.DevTileUI;
 import com.chessfx.ui.game.tiles.TileUI;
@@ -23,7 +21,7 @@ import javafx.scene.layout.Region;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoardUIModel implements GridContainer<TileUI> {
+public class BoardUIManager implements GridContainer<TileUI> {
 
     // Selection
     private TileUI selectedTile; // there can only ever be 1.
@@ -43,9 +41,9 @@ public class BoardUIModel implements GridContainer<TileUI> {
     // CONFIG
     private boolean isDragEnabled = true;
 
-    public BoardUIModel(DragHandler dragHandler, GameBoardContainer game, TileUI[][] boardUiTiles,
-                        PieceSpriteFactory pieceSpriteFactory, DoubleProperty rotateDegreesProperty,
-                        PopupManager popupManager) {
+    public BoardUIManager(DragHandler dragHandler, GameBoardContainer game, TileUI[][] boardUiTiles,
+                          PieceSpriteFactory pieceSpriteFactory, DoubleProperty rotateDegreesProperty,
+                          PopupManager popupManager) {
         this.dragHandler = dragHandler;
         this.rotateDegreesProperty = rotateDegreesProperty;
         this.popupManager = popupManager;
@@ -67,7 +65,7 @@ public class BoardUIModel implements GridContainer<TileUI> {
         tileUI.setActive();
         selectedTile = tileUI;
         Log.debug("BoardUIModel", "Selected Piece");
-        showMoves(getMovesToShow(tileUI));
+        showMoves(game.getValidatedMoves(tileUI.getTile()));
         if (isDragEnabled) {
             dragHandler.startDrag(tileUI, event);
         }
@@ -96,11 +94,6 @@ public class BoardUIModel implements GridContainer<TileUI> {
         deselect();
 
 
-    }
-
-    private List<Move> getMovesToShow(TileUI tileUI) {
-        List<Move> unvalidatedMoves = tileUI.getTile().getPiece().moves(game);
-        return game.getValidatedMoves(unvalidatedMoves);
     }
 
     private void showMoves(List<Move> moves) {
@@ -227,12 +220,12 @@ public class BoardUIModel implements GridContainer<TileUI> {
     }
 
     private void boardStateEffect(BoardState boardState) {
-        Coordinate kingCoOrds = game.getCurrentTeam().getKing().getCoOrds();
+        Coordinate kingCoOrds = game.getCurrentTeam().getKing().getPos();
         TileUI tile = getTile(kingCoOrds);
         tile.showBoardStateEffect(boardState);
 
         // clear the effect from last round...
-        Coordinate enemyKingCoOrds = game.getEnemyTeam().getKing().getCoOrds();
+        Coordinate enemyKingCoOrds = game.getEnemyTeam().getKing().getPos();
         TileUI otherTile = getTile(enemyKingCoOrds);
         otherTile.showBoardStateEffect(BoardState.DEFAULT);
     }
@@ -261,14 +254,19 @@ public class BoardUIModel implements GridContainer<TileUI> {
 
         TileUI from = getTile(move.destCoOrds());
         TileUI to = getTile(move.startCoOrds());
+        Region movedSprite;
 
-        Region movedSprite = from.removePieceSprite();
+            movedSprite = from.removePieceSprite();
+        if (move instanceof PromotionMove) {
+            movedSprite = pieceSpriteFactory.makePieceSprite(ply.origPiece());
+        }
+
         to.showPieceSprite(movedSprite);
 
         // reinstate captured pieces affected by this move.
         if (move.isSuperCapture()) {
-            for (Piece p : move.getCaptures()) {
-                getTile(p.getCoOrds()).showPieceSprite(pieceSpriteFactory.makePieceSprite(p));
+            for (Coordinate pos : move.getCaptureCoordinates()) {
+                getTile(pos).showPieceSprite(pieceSpriteFactory.makePieceSprite(getTile(pos).getTile()));
             }
         }
         if (ply.directCapture() != null) {

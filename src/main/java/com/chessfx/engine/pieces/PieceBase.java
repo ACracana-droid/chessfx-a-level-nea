@@ -2,12 +2,6 @@ package com.chessfx.engine.pieces;
 
 import com.chessfx.engine.board.Team;
 import com.chessfx.engine.moves.Coordinate;
-import com.chessfx.engine.moves.Move;
-import com.chessfx.engine.moves.MoveVector;
-import com.chessfx.log.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 abstract public class PieceBase {
 
@@ -16,17 +10,28 @@ abstract public class PieceBase {
     final protected int value;
     final protected Team team;
 
-    protected Coordinate coOrds;
+    protected Coordinate pos;
     protected boolean hasMoved;
 
-    public PieceBase(String name, String fenId, int value, Team team, Coordinate coOrds) {
+    public PieceBase(String name, String fenId, int value, Team team, Coordinate pos) {
         this.name = name;
         this.fenId = fenId;
         this.team = team;
         this.value = value;
-
-        this.coOrds = coOrds;
-
+        this.pos = pos;
 
     }
+
+    public String getFenID() {
+        return fenId;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public String getName() {
+        return name;
+    }
+
 }

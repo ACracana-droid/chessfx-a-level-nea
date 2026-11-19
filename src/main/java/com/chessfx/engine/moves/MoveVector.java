@@ -2,24 +2,18 @@ package com.chessfx.engine.moves;
 
 public class MoveVector {
 
-
-    // 1 1 1 1 1 1 1 int int int
-
-
     // Conditions:
     final boolean[] flags;
 //    final boolean isInitialOnly; // i
 //    final boolean isCaptureOnly; // c
 //    final boolean isNotCapture; // o
 //
-//    // Move Type:
-    /// /    boolean isSliding; // the default
+//    // Move Type
+///   final boolean isSliding; // the default
 //    final boolean isLeaping; // ~
 //    final boolean isHopping; // ^
 
-
     // Distance & Direction:
-//    boolean isSpecific; // otherwise move repeats for each cardinal direction.
     final int dy;
     final int dx;
     final int steps; // -1 means infinite
@@ -28,19 +22,8 @@ public class MoveVector {
         this.dy = vector[0];
         this.dx = vector[1];
         this.flags = flags;
-        assignFlags(flags);
         this.steps = steps;
     }
-
-    private void assignFlags(boolean[] flags) {
-//        this.flags = flags;
-//        isInitialOnly = flags[0];
-//        isCaptureOnly = flags[1];
-//        isNotCapture = flags[2];
-//        isLeaping = flags[3];
-//        isHopping = flags[4];
-    }
-
 
     @Override
     public boolean equals(Object obj) {

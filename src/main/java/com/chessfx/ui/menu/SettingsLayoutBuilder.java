@@ -26,8 +26,6 @@ public class SettingsLayoutBuilder extends LayoutBuilder {
         rootPane.setCenter(SettingsLayoutUtil.makeSettingsVbox(appSettings));
     }
 
-
-
     @Override
     public Region build() {
         return rootPane;

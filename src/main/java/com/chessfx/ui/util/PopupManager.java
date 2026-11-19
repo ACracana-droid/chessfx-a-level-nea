@@ -3,7 +3,9 @@ package com.chessfx.ui.util;
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.engine.board.Team;
+import com.chessfx.engine.moves.Move;
 import com.chessfx.log.Log;
+import com.chessfx.ui.game.board.BoardUIManager;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
 import com.chessfx.ui.menu.GamePopup;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -14,8 +16,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import org.girod.javafx.svgimage.SVGLoader;
 
 import java.util.List;
+import java.util.Objects;
 
 
 public class PopupManager {
@@ -26,7 +30,7 @@ public class PopupManager {
 
     // For stack logic
     private int popupIndex = 0;
-    boolean locked = false;
+    private boolean locked = false;
 
     public PopupManager(Pane popupLayer, ReadOnlyDoubleProperty rootHeightProperty, ReadOnlyDoubleProperty rootWidthProperty) {
         this.rootChildren = popupLayer.getChildren();
@@ -49,11 +53,11 @@ public class PopupManager {
         toggleLock();
     }
 
-    private void toggleLock() {
+    void toggleLock() {
         locked = !locked;
     }
 
-    private void pop() {
+     void pop() {
         // Prevent removal of the appLevelBorderPane.
         if (popupIndex == 0)
             return;
@@ -62,20 +66,22 @@ public class PopupManager {
         popupIndex--;
     }
 
-    private void push(GamePopup popup) {
+    void push(GamePopup popup) {
         popupIndex++;
         rootChildren.add(popupIndex, popup);
     }
 
-    private void push(Node node) {
+    void push(Node node) {
         popupIndex++;
         rootChildren.add(popupIndex, node);
     }
 
     public Node closeButton() {
-        Button button = new Button("Close");
+        Button button = new Button();
+        button.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("close.svg"))));
         HBox hBox = new HBox(button);
-        hBox.getStyleClass().add("close-popup-button");
+//        button.getStyleClass().addAll("icon-button", "close-popup");
+        hBox.getStyleClass().addAll("icon-button", "close-popup-button");
         button.setOnAction(event -> {
             pop();
             toggleLock();
@@ -103,15 +109,28 @@ public class PopupManager {
         popup.maxWidthProperty().bind(rootWidthProperty.multiply(scale));
     }
 
-    public void promotionPopup(PieceSpriteFactory pieceSpriteFactory, Team promotingTeam) {
+    public void promotionPopup(PieceSpriteFactory pieceSpriteFactory, Team promotingTeam, List<String> promotablePiecesList, BoardUIManager boardUIManager, Move destinationTile) {
         if (locked) {
             Log.info("Cannot close promotion popup without promoting");
         }
         Region popup = new PromotionPopupBuilder(pieceSpriteFactory,
-                List.of("queen", "rook", "knight", "bishop"), promotingTeam).build();
+                promotablePiecesList, promotingTeam, this, boardUIManager, destinationTile).build();
+        rescale(0.5, popup);
 
         push(popup);
         toggleLock();
     }
 
+    public void gameConfigurePopup(boolean isVsBot) {
+//     todo:  1. Read objectives. Make Game config popup.
+        if (locked) {
+            pop();
+            toggleLock();
+        }
+        Region popup = new GameConfigurationPopup(isVsBot);
+        rescale(0.5, popup);
+
+        push(popup);
+        toggleLock();
+    }
 }

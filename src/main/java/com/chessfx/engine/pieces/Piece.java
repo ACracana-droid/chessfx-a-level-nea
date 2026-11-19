@@ -2,62 +2,51 @@ package com.chessfx.engine.pieces;
 
 import com.chessfx.engine.board.BoardContainer;
 import com.chessfx.engine.board.GameBoardContainer;
-import com.chessfx.engine.board.BoardContainerBase;
 import com.chessfx.engine.board.Team;
 import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
 import com.chessfx.engine.moves.MoveVector;
+import com.chessfx.engine.moves.PromotionMove;
 import com.chessfx.log.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Piece extends PieceBase implements Cloneable {
+public class Piece extends PieceBase {
 
     protected List<Move> movesCache;
     final protected MoveVector[] moveSet;
-
-    Piece(String name, String fenId, Team team, int value,
-          int rank, int file, MoveVector[] moveSet, boolean hasMoved) {
-        super(name, fenId, value, team, new Coordinate(rank, file));
-        this.moveSet = moveSet;
-        this.hasMoved = hasMoved;
-    }
+    protected BoardContainer game;
 
     Piece(Piece piece, Team team) {
-        super(piece.name, piece.fenId, piece.value, team, piece.getCoOrds());
+        super(piece.name, piece.fenId, piece.value, team, piece.getPos());
         this.moveSet = piece.moveSet;
         this.hasMoved = piece.hasMoved;
+    }
+
+    public Piece(String name, Team team, int rank, int file, boolean hasMoved, PieceData pieceData) {
+        super(name, pieceData.fenId, pieceData.value, team, new Coordinate(rank, file));
+        this.hasMoved = hasMoved;
+        this.moveSet = pieceData.getAllMoveVectors(team).toArray(new MoveVector[0]);
     }
 
     // TODO: fix pawn moves, which are totally broken.
     // Pieces remain on the board after being captured in a sort of ghost state.
 
-    public String getFenID() {
-        return fenId;
-    }
-
-    public Team getTeam() {
-        return team;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     public boolean hasMoved() {
         return hasMoved;
     }
 
-    public List<Move> moves(BoardContainer boardModel) {
+    public List<Move> moves() {
 //        if (isMovesCacheValid(boardModel)) {
 //            movesCache = calculateMoves(boardModel);
 //        }
 //        return movesCache;
-        return calculateMoves(boardModel);
+        return calculateMoves();
     }
 
-    private boolean isMovesCacheValid(GameBoardContainer boardModel) {
+    private boolean isMovesCacheValid() {
         if (movesCache == null) return false;
 
         if (false) return true;
@@ -65,53 +54,53 @@ public class Piece extends PieceBase implements Cloneable {
         return false;
     }
 
-    private List<Move> calculateMoves(BoardContainer boardModel) {
+    protected List<Move> calculateMoves() {
         Log.info("Querying moves: " + team + " " + name);
         List<Move> ls = new ArrayList<>();
         for (MoveVector mv : filterInitialMoveVectors()) {
             if (mv.hasInterval()) {
                 if (mv.isLeaping()) {
                     // don't need to check interval.
-                    handleConditions(mv, boardModel, ls);
+                    handleConditions(mv, ls);
                 } else {
                     // must check interval, check intermediate steps.
-                    handleConditionsCheckingInterval(mv, boardModel, ls);
+                    handleConditionsCheckingInterval(mv, ls);
                     // isHopping should be handled here.
                 }
                 continue;
             }
             // move has no interval - basic move in a single direction.
-            handleConditions(mv, boardModel, ls);
+            handleConditions(mv, ls);
         }
         return ls;
     }
 
-    private void handleConditionsCheckingInterval(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
+    private void handleConditionsCheckingInterval(MoveVector mv, List<Move> ls) {
         Log.warn("Piece", "Unimplemented method");
     }
 
-    private void handleConditions(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
+    private void handleConditions(MoveVector mv, List<Move> ls) {
         if (mv.isCaptureOnly()) {
-            captureMoves(mv, boardModel, ls);
+            captureMoves(mv, ls);
         } else if (mv.isNotCapture()) {
-            nonCaptureMoves(mv, boardModel, ls);
+            nonCaptureMoves(mv, ls);
         } else {
             // default
-            standardMoves(mv, boardModel, ls);
+            standardMoves(mv, ls);
         }
     }
 
-    private void standardMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
-        int y = coOrds.y() + mv.getDy(), x = coOrds.x() + mv.getDx();
+    private void standardMoves(MoveVector mv, List<Move> ls) {
+        int y = pos.y() + mv.getDy(), x = pos.x() + mv.getDx();
         int steps = mv.getSteps();
-        while (steps != 0 && boardModel.inBoardBounds(y, x)) {
-            if (boardModel.tileHasPiece(y, x)) {
-                if (!boardModel.tileHasPieceMatchingTeam(y, x, getTeam())) {
-                    ls.add(capture(this, y, x));
+        while (steps != 0 && game.inBoardBounds(y, x)) {
+            if (game.tileHasPiece(y, x)) {
+                if (!game.tileHasPieceMatchingTeam(y, x, getTeam())) {
+                    ls.addAll(capture(this, y, x));
                 }
                 return; // is stopped by allied piece and will stop after capturing enemy.
             } else {
-                ls.add(make(this, y, x));
+                ls.addAll(make(this, y, x));
             }
             y += mv.getDy();
             x += mv.getDx();
@@ -119,21 +108,41 @@ public class Piece extends PieceBase implements Cloneable {
         }
     }
 
-    private Move capture(Piece piece, int y, int x) {
-        return Move.capture(piece, y, x);
+    protected List<Move> capture(Piece piece, int y, int x) {
+        if (isPromotion(y)) {
+            List<Move> promoteList = new ArrayList<>();
+            ArbitraryPieceFactory pieceFactory = game.getGameModel().getChessConfig().getPieceFactory();
+            for (String name : game.getGameModel().getChessConfig().getPromotablePieces()) {
+                promoteList.add(new PromotionMove(piece, name, y, x, true));
+            }
+            return promoteList;
+        }
+        return List.of(Move.capture(piece, y, x));
     }
 
-    private Move make(Piece piece, int y, int x) {
-        return Move.make(piece, y, x);
+    protected boolean isPromotion(int y) {
+        return false;
+    }
+
+    protected List<Move> make(Piece piece, int y, int x) {
+        if (isPromotion(y)) {
+            List<Move> promoteList = new ArrayList<>();
+            ArbitraryPieceFactory pieceFactory = game.getGameModel().getChessConfig().getPieceFactory();
+            for (String name : game.getGameModel().getChessConfig().getPromotablePieces()) {
+                promoteList.add(new PromotionMove(piece, name, y, x, false));
+            }
+            return promoteList;
+        }
+        return List.of(Move.make(piece, y, x));
     }
 
     private void nonCaptureMoves(int dy, int dx, int steps, BoardContainer boardModel, List<Move> ls) {
-        int y = coOrds.y() + dy, x = coOrds.x() + dx;
+        int y = pos.y() + dy, x = pos.x() + dx;
         while (steps != 0 && boardModel.inBoardBounds(y, x)) {
             if (boardModel.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(make(this, y, x));
+            ls.addAll(make(this, y, x));
 
             y += dy;
             x += dx;
@@ -141,20 +150,20 @@ public class Piece extends PieceBase implements Cloneable {
         }
     }
 
-    private void nonCaptureMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
-        nonCaptureMoves(mv.getDy(), mv.getDx(), mv.getSteps(), boardModel, ls);
+    private void nonCaptureMoves(MoveVector mv, List<Move> ls) {
+        nonCaptureMoves(mv.getDy(), mv.getDx(), mv.getSteps(), game, ls);
     }
 
     // finish this.
-    private void captureMoves(MoveVector mv, BoardContainer boardModel, List<Move> ls) {
-        int y = coOrds.y() + mv.getDy(), x = coOrds.x() + mv.getDx();
+    private void captureMoves(MoveVector mv, List<Move> ls) {
+        int y = pos.y() + mv.getDy(), x = pos.x() + mv.getDx();
         int steps = mv.getSteps();
-        while (steps != 0 && boardModel.inBoardBounds(y, x)) {
-            if (boardModel.tileHasPieceMatchingTeam(y, x, getTeam())
-                    || !boardModel.tileHasPiece(y, x)) {
+        while (steps != 0 && game.inBoardBounds(y, x)) {
+            if (game.tileHasPieceMatchingTeam(y, x, getTeam())
+                    || !game.tileHasPiece(y, x)) {
                 return;
             }
-            ls.add(capture(this, y, x));
+            ls.addAll(capture(this, y, x));
             y += mv.getDy();
             x += mv.getDx();
             steps--;
@@ -162,14 +171,14 @@ public class Piece extends PieceBase implements Cloneable {
     }
 
 
-    private void captureMovesThreat(MoveVector mv, BoardContainerBase boardModel, List<Move> ls) {
-        int y = coOrds.y() + mv.getDy(), x = coOrds.x() + mv.getDx();
+    private void captureMovesThreat(MoveVector mv, List<Move> ls) {
+        int y = pos.y() + mv.getDy(), x = pos.x() + mv.getDx();
         int steps = mv.getSteps();
-        while (steps != 0 && boardModel.inBoardBounds(y, x)) {
-            if (boardModel.tileHasPieceMatchingTeam(y, x, getTeam())) {
+        while (steps != 0 && game.inBoardBounds(y, x)) {
+            if (game.tileHasPieceMatchingTeam(y, x, getTeam())) {
                 return;
             }
-            ls.add(capture(this, y, x));
+            ls.addAll(capture(this, y, x));
             y += mv.getDy();
             x += mv.getDx();
             steps--;
@@ -177,32 +186,20 @@ public class Piece extends PieceBase implements Cloneable {
     }
 
     public void setCoOrds(int y, int x) {
-        coOrds = new Coordinate(y, x);
+        pos = new Coordinate(y, x);
     }
 
     public void setCoOrds(Coordinate coOrds) {
-        this.coOrds = coOrds;
+        this.pos = coOrds;
     }
 
     public void setHasMoved(boolean b) {
         hasMoved = b;
     }
 
-    @Override
-    public Piece clone() {
-        try {
-            Log.warn("Hello piece clone...");
-            Piece clone = (Piece) super.clone();
-//            clone = new Piece(this);
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-
-    public Coordinate getCoOrds() {
-        return coOrds;
+    public Coordinate getPos() {
+        return pos;
     }
 
     /**
@@ -217,16 +214,16 @@ public class Piece extends PieceBase implements Cloneable {
             if (mv.hasInterval()) {
                 if (mv.isLeaping()) {
                     // don't need to check interval.
-                    handleConditions(mv, boardContainer, ls);
+                    handleConditions(mv, ls);
                 } else {
                     // must check interval, check intermediate steps.
-                    handleConditionsCheckingInterval(mv, boardContainer, ls);
+                    handleConditionsCheckingInterval(mv, ls);
                     // isHopping should be handled here.
                 }
                 continue;
             }
             // move has no interval - basic move in a single direction.
-            handleConditions(mv, boardContainer, ls);
+            handleConditions(mv, ls);
 
         }
         List<Move> captures = new ArrayList<>();
@@ -263,26 +260,26 @@ public class Piece extends PieceBase implements Cloneable {
         return ls;
     }
 
-    public List<Move> threats(BoardContainer boardContainer) {
+    public List<Move> threats() {
         List<Move> ls = new ArrayList<>();
         for (MoveVector mv : filterInitialAndNonCaptureMoveVectors()) {
             if (mv.hasInterval()) {
                 if (mv.isLeaping()) {
                     // don't need to check interval.
-                    if (mv.isCaptureOnly()) captureMovesThreat(mv, boardContainer, ls);
-                    else standardMoves(mv, boardContainer, ls);
+                    if (mv.isCaptureOnly()) captureMovesThreat(mv, ls);
+                    else standardMoves(mv, ls);
                 } else {
                     // must check interval, check intermediate steps.
                     //TODO: fix this...
-                    if (mv.isCaptureOnly()) captureMovesThreat(mv, boardContainer, ls);
-                    else standardMoves(mv, boardContainer, ls);
+                    if (mv.isCaptureOnly()) captureMovesThreat(mv, ls);
+                    else standardMoves(mv, ls);
                     // isHopping should be handled here.
                 }
                 continue;
             }
             // move has no interval - basic move in a single direction.
-            if (mv.isCaptureOnly()) captureMovesThreat(mv, boardContainer, ls);
-            else standardMoves(mv, boardContainer, ls);
+            if (mv.isCaptureOnly()) captureMovesThreat(mv, ls);
+            else standardMoves(mv, ls);
 
         }
         return ls;
@@ -290,5 +287,9 @@ public class Piece extends PieceBase implements Cloneable {
 
     public boolean isKing() {
         return this instanceof King;
+    }
+
+    public void setBoardContainer(BoardContainer boardContainer) {
+        this.game = boardContainer;
     }
 }

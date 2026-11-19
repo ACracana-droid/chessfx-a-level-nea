@@ -1,4 +1,4 @@
-package com.chessfx.engine.moves;
+package com.chessfx.ui.game;
 
 import com.chessfx.engine.board.GameStateModel;
 import com.chessfx.engine.board.Team;

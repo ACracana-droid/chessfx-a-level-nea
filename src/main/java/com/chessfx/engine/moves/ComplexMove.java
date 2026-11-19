@@ -7,21 +7,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class ComplexMove extends Move {
-    private final List<Piece> captures; // could be null
+    private final List<Coordinate> captureCoordinates; // could be null
 
-    protected ComplexMove(Piece piece, int y, int x, List<Piece> captures) {
+    protected ComplexMove(Piece piece, int y, int x, List<Coordinate> captureCoordinates) {
         super(piece, y, x, true);
-        this.captures = Objects.requireNonNullElseGet(captures, ArrayList::new);
+        this.captureCoordinates = Objects.requireNonNullElseGet(captureCoordinates, ArrayList::new);
     }
 
     @Override
-    public List<Piece> getCaptures() {
-        return captures;
+    public List<Coordinate> getCaptureCoordinates() {
+        return captureCoordinates;
     }
 
     @Override
     public boolean isCapture() {
-        return !captures.isEmpty();
+        return !captureCoordinates.isEmpty();
     }
 
     @Override
@@ -31,6 +31,6 @@ public class ComplexMove extends Move {
 
     @Override
     public boolean isSuperCapture() {
-        return captures.isEmpty();
+        return captureCoordinates.isEmpty();
     }
 }

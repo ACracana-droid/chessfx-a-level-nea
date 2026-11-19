@@ -1,11 +1,16 @@
 package com.chessfx.engine.board;
 
+import com.chessfx.engine.moves.Coordinate;
 import com.chessfx.engine.moves.Move;
+import com.chessfx.engine.moves.PromotionMove;
+import com.chessfx.engine.pieces.ArbitraryPieceFactory;
 import com.chessfx.engine.pieces.Piece;
 import com.chessfx.engine.tiles.TileBase;
 import com.chessfx.log.Log;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BoardContainer extends BoardContainerBase {
 
@@ -20,6 +25,7 @@ public class BoardContainer extends BoardContainerBase {
         this.gameModel = gameModel;
     }
 
+
     public void doMove(Move move) {
         if (gameModel.isGameOver()) {
             Log.info("Cannot move, game is over."); // kinda unnecessary seeing as the game always ends when there are no valid moves: moving is impossible.
@@ -31,33 +37,35 @@ public class BoardContainer extends BoardContainerBase {
             Log.debug("BoardContainer", getStringRepresentation());
             Log.error("BoardContainer", "Piece origin square is null!");
         }
-        Piece directCapture = updatePiecePosition(move);
-        if (isPromotion(move)) {
-            if (this instanceof GameBoardContainer) {
-                gameModel.setIsPromotion(true);
-                // suspend game update until after promotion...
-                // MUST NOT UNDO, etc during this time.
-                return;
-            } else {
-
+        /// side captures...
+        List<Piece> indirectCaptures = new ArrayList<>();
+        if (move.isSuperCapture()) {
+            for (Coordinate enemyPos : move.getCaptureCoordinates()) {
+                Piece enemy = getTile(enemyPos).removePiece();
+                captureListUpdate(enemy);
+                indirectCaptures.add(enemy);
             }
         }
-        updateGame(move, origPiece, directCapture);
+
+
+        Piece directCapture = updatePiecePosition(move);
+
+        updateGame(move, origPiece, directCapture, indirectCaptures);
     }
 
     private void promote(Piece origPiece, Piece desiredPiece) {
-        TileBase tile = getTile(origPiece.getCoOrds());
+        TileBase tile = getTile(origPiece.getPos());
         tile.removePiece();
         getCurrentTeam().getPieceList().remove(origPiece);
 
         tile.setPiece(desiredPiece);
     }
 
-    private boolean isPromotion(Move move) {
-        if (move.destCoOrds().y() == HEIGHT - 1 || move.destCoOrds().y() == 0) {
-            return true;
-        }
-        return false;
+    private Piece undoPromote(Piece origPiece, Piece promoted) {
+        Team team = promoted.getTeam();
+        team.getPieceList().remove(promoted);
+        team.getPieceList().add(origPiece);
+        return origPiece;
     }
 
 
@@ -80,12 +88,6 @@ public class BoardContainer extends BoardContainerBase {
         Log.debug("Dest tile piece: " + (dest.hasPiece() ? dest.getPiece().getName() : "no piece"));
 
         Log.debug("Current team: " + getCurrentTeam().getName() + "");
-        if (move.isSuperCapture()) {
-            for (Piece enemy : move.getCaptures()) {
-                getTile(enemy.getCoOrds()).removePiece();
-                captureListUpdate(enemy);
-            }
-        }
 
         Piece directCapture = null;
 
@@ -98,11 +100,22 @@ public class BoardContainer extends BoardContainerBase {
             dest.removePiece();
         }
 
+
+        if (move instanceof PromotionMove promotion) {
+            Piece promotedPiece = getPieceFactory().mutate(piece, promotion.getPromotionPieceName());
+            promotedPiece.setBoardContainer(this);
+            promote(piece, promotedPiece);
+            piece = promotedPiece;
+        }
         dest.setPiece(piece);
         return directCapture;
     }
 
-    private TileBase getTile(String str) {
+    private ArbitraryPieceFactory getPieceFactory() {
+        return getGameModel().getChessConfig().getPieceFactory();
+    }
+
+    public TileBase getTile(String str) {
         return getTile(pos(str));
     }
 
@@ -123,16 +136,6 @@ public class BoardContainer extends BoardContainerBase {
 //        Log.debug("Contains queen???", "" + containsQueen(enemy.getTeam()));
     }
 
-    private boolean containsQueen(Team enemyTeam) {
-        boolean flag = false;
-        for (Piece p : enemyTeam.getPieceList()) {
-            if (p.getName().equals("queen")) {
-                Log.error("queen", posString(p.getCoOrds()) + " " + p);
-                flag = true;
-            }
-        }
-        return flag;
-    }
 
     protected void undoCaptureListUpdate(Piece enemy) {
         getCurrentTeam().getCapturedPieces().remove(enemy);
@@ -180,7 +183,7 @@ public class BoardContainer extends BoardContainerBase {
         Move move = ply.move();
 
         undoUpdateGame();
-        undoUpdatePiecePosition(move, ply.hasPieceMovedBefore(), ply.directCapture());
+        undoUpdatePiecePosition(move, ply);
         return ply;
     }
 
@@ -196,76 +199,61 @@ public class BoardContainer extends BoardContainerBase {
         gameModel.cycleTeam(isForwards);
     }
 
-    protected void undoUpdatePiecePosition(Move move, boolean hasMoved, Piece directCapture) {
+    protected void undoUpdatePiecePosition(Move move, PlyData ply) {
         Log.info("Undoing move...");
-        Piece piece = getTile(move).removePiece();
+        Piece piece = getTile(move.destCoOrds()).removePiece();
+
+
+        // todo undo promote...
+        if (move instanceof PromotionMove) {
+            piece = undoPromote(ply.origPiece(), piece);
+        }
+
         piece.setCoOrds(move.startCoOrds());
-        piece.setHasMoved(hasMoved);
+        piece.setHasMoved(ply.hasPieceMovedBefore());
+
 
         if (move.isSuperCapture()) {
             // for things like en passant
             // handle capture removeCapture
-            for (Piece enemy : move.getCaptures()) {
+            for (Piece enemy : ply.indirectCaptures()) {
                 undoCaptureListUpdate(enemy);
-                getTile(enemy.getCoOrds()).setPiece(enemy);
+                getTile(enemy.getPos()).setPiece(enemy);
             }
         }
 
+        Piece directCapture = ply.directCapture();
         if (directCapture != null) {
             undoCaptureListUpdate(directCapture);
             getTile(move.destCoOrds()).setPiece(directCapture);
         } else Log.warn("Direct Capture is null...");
 
+
         getTile(move.startCoOrds()).setPiece(piece);
     }
 
-    protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
-        plyStack.push(new PlyData(move, origPiece.hasMoved(), directCapture, getCurrentTeam()));
+
+    protected void updateGame(Move move, Piece origPiece, Piece directCapture, List<Piece> indirectCaptures) {
+        gameModel.setEnPassantTarget(calculateEnPassantTargetSquare(move, origPiece));
+        plyStack.push(new PlyData(move, origPiece, origPiece.hasMoved(), directCapture, indirectCaptures,
+                getCurrentTeam(), gameModel.getEnPassantTarget()));
         origPiece.setHasMoved(true);
         switchTeam(true);
         Log.debug("Current Team: -> " + getCurrentTeam().getName());
+    }
+
+    private Coordinate calculateEnPassantTargetSquare(Move move, Piece origPiece) {
+        int diff = move.getStartY() - move.getEndY();
+        if (origPiece.getName().equals("pawn") && Math.abs(diff) == 2) {
+            return new Coordinate(move.getStartY() + (diff > 0 ? +1 : -1), move.getStartX());
+        }
+        return null;
     }
 
     protected void undoUpdateGame() {
         switchTeam(false);
     }
 
-    public String getStringRepresentation() {
-        StringBuilder sb = new StringBuilder(); //
-
-        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
-        sb.append("\n");
-        // must traverse board from 8, downwards.
-        boolean checkerPattern = true;
-        //// using i to make rank index
-        for (int i = HEIGHT; i > 0; ) {
-            sb.append((i - HEIGHT) * -1).append(" | "); // length 4
-            i--;
-            for (TileBase tile : board[i]) {
-                sb.append(" ");
-                if (tile.hasPiece()) {
-                    sb.append(tile.getPiece().getFenID());
-                } else {
-                    sb.append(checkerPattern ? '#' : '-'); //// white symbol, black symbol
-                }
-                checkerPattern = !checkerPattern;
-
-                sb.append(" ");
-
-            }
-            sb.append(" |\n"); //length 2*
-            checkerPattern = !checkerPattern;
-        }
-        sb.append("_".repeat((3 * WIDTH) + 4 + 2));
-        sb.append("\n").
-                append(" ".repeat(4 + 1));
-        //// making file index
-        for (char i = 'a'; i <= 'h'; i++) {
-            sb.append(i).repeat(" ", 2);
-        }
-
-        return sb.reverse().toString();
-    }
 
     /**
      * Generates long algebraic notation that is valid on the standard 8x8 board and other more
@@ -301,4 +289,23 @@ public class BoardContainer extends BoardContainerBase {
         Log.info("BoardState is " + boardState.getText());
         gameModel.setBoardState(boardState);
     }
+
+    protected void gameStart() {
+        for (Team team : gameModel.getTeams()) {
+            for (Piece piece : team.getPieceList()) {
+                piece.setBoardContainer(this);
+            }
+        }
+
+        String enPassantTarget = gameModel.getEnPassantTargetString();
+
+        if (enPassantTarget != null && !enPassantTarget.equals("-")) {
+            gameModel.setEnPassantTarget(pos(enPassantTarget));
+        }
+    }
+
+    public ArrayDeque<PlyData> getPlyStack() {
+        return plyStack;
+    }
+
 }

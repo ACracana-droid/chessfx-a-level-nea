@@ -4,7 +4,7 @@ import com.chessfx.chessconfig.ChessConfigModel;
 import com.chessfx.engine.board.GameStateModel;
 import com.chessfx.engine.board.ReactiveChessContainer;
 import com.chessfx.log.Log;
-import com.chessfx.ui.game.board.BoardUIModel;
+import com.chessfx.ui.game.board.BoardUIManager;
 import com.chessfx.ui.game.board.ChessBoardBuilder;
 import com.chessfx.chessconfig.AppSettings;
 import com.chessfx.ui.menu.LayoutBuilder;
@@ -32,7 +32,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
 
     private final ChessConfigModel chessConfig;
     private final AppSettings appSettings;
-    private BoardUIModel boardUIModel;
+    private BoardUIManager boardUIManager;
 
     public GameLayoutBuilder(LayoutManager layoutManager, ChessConfigModel chessConfig, AppSettings appSettings) {
         super(chessConfig, layoutManager, LayoutManager.Layout.GAME);
@@ -143,15 +143,15 @@ public class GameLayoutBuilder extends LayoutBuilder {
         loadBoardModel.setOnSucceeded(event -> {
             Log.debug("GameLayoutBuilder", "Successfully created backend board.");
             ChessBoardBuilder boardBuilder = (new ChessBoardBuilder(boardContainer, chessConfig, layoutManager));
-            boardUIModel = boardBuilder.getBoardUIModel();
-            boardContainer.setUIModel(boardUIModel);
+            boardUIManager = boardBuilder.getBoardUIModel();
+            boardContainer.setUIModel(boardUIManager);
             rootPane.setCenter(screenCentreHBox(boardBuilder.build(), makeMoveTableSideBar(
                     new MoveTable(boardContainer.getMoveTableData(), makeGameButton("-"), makeGameButton("+"))
             )));
             rootPane.setTop(makeGameTopWrapper(boardContainer.fullmoveCounterProperty(), boardContainer.boardStateProperty()));
             rootPane.setBottom(makeTurnLabel(boardContainer.currentTeamStringProperty()));
 
-            boardUIModel.gameStart();
+            boardUIManager.gameStart();
             super.startup();
         });
         Thread thread = new Thread(loadBoardModel);
@@ -187,7 +187,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
     private HBox makeTopLeftHBox() {
         Button returnButton = returnButton("Exit", endAndReturnAction());
         returnButton.setFocusTraversable(false);
-        Button settingsButton = SettingsLayoutUtil.makeIconButton(appSettings, layoutManager.getPopupManager());
+        Button settingsButton = SettingsLayoutUtil.makeSettingsIconButton(appSettings, layoutManager.getPopupManager());
         settingsButton.setFocusTraversable(false);
 
         HBox hBox = new HBox(returnButton, settingsButton);
@@ -205,7 +205,7 @@ public class GameLayoutBuilder extends LayoutBuilder {
     private Node makeUndoButton() {
         Button button = makeGameButton("Undo", () -> {
             if (boardContainer == null) return;
-            boardUIModel.undoLastMoveIfPossible();
+            boardUIManager.undoLastMoveIfPossible();
         });
         // Vbox does not take up horizontal space on layout
         button.getStyleClass().add("undo-button");

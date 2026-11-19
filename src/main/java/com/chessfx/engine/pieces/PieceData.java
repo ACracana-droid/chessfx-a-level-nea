@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.chessfx.engine.pieces.PieceAttribute.*;
+
 
 public class PieceData {
 
@@ -20,10 +22,10 @@ public class PieceData {
     Map<int[], Set<MoveVector>> moveTransformMap = new HashMap<>();
 
     public PieceData(String[] data) {
-        name = data[0];
-        fenId = data[1];
-        value = Integer.parseInt(data[2]);
-        makeMoveSetFromData(data[3]);
+        name = data[NAME.ordinal()];
+        fenId = data[FEN_ID.ordinal()];
+        value = Integer.parseInt(data[VALUE.ordinal()]);
+        makeMoveSetFromData(data[MOVE_NOTATION.ordinal()]);
         Log.debug("PieceData", "All moves for " + name + ":" + moveSet);
     }
 
@@ -245,5 +247,9 @@ public class PieceData {
         moveTransformMap.put(moveTransform, set);
         team.addMoveSetToList(fenId, set);
         return moveTransformMap.get(moveTransform);
+    }
+
+    public String getFenId() {
+        return fenId;
     }
 }

@@ -29,6 +29,7 @@ public class FenManager {
     Map<String, String> fenIdToNameMap;
 
     TileBase[][] board;
+    private String enPassantTileString;
 
 
     // FEN stands for Forsyth-Edwards notation.
@@ -111,8 +112,14 @@ public class FenManager {
         }
         i++;
 
+        enPassantTileString = "";
         while (fen[i] != ' ') {
             // parse enPassant square
+            if (fen[i] != '-') {
+                enPassantTileString = enPassantTileString + fen[i];
+            } else {
+                enPassantTileString = "-";
+            }
             i++;
         }
         i++;
@@ -203,5 +210,9 @@ public class FenManager {
 
     public int getStartingTeamIdx() {
         return startingTeamIdx;
+    }
+
+    public String getEnPassantTileString() {
+        return enPassantTileString;
     }
 }

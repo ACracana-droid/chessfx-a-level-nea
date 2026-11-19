@@ -11,7 +11,6 @@ import static com.chessfx.ui.util.LayoutManager.Layout.GAME_OPTIONS;
 
 public class AllGameOptionsLayoutBuilder extends LayoutBuilder {
 
-
     BorderPane rootPane;
 
     public AllGameOptionsLayoutBuilder(LayoutManager layoutManager, ChessConfigModel chessConfig) {

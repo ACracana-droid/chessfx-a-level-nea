@@ -8,7 +8,7 @@ import com.chessfx.log.Log;
 
 public class BoardContainerBase implements GridContainer<TileBase> {
 
-    protected final TileBase[][] board;
+    private final TileBase[][] board;
     public final int HEIGHT;
     public final int WIDTH;
 
@@ -24,6 +24,11 @@ public class BoardContainerBase implements GridContainer<TileBase> {
         return 0 <= y && y < HEIGHT
                 && 0 <= x && x < WIDTH;
     }
+
+    public boolean atEndRank(int y) {
+        return y == 0 || y == HEIGHT - 1;
+    }
+
 
     public boolean tileHasPiece(int rank, int file) {
         return board[rank][file].hasPiece();
@@ -85,5 +90,41 @@ public class BoardContainerBase implements GridContainer<TileBase> {
     }
 
 
+    public String getStringRepresentation() {
+        StringBuilder sb = new StringBuilder(); //
+        sb.append("\n");
+        sb.repeat("_", (3 * WIDTH) + 4 + 2);
+        sb.append("\n");
+        // must traverse board from 8, downwards.
+        boolean checkerPattern = true;
+        //// using i to make rank index
+        for (int i = HEIGHT; i > 0; ) {
+            sb.append((i - HEIGHT) * -1).append(" | "); // length 4
+            i--;
+            for (TileBase tile : getBoard()[i]) {
+                sb.append(" ");
+                if (tile.hasPiece()) {
+                    sb.append(tile.getPiece().getFenID());
+                } else {
+                    sb.append(checkerPattern ? '#' : '-'); //// white symbol, black symbol
+                }
+                checkerPattern = !checkerPattern;
+
+                sb.append(" ");
+
+            }
+            sb.append(" |\n"); //length 2*
+            checkerPattern = !checkerPattern;
+        }
+        sb.repeat("_", (3 * WIDTH) + 4 + 2);
+        sb.append("\n").
+                append(" ".repeat(4 + 1));
+        //// making file index
+        for (char i = 'a'; i <= 'h'; i++) {
+            sb.append(i).repeat(" ", 2);
+        }
+
+        return sb.reverse().toString();
+    }
 
 }

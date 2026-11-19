@@ -84,15 +84,6 @@ public class AttackMap implements Cloneable {
         boolBoard = new boolean[HEIGHT][WIDTH];
     }
 
-    private MoveListWrapper[][] initialiseMap() {
-        MoveListWrapper[][] board = new MoveListWrapper[HEIGHT][WIDTH];
-        for (int i = 0; i < HEIGHT; i++) {
-            for (int j = 0; j < WIDTH; j++) {
-                board[i][j] = new MoveListWrapper();
-            }
-        }
-        return board;
-    }
 
     public void clear() {
         for (int i = 0; i < HEIGHT; i++) {
@@ -104,15 +95,15 @@ public class AttackMap implements Cloneable {
     }
 
 
-    // TODO: FINISH, and split for multiple reams.
-    public void calculate(BoardContainer boardContainer, Team team) {
-        calculateBools(boardContainer, team);
+    // TODO: FINISH, and split for multiple teams.
+    public void calculate(Team team) {
+        calculateBools(team);
     }
 
-    private void calculateBools(BoardContainer boardContainer, Team team) {
+    private void calculateBools(Team team) {
         clear();
         for (Piece piece : team.getPieceList()) {
-            for (Move move : piece.threats(boardContainer)) {
+            for (Move move : piece.threats()) {
                 addCapturesToBoolBoard(move);
             }
         }
@@ -120,10 +111,9 @@ public class AttackMap implements Cloneable {
 
     private void addCapturesToBoolBoard(Move move) {
         if (move.isSuperCapture()) {
-            List<Piece> captures = move.getCaptures();
-            for (Piece capture : captures) {
-                Coordinate coOrds = capture.getCoOrds();
-                boolBoard[coOrds.y()][coOrds.x()] = true;
+            List<Coordinate> captureCoordinates = move.getCaptureCoordinates();
+            for (Coordinate pos : captureCoordinates) {
+                boolBoard[pos.y()][pos.x()] = true;
             }
         }
         boolBoard[move.getEndY()][move.getEndX()] = true;

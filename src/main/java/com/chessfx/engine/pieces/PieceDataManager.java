@@ -9,18 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class PieceDataManager {
+import static com.chessfx.engine.pieces.PieceAttribute.*;
 
-    private String csv;
+public class PieceDataManager {
 
     // these are passed around via chessConfig
     private final Map<String, PieceData> pieceMap;
     private final Map<String, String> fenIdToNameMap;
 
+
     public PieceDataManager() {
         pieceMap = new HashMap<>();
         fenIdToNameMap = new HashMap<>();
 
+        String csv;
         try {
             csv = new String(Objects.requireNonNull(getClass().getResourceAsStream(
                     "pieces.csv")).readAllBytes(), StandardCharsets.UTF_8);
@@ -30,13 +32,14 @@ public class PieceDataManager {
                     "Application cannot run.");
             throw new RuntimeException(e);
         }
-        for (String piece : csv.split("\n")) {
-            Log.debug("PieceDataManager", "raw string from pieces.csv: " + piece);
-            String[] pieceData = piece.split(",");
+        String[] stringArray = csv.split("\n");
+        for (int i = 0; i < stringArray.length; i++) {
+            String[] pieceData = stringArray[i].split(",");
             Log.debug("PieceDataManager", "Split string as array: " + Arrays.toString(pieceData));
 
-            pieceMap.put(pieceData[0], new PieceData(pieceData)); // map of name to pieceData
-            fenIdToNameMap.put(pieceData[1], pieceData[0]); // map of fenId to name
+            // todo, use i as a unique id...
+            pieceMap.put(pieceData[NAME.ordinal()], new PieceData(pieceData)); // map of name to pieceData
+            fenIdToNameMap.put(pieceData[FEN_ID.ordinal()], pieceData[NAME.ordinal()]); // map of fenId to name
         }
     }
 

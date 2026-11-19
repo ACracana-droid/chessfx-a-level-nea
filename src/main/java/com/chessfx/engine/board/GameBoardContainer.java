@@ -13,10 +13,8 @@ import java.util.List;
 
 public class GameBoardContainer extends BoardContainer {
 
-
     protected AttackMap attackMap;
     protected BoardContainer virtualBoard;
-
 
     public GameBoardContainer(GameStateModel gameModel, TileBase[][] board) {
         super(gameModel, board);
@@ -25,13 +23,16 @@ public class GameBoardContainer extends BoardContainer {
         this.attackMap = new AttackMap(this);
     }
 
-
     @Override
-    protected void updateGame(Move move, Piece origPiece, Piece directCapture) {
-        super.updateGame(move, origPiece, directCapture);
+    protected void updateGame(Move move, Piece origPiece, Piece directCapture, List<Piece> indirectCaptures) {
+        super.updateGame(move, origPiece, directCapture, indirectCaptures);
 
 //        attackMap.calculate(virtualBoard, virtualBoard.getEnemyTeam());
+        Log.setThreshold(1000);
+
         setBoardState(queryBoardState());
+        Log.setThreshold(0);
+
         if (gameModel.isGameOver()) {
             endGame();
             return;
@@ -62,7 +63,7 @@ public class GameBoardContainer extends BoardContainer {
      */
     public void gameStart() {
         // Initial game update:
-
+        super.gameStart();
 
         virtualBoard = makeIsolatedBoardContainer();
 
@@ -74,9 +75,10 @@ public class GameBoardContainer extends BoardContainer {
     private BoardContainer makeIsolatedBoardContainer() {
         List<Team> teamList = gameModel.copyTeams();
         GameStateModel gameStateModel = new GameStateModel(gameModel, teamList);
-        TileBase[][] board = boardCopy(this.board, teamList);
+        TileBase[][] board = boardCopy(getBoard(), teamList);
 
         BoardContainer isolatedBoardContainer = new BoardContainer(gameStateModel, board);
+        isolatedBoardContainer.gameStart();
         return isolatedBoardContainer;
     }
 
@@ -134,7 +136,7 @@ public class GameBoardContainer extends BoardContainer {
 
         Move desiredMove = null;
 
-        for (Move move : getValidatedMoves(piece.moves(this))) {
+        for (Move move : getValidatedMoves(piece.moves())) {
             if (move.getStartX() == origin.x() && move.getStartY() == origin.y() && move.getEndX() == destination.x() && move.getEndY() == destination.y()) {
                 desiredMove = move;
                 break;
@@ -175,7 +177,7 @@ public class GameBoardContainer extends BoardContainer {
             Log.debug("VirtualBoard representation:\n", virtualBoard.getStringRepresentation());
 
             // now curr team is light
-            attackMap.calculate(virtualBoard, virtualBoard.getCurrentTeam());
+            attackMap.calculate(virtualBoard.getCurrentTeam());
             Log.debug("(post) TEAM is" + virtualBoard.getCurrentTeam().getName());
 
             // thus enemy team is black again...
@@ -195,8 +197,16 @@ public class GameBoardContainer extends BoardContainer {
         return validated;
     }
 
+    public List<Move> getValidatedMoves(TileBase tile) {
+        if (!tile.hasPiece())  {
+            Log.error("GameBoardContainer","SelectedTile has no piece, therefore no valid moves.");
+            return new ArrayList<>();
+        }
+        return getValidatedMoves(tile.getPiece().moves());
+    }
+
     private boolean isCheck(Team team) {
-        return attackMap.getTile(team.getKing().getCoOrds());
+        return attackMap.getTile(team.getKing().getPos());
     }
 
     public void terminate() {
@@ -224,8 +234,8 @@ public class GameBoardContainer extends BoardContainer {
     }
 
     public boolean isCheck() {
-        attackMap.calculate(this, this.getEnemyTeam());
-        return attackMap.getTile(getCurrentTeam().getKing().getCoOrds());
+        attackMap.calculate(this.getEnemyTeam());
+        return attackMap.getTile(getCurrentTeam().getKing().getPos());
     }
 
     public boolean noValidMoves() {
@@ -235,12 +245,12 @@ public class GameBoardContainer extends BoardContainer {
         }
         for (Piece piece : getCurrentTeam().getPieceList()) {
             Log.debug("GameBoardContainer", "Getting validated moves for " + piece.getName());
-            List<Move> moveList = getValidatedMoves(piece.moves(this));
+            List<Move> moveList = getValidatedMoves(piece.moves());
 
 
             if (!moveList.isEmpty()) {
                 Log.error("MoveList", "it was " + piece.getTeam().getName() + piece.getName() +
-                        " on " + posString(piece.getCoOrds()));
+                        " on " + posString(piece.getPos()));
                 for (Move move : moveList) {
                     Log.append(longAlgebraicNotation(move));
                 }
@@ -253,8 +263,9 @@ public class GameBoardContainer extends BoardContainer {
     }
 
 
-
     public void doMoveWithValidation(String longAlgebraicNotation) {
         doMoveWithValidation(pos(longAlgebraicNotation.substring(0, 2)), pos(longAlgebraicNotation.substring(3)));
     }
+
+
 }

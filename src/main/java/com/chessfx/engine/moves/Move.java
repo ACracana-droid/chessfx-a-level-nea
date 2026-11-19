@@ -16,30 +16,36 @@ public class Move extends MoveBase {
 
 
     protected Move(Piece piece, Coordinate dest, boolean isCapture) {
-        super(piece.getCoOrds(), dest);
+        super(piece.getPos(), dest);
         this.piece = piece;
         this.isCapture = isCapture;
     }
 
     protected Move(Piece piece, int y, int x, boolean isCapture) {
-        super(piece.getCoOrds(), new Coordinate(y, x));
+        super(piece.getPos(), new Coordinate(y, x));
         this.piece = piece;
         this.isCapture = isCapture;
+    }
+
+    public Move(Move move) {
+        super(move.startCoOrds(), move.destCoOrds());
+        this.piece = move.getPiece();
+        this.isCapture = move.isCapture();
     }
 
     public static Move make(Piece piece, int y, int x) {
         return new Move(piece, y, x, false);
     }
 
-    public static Move make(Piece piece, int y, int x, List<Piece> captures) {
+    public static Move make(Piece piece, int y, int x, List<Coordinate> captures) {
         return new ComplexMove(piece, y, x, captures);
     }
-
 
 
     public static Move capture(Piece piece, int y, int x) {
         return new Move(piece, y, x, true);
     }
+
 
 
     /**
@@ -70,7 +76,7 @@ public class Move extends MoveBase {
         return false;
     }
 
-    public List<Piece> getCaptures() {
+    public List<Coordinate> getCaptureCoordinates() {
         return new ArrayList<>();
     }
 
