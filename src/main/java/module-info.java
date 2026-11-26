@@ -7,6 +7,7 @@ module com.chess.chessfx {
     requires org.girod.javafx.svgimage;
     requires java.management;
     requires org.junit.jupiter.api;
+    requires org.controlsfx.controls;
 
     opens com.chessfx.ui.menu to javafx.fxml;
     exports com.chessfx.chessconfig;

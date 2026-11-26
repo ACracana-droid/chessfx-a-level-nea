@@ -7,7 +7,6 @@ import com.chessfx.engine.moves.Move;
 import com.chessfx.log.Log;
 import com.chessfx.ui.game.board.BoardUIManager;
 import com.chessfx.ui.game.pieces.PieceSpriteFactory;
-import com.chessfx.ui.menu.GamePopup;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -31,6 +30,7 @@ public class PopupManager {
     // For stack logic
     private int popupIndex = 0;
     private boolean locked = false;
+    private LayoutManager layoutManager;
 
     public PopupManager(Pane popupLayer, ReadOnlyDoubleProperty rootHeightProperty, ReadOnlyDoubleProperty rootWidthProperty) {
         this.rootChildren = popupLayer.getChildren();
@@ -42,22 +42,12 @@ public class PopupManager {
         return rootChildren;
     }
 
-    public void askGameTypeAndWait(Runnable changeLayoutToGame, ChessConfigModel chessConfig) {
-        // GamePopup class destroys itself upon completion, and switches layout if necessary.
-        if (locked) return;
-        Log.info("PopupManager", "Made new popup.");
-        GamePopup popup = new GamePopup(changeLayoutToGame,
-                this::pop, chessConfig);
-        rescale(0.3, popup);
-        push(popup);
-        toggleLock();
-    }
 
     void toggleLock() {
         locked = !locked;
     }
 
-     void pop() {
+    void pop() {
         // Prevent removal of the appLevelBorderPane.
         if (popupIndex == 0)
             return;
@@ -66,27 +56,29 @@ public class PopupManager {
         popupIndex--;
     }
 
-    void push(GamePopup popup) {
-        popupIndex++;
-        rootChildren.add(popupIndex, popup);
-    }
 
     void push(Node node) {
         popupIndex++;
         rootChildren.add(popupIndex, node);
     }
 
-    public Node closeButton() {
+    public Node closeButtonRegion() {
+        HBox hBox = new HBox(closeButton());
+        hBox.getStyleClass().addAll("close-popup-button");
+        return hBox;
+    }
+
+    public Button closeButton() {
         Button button = new Button();
         button.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("close.svg"))));
-        HBox hBox = new HBox(button);
-//        button.getStyleClass().addAll("icon-button", "close-popup");
-        hBox.getStyleClass().addAll("icon-button", "close-popup-button");
+
+        button.getStyleClass().addAll("icon-button");
         button.setOnAction(event -> {
             pop();
             toggleLock();
+            layoutManager.getCurrentLayoutBuilder().enableButtons();
         });
-        return hBox;
+        return button;
     }
 
     public void makeSettingsPopup(AppSettings appSettings) {
@@ -95,13 +87,18 @@ public class PopupManager {
             toggleLock();
             return;
         }
-        BorderPane popup = new BorderPane();
-        popup.getStyleClass().add("settings-popup");
-        popup.setTop(closeButton());
+        BorderPane popup = makePopup();
         popup.setCenter(SettingsLayoutUtil.makeSettingsVbox(appSettings));
-        rescale(0.5, popup);
         push(popup);
         toggleLock();
+    }
+
+    private BorderPane makePopup() {
+        BorderPane popup = new BorderPane();
+        popup.getStyleClass().add("popup");
+        popup.setTop(closeButtonRegion());
+        rescale(0.5, popup);
+        return popup;
     }
 
     private void rescale(double scale, Region popup) {
@@ -121,16 +118,24 @@ public class PopupManager {
         toggleLock();
     }
 
-    public void gameConfigurePopup(boolean isVsBot) {
+    public void gameConfigurePopup(boolean isVsBot, LayoutManager layoutManager, ChessConfigModel chessConfig) {
 //     todo:  1. Read objectives. Make Game config popup.
         if (locked) {
             pop();
             toggleLock();
+            layoutManager.getCurrentLayoutBuilder().enableButtons();
         }
-        Region popup = new GameConfigurationPopup(isVsBot);
-        rescale(0.5, popup);
+        layoutManager.getCurrentLayoutBuilder().disableButtons();
+        BorderPane popup = new GameConfigurationPopup(isVsBot, layoutManager, chessConfig);
+        rescale(0.8, popup);
+
 
         push(popup);
         toggleLock();
+    }
+
+
+    public void setLayoutManager(LayoutManager layoutManager) {
+        this.layoutManager = layoutManager;
     }
 }

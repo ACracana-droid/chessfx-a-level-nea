@@ -22,19 +22,17 @@ public class AllGameOptionsLayoutBuilder extends LayoutBuilder {
     }
 
     private Node makeOptionsVBox() {
-        VBox vBox = new VBox(makeCapablancaPlayButton());
+        VBox vBox = new VBox(); //makeCapablancaPlayButton()
         vBox.getStyleClass().add("options-vbox");
         return vBox;
     }
-
-    private Button makeCapablancaPlayButton() {
-//        Button button = (changeLayoutToGame,
-//                (() -> chessConfig.setChessConfigFromPropertie
-//                sResource("capablancaPvP.properties")));
-        Button button = makeQuickGameButton("capablancaPvP.properties");
-        button.setText("Capablanca PvP");
-        return button;
-    }
+//
+//    private Button makeCapablancaPlayButton() {
+//
+//        Button button = makeQuickGameButton("capablancaPvP.properties");
+//        button.setText("Capablanca PvP");
+//        return button;
+//    }
 
     @Override
     public void startup() {

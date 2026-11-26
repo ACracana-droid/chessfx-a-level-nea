@@ -27,7 +27,7 @@ public class ChessConfigModel {
 
     private int halfmoveClockRuleNumber = 50;
     private EnPassantRule enPassantRule = EnPassantRule.DEFAULT;
-    private int tileCheckerboardOffset = 0;
+    private boolean isVsBot = true;
 
     private List<String> promotablePieces;
 
@@ -58,7 +58,7 @@ public class ChessConfigModel {
 
     public void setChessConfigFromPropertiesResource(String propertiesName) {
         Properties properties = new Properties();
-
+        Log.info("TEMPORARY"); // DOESNT GET PAST TRY IF NAME IS NOT REAL FILE
         try {
             InputStream stream = getClass().getResourceAsStream(propertiesName);
             properties.load(stream);
@@ -66,6 +66,7 @@ public class ChessConfigModel {
             System.out.println("This should not happen.\npropertiesName: " + propertiesName);
             e.printStackTrace();
         }
+        Log.info("TEMPORARY");
 
         height = Integer.parseInt(properties.getProperty("height", "8"));
         width = Integer.parseInt(properties.getProperty("width", "8"));
@@ -77,12 +78,10 @@ public class ChessConfigModel {
         enPassantRule = EnPassantRule.parseRule(properties.getProperty("enPassantRule", "default"));
         // can change how en passant works
 
-        // 1 or 0
-        tileCheckerboardOffset = Integer.parseInt(properties.getProperty("tileCheckerboardOffset", "0"));
 
         board = fen.getGameBoard();
 
-        promotablePieces = Arrays.asList(properties.getOrDefault("promotablePieces", "queen,rook,knight,bishop").toString().split(","));
+        promotablePieces = Arrays.asList(properties.getProperty("promotablePieces", "queen,rook,knight,bishop").toString().split(","));
         Log.debug("ChessConfigModel", "Config has been loaded.");
     }
 
@@ -118,10 +117,6 @@ public class ChessConfigModel {
         return halfmoveClockRuleNumber;
     }
 
-    public int getTileCheckerboardOffset() {
-        return tileCheckerboardOffset;
-    }
-
     public Set<String> getInstantiatedPiecesNameSet() {
         return fen.getInstantiatedPieceNameSet();
     }
@@ -138,9 +133,7 @@ public class ChessConfigModel {
         return pieceMap;
     }
 
-    public void setGameType(String s) {
-        gameType = s;
-    }
+
 
     public ArbitraryPieceFactory getPieceFactory() {
         return pieceFactory;
@@ -157,5 +150,9 @@ public class ChessConfigModel {
             fenIds.add(pieceData.getFenId());
         }
         return fenIds;
+    }
+
+    public void setIsVsBot(boolean isVsBot) {
+        this.isVsBot = isVsBot;
     }
 }

@@ -22,6 +22,12 @@
     -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.8), 10, 0.5, 0, 0);
 }
 
+.game-config-vbox {
+    -fx-alignment: top-center;
+    -fx-spacing: 2em;
+}
+
+
 
 .root-wrapper-pane {
     /*-fx-border-color: -accent1;*/
@@ -70,17 +76,15 @@
     /*    Crazy hack... */
 }
 
-
-.settings-popup {
+.popup {
     -fx-alignment: center;
     -fx-background-color: -bg2;
     -fx-background-radius: 2em;
     -fx-border-radius: 0.9em;
     -fx-border-width: 0.4em;
     -fx-border-color: red;
-
-
 }
+
 
 
 /* GAME  */
@@ -142,6 +146,8 @@
 /_/  /_/\____/|___/\___/    /_/  \__,_/_.___/_/\___/
 Move table
 */
+
+
 
 
 .move-table {
@@ -244,7 +250,7 @@ Move table
 
 
 .game-button {
-
+    -fx-alignment: center;
 }
 
 .game-screen-centre {

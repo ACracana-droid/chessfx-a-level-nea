@@ -7,6 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 
+import java.util.List;
+
 import static com.chessfx.ui.util.LayoutManager.Layout.*;
 import static com.chessfx.ui.util.LayoutManager.Layout.GAME_OPTIONS;
 import static com.chessfx.ui.util.LayoutManager.Layout.MENU;
@@ -28,8 +30,8 @@ public class MenuLayoutBuilder extends LayoutBuilder {
 //                makeDefaultGameButton(),
 //                makeWildCardButton(),
 //                makeSettingsButton(),
-                makeGameConfigureButton(true),
-                makeGameConfigureButton(false),
+                menuHBox(List.of(makeGameConfigureButton(true),
+                        makeGameConfigureButton(false))),
 
                 makeMoreOptionsButton(),
                 makeSettingsButton());
@@ -37,10 +39,18 @@ public class MenuLayoutBuilder extends LayoutBuilder {
         return vBox;
     }
 
+    private HBox menuHBox(List<Node> nodes) {
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(nodes);
+        hBox.getStyleClass().add("options-vbox");
+        return hBox;
+    }
+
     private Button makeGameConfigureButton(boolean isVsBot) {
         String text = "Vs " + (isVsBot ? "Bot" : "Player");
         Button button = makeMenuButton(text);
-        button.setOnAction(event ->  layoutManager.getPopupManager().gameConfigurePopup(isVsBot));
+        button.setOnAction(event ->
+                layoutManager.getPopupManager().gameConfigurePopup(isVsBot, layoutManager, chessConfig));
         return button;
     }
 
@@ -50,11 +60,11 @@ public class MenuLayoutBuilder extends LayoutBuilder {
     }
 
 
-    private Button makeDefaultGameButton() {
-        Button button = makeQuickGameButton("defaultPvP.properties");
-        button.setText("Default Game");
-        return button;
-    }
+//    private Button makeDefaultGameButton() {
+//        Button button = makeQuickGameButton("defaultPvP.properties");
+//        button.setText("Default Game");
+//        return button;
+//    }
 
     private Node makeBoardOrnament() {
         Pane chessBoard = new ChessBoardOrnamentBuilder().build();
@@ -78,11 +88,11 @@ public class MenuLayoutBuilder extends LayoutBuilder {
     }
 
 
-    private Node makeWildCardButton() {
-        Button button = makeQuickGameButton("reallyBigBasicChess.properties");
-        button.setText("Wildcard 2 player");
-        return button;
-    }
+//    private Node makeWildCardButton() {
+////        Button button = makeQuickGameButton("reallyBigBasicChess.properties");
+//        button.setText("Wildcard 2 player");
+//        return button;
+//    }
 
 
     @Override

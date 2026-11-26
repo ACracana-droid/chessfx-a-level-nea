@@ -38,6 +38,7 @@ public class LayoutManager {
         Log.debug("LayoutManager", "Starting constructor...");
         this.appPane = appLevelBorderPane;
         this.popupManager = popupManager;
+        popupManager.setLayoutManager(this);
         this.chessConfig = chessConfig;
         this.appSettings = appSettings;
         initialiseLayouts();
@@ -97,6 +98,10 @@ public class LayoutManager {
 
     public PopupManager getPopupManager() {
         return popupManager;
+    }
+
+    public LayoutBuilder getCurrentLayoutBuilder() {
+        return currentLayout.layoutBuilder;
     }
 
 

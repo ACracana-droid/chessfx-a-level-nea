@@ -37,32 +37,7 @@ public abstract class LayoutBuilder implements Builder<Region> {
         return button;
     }
 
-    public EventHandler<ActionEvent> gameButtonAction(String chessConfigName, Runnable onCompleted) {
-        return event -> {
-            Task<Void> task = getChessConfigLoadTask(chessConfigName);
-            task.setOnSucceeded(taskEvent -> {
-                onCompleted.run();
-                Log.debug("Button event completed successfully.");
-            });
-            Log.debug("Button pressed...");
-            layoutButtonDisabledProperty.set(true);
-            Thread thread = new Thread(task);
-            thread.start();
-        };
-    }
 
-    private Task<Void> getChessConfigLoadTask(String chessConfigName) {
-        return new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                Log.debug("... Button task started...");
-
-                chessConfig.setChessConfigFromPropertiesResource(chessConfigName);
-                Log.debug("... Button task final line...");
-                return null;
-            }
-        };
-    }
 
     public Button makeGameButton(String text) {
         Button button = new Button(text);
@@ -105,19 +80,6 @@ public abstract class LayoutBuilder implements Builder<Region> {
         return vBox;
     }
 
-    /**
-     * Do not call if chess config has not been instantiated.
-     *
-     * @param chessConfigName
-     * @return Button which starts the configured game when pressed
-     */
-    protected Button makeQuickGameButton(String chessConfigName) {
-        Button button = new Button();
-        button.setOnAction(gameButtonAction(chessConfigName, () -> layoutManager.startup(LayoutManager.Layout.GAME)));
-        applyDisableSync(button);
-        return button;
-    }
-
 
     @Override
     abstract public Region build();
@@ -125,5 +87,9 @@ public abstract class LayoutBuilder implements Builder<Region> {
     public void startup() {
         enableButtons();
         layoutManager.setCurrentLayout(this.layout);
+    }
+
+    public void disableButtons() {
+        layoutButtonDisabledProperty.set(true);
     }
 }
